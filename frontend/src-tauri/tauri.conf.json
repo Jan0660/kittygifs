@@ -5,8 +5,8 @@
     "distDir": "Injected by vite-plugin-tauri"
   },
   "package": {
-    "productName": "MyApp",
-    "version": "1.0.0"
+    "productName": "kittygifs",
+    "version": "0.1.0"
   },
   "tauri": {
     "allowlist": {
@@ -19,7 +19,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.kittygifs-desktop.dev",
+      "identifier": "com.kittygifs.dev",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
