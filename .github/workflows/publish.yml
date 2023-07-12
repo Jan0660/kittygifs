@@ -17,11 +17,11 @@ jobs:
             - name: Checkout 🛎️
               uses: actions/checkout@v3
 
-            - name: Install webkit2gtk (ubuntu only)
+            - name: Install webkit2gtk, libxdo-dev (ubuntu only)
               if: matrix.platform == 'ubuntu-latest'
               run: |
                   sudo apt-get update
-                  sudo apt-get install -y webkit2gtk-4.0
+                  sudo apt-get install -y webkit2gtk-4.0 libxdo-dev
 
             - name: Setup PNPM
               uses: pnpm/action-setup@v2
