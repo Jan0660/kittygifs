@@ -1,0 +1,14 @@
+.gifs {
+    display: flex;
+    /* flex-wrap: wrap-reverse;
+    justify-content: center; */
+    margin: 0 auto;
+    max-width: 100vw;
+}
+.col {
+    flex: 1;
+}
+.gifPreview {
+    max-width: 100%;
+    background-color: gray;
+}
