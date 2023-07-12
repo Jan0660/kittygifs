@@ -56,6 +56,6 @@ jobs:
                   releaseDraft: true
                   prerelease: false
                   tauriScript: "pnpm"
-                  projectPath: ./frontend
-                  distPath: ./frontend/dist
+                  projectPath: ./frontend/src-tauri
+                  # distPath: ./frontend/dist
                   # iconPath: src-tauri/icons/icon.png
