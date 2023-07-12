@@ -45,6 +45,10 @@ jobs:
               working-directory: ./frontend
               run: pnpm install
 
+            - name: Build manually?
+              working-directory: ./frontend
+              run: pnpm build:tauri
+
             - name: Build 🔧
               uses: tauri-apps/tauri-action@v0
               env:
