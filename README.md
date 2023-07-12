@@ -1,5 +1,3 @@
-<img src="https://raw.githubusercontent.com/Jan0660/kittygifs/main/docs/img/logo.svg?sanitize=true" alt="kittygifs logo" width="200" align="right">
-
 # kittygifs
 
 A tool to optimize your gifkittyposting, and of course posting of other gifs.
