@@ -1,18 +1,29 @@
-import { Component, Suspense, createSignal } from "solid-js";
+import { Component, Show, Suspense, createEffect, createSignal } from "solid-js";
 import { useRouteData } from "@solidjs/router";
 import { GifViewData } from "../App";
 import GifPage from "./GifPage";
 import { client, getErrorString } from "..";
 import { AxiosError } from "axios";
+import { GifPreviewSingle } from "../GifPreviewSingle";
 
 const EditGifPage: Component = () => {
     const gif = useRouteData<typeof GifViewData>();
-    const [tags, setTags] = createSignal(gif().tags);
-    const [note, setNote] = createSignal(gif().note);
-    const [getPrivate, setPrivate] = createSignal(gif().private);
+
+    const [tags, setTags] = createSignal([]);
+    const [note, setNote] = createSignal('');
+    const [getPrivate, setPrivate] = createSignal(false);
     const [error, setError] = createSignal("");
+
+    createEffect(() => {
+        if (gif()) {
+            setTags(gif().tags)
+            setNote(gif().note)
+            setPrivate(gif().private)
+        }
+    })
+
     return (
-        <Suspense fallback={<h1>Loading... :)</h1>}>
+        <Show when={gif()} fallback={<h1>Loading... :)</h1>}>
             <h1>Edit Gif</h1>
             <h2>Editing</h2>
             {error() == "" ? <></> : <p>{error()}</p>}
@@ -61,8 +72,8 @@ const EditGifPage: Component = () => {
             </button>
 
             <h2>Original Post</h2>
-            <GifPage />
-        </Suspense>
+            <GifPreviewSingle gif={gif()} />
+        </Show>
     );
 };
 
