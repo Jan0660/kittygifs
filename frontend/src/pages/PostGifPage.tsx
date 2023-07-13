@@ -1,4 +1,4 @@
-import { Accessor, Component, For, Suspense, createSignal } from "solid-js";
+import { Accessor, Component, Suspense, createSignal } from "solid-js";
 import { Gif } from "../client/Client";
 import { useRouteData } from "@solidjs/router";
 import { GifPreviewSingle } from "../GifPreviewSingle";
@@ -12,66 +12,46 @@ const PostGifPage: Component = () => {
     const [note, setNote] = createSignal("");
     return (
         <>
-            <div class="content-header">
-                <h1>Post Gif</h1>
-
-            </div>
-            <div class="content-content">
-
-                <div class="error">
-                    {error() == "" ? <></> : <p>{error()}</p>}
-                </div>
-                <input
-                    type="text"
-                    placeholder="URL"
-                    value={url()}
-                    class="input"
-                    onInput={e => setUrl(e.currentTarget.value)}
-                />
-                <br />
-                <For each={tags()}>
-                    {tag => {
-                        return (
-                            <span class="tag">
-                                {tag}
-                            </span>
-                        )
-                    }}
-                </For><br />
-                <input
-                    type="text"
-                    placeholder="Tags"
-                    value={tags().join(" ")}
-                    class="input"
-                    onInput={e => setTags(e.currentTarget.value.split(" "))}
-                />
-                <br />
-                <input
-                    type="text"
-                    placeholder="Note"
-                    value={note()}
-                    class="input"
-                    onInput={e => setNote(e.currentTarget.value)}
-                />
-                <br />
-                <button
-                    onClick={async () => {
-                        try {
-                            const gif = await client.postGif({
-                                url: url(),
-                                tags: tags(),
-                                note: note(),
-                                private: false,
-                            });
-                            window.location.href = `/gifs/${gif.id}`;
-                        } catch (e) {
-                            setError(getErrorString(e));
-                        }
-                    }}
-                >
-                    Post Gif
-                </button>
-            </div>
+            <h1>Post Gif</h1>
+            {error() == "" ? <></> : <p>{error()}</p>}
+            <input
+                type="text"
+                placeholder="URL"
+                value={url()}
+                onInput={e => setUrl(e.currentTarget.value)}
+            />
+            <br />
+            <input
+                type="text"
+                placeholder="Tags"
+                value={tags().join(" ")}
+                onInput={e => setTags(e.currentTarget.value.split(" "))}
+            />
+            <br />
+            <input
+                type="text"
+                placeholder="Note"
+                value={note()}
+                onInput={e => setNote(e.currentTarget.value)}
+            />
+            <br />
+            <button
+                onClick={async () => {
+                    try {
+                        const gif = await client.postGif({
+                            url: url(),
+                            tags: tags(),
+                            note: note(),
+                            private: false,
+                        });
+                        window.location.href = `/gifs/${gif.id}`;
+                    } catch (e) {
+                        setError(getErrorString(e));
+                    }
+                }}
+            >
+                Post Gif
+            </button>
         </>
     );
 };

@@ -4,8 +4,6 @@ import App from "./App";
 import { KittyGifsClient } from "./client/Client";
 import localforage from "localforage";
 import { AxiosError } from "axios";
-import './skybord-components.css'
-import './skybord-main.css'
 
 interface Config {
     token?: string;
