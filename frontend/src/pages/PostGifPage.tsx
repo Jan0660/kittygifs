@@ -13,7 +13,9 @@ const PostGifPage: Component = () => {
     return (
         <>
             <h1>Post Gif</h1>
-            {error() == "" ? <></> : <p>{error()}</p>}
+            <div class="error">
+                {error() == "" ? <></> : <p>{error()}</p>}
+            </div>
             <input
                 type="text"
                 placeholder="URL"

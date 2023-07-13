@@ -11,7 +11,9 @@ const LoginPage: Component = () => {
                 <h1>Login</h1>
             </div>
             <div class="content-content">
-                {error() == "" ? <></> : <p>{error()}</p>}
+                <div class="error">
+                    {error() == "" ? <></> : <p>{error()}</p>}
+                </div>
                 <h3>Username</h3>
                 <input
                     type="text"

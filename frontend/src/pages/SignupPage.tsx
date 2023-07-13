@@ -9,7 +9,9 @@ const SignupPage: Component = () => {
     return (
         <>
             <h1>Login</h1>
-            {error() == "" ? <></> : <p>{error()}</p>}
+            <div class="error">
+                {error() == "" ? <></> : <p>{error()}</p>}
+            </div>
             <h2>Username</h2>
             <input
                 type="text"

@@ -8,7 +8,9 @@ const LogoutPage: Component = () => {
     return (
         <>
             <h1>Are you sure?</h1>
-            {error() == "" ? <></> : <p>{error()}</p>}
+            <div class="error">
+                {error() == "" ? <></> : <p>{error()}</p>}
+            </div>
             <br />
             <button
                 onClick={async () => {
