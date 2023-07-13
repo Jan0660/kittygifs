@@ -1,51 +1,35 @@
-import { createSignal, type Component, Show } from "solid-js";
+import { createSignal, type Component, Show, For } from "solid-js";
 import { Gif } from "../client/Client";
 import "../index.css";
 import QueryInput from "../QueryInput";
 import { GifPreviewSingle } from "../GifPreviewSingle";
 import { config } from "..";
+import { SearchHighlight } from "../components/SearchHighlight";
 
 const IndexPage: Component = () => {
     const [gifs, setGifs] = createSignal([] as Gif[]);
+    const [query, setQuery] = createSignal('');
 
     return (
         <>
-            <Show when={config.token != null}>
-                <a href="/gifs/post">Post</a>
-                <br />
-            </Show>
-            <QueryInput setGifs={setGifs} />
-
-            <div class="gifs">
-                {(() => {
-                    const columnCount = 3;
-                    const columns = [];
-                    for (let i = 0; i < columnCount; i++) {
-                        columns.push([]);
-                    }
-                    gifs().forEach((gif, i) => {
-                        columns[i % columnCount].push(
-                            <a href={`/gifs/${gif.id}`}>
-                                <GifPreviewSingle gif={gif} tryForceCache />
-                            </a>,
-                        );
-                        return;
-                    });
-                    return columns.map(col => (
-                        <div class="col" style={{ "max-width": `calc(100% / ${columnCount})` }}>
-                            {col}
-                        </div>
-                    ));
-                })()}
+            <div class="content-header">
+                <h2>Home page</h2>
             </div>
-            <Show when={config.token == null}>
-                <a href="/login">Login</a><br/>
-                <a href="/signup">Signup</a>
-            </Show>
-            <Show when={config.token != null}>
-                <a href="/logout">Log out</a> <br />
-                <a href="/resetPassword">Reset Password</a>
-            </Show>
+            <div class="content-content">
+
+                <QueryInput setGifs={setGifs} setQuery={setQuery} />
+
+                <div class="gifs">
+                    <For each={gifs()}>
+                        {(gif, i) => (
+                            <a href={`/gifs/${gif.id}`} style="width: 100%; height: auto;" class="gif-link">
+                                <GifPreviewSingle gif={gif} tryForceCache />
+                                <SearchHighlight gif={gif} query={query()}></SearchHighlight>
+                            </a>
+                        )}
+                    </For>
+                </div>
+            </div>
         </>
     );
 };
