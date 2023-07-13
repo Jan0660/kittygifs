@@ -7,39 +7,48 @@ const LoginPage: Component = () => {
     const [password, setPassword] = createSignal("");
     return (
         <>
-            <h1>Login</h1>
-            {error() == "" ? <></> : <p>{error()}</p>}
-            <h2>Username</h2>
-            <input
-                type="text"
-                value={username()}
-                onInput={e => {
-                    setUsername(e.currentTarget.value);
-                }}
-            />
-            <h2>Password</h2>
-            <input
-                type="password"
-                value={password()}
-                onInput={e => {
-                    setPassword(e.currentTarget.value);
-                }}
-            />
-            <br />
-            <button
-                onClick={async () => {
-                    try {
-                        const token = await client.createSession(username(), password());
-                        config.token = token;
-                        await saveConfig();
-                        window.location.href = "/";
-                    } catch (e) {
-                        setError(getErrorString(e));
-                    }
-                }}
-            >
-                Login
-            </button>
+            <div class="content-header">
+                <h1>Login</h1>
+            </div>
+            <div class="content-content">
+                {error() == "" ? <></> : <p>{error()}</p>}
+                <h3>Username</h3>
+                <input
+                    type="text"
+                    value={username()}
+                    class="input"
+                    onInput={e => {
+                        setUsername(e.currentTarget.value);
+                    }}
+                    required
+                />
+                <h3>Password</h3>
+                <input
+                    type="password"
+                    value={password()}
+                    class="input"
+                    onInput={e => {
+                        setPassword(e.currentTarget.value);
+                    }}
+                    required
+                />
+                <br />
+                <button
+                    class="button"
+                    onClick={async () => {
+                        try {
+                            const token = await client.createSession(username(), password());
+                            config.token = token;
+                            await saveConfig();
+                            window.location.href = "/";
+                        } catch (e) {
+                            setError(getErrorString(e));
+                        }
+                    }}
+                >
+                    Login
+                </button>
+            </div>
         </>
     );
 };
