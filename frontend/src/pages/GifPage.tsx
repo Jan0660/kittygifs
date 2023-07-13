@@ -7,7 +7,6 @@ import { client, config, getErrorString } from "..";
 
 const GifPage: Component = () => {
     const gif = useRouteData<typeof GifViewData>();
-    console.log(gif())
     const [deleteAreYouSure, setDeleteAreYouSure] = createSignal(false);
     return (
         <>
