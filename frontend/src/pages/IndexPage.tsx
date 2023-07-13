@@ -22,11 +22,9 @@ const IndexPage: Component = () => {
                 <div class="gifs">
                     <For each={gifs()}>
                         {(gif, i) => (
-                            <a href={`/gifs/${gif.id}`}>
-                                <div style="width: 100%; height: auto;">
-                                    <GifPreviewSingle gif={gif} tryForceCache />
-                                    <SearchHighlight gif={gif} query={query()}></SearchHighlight>
-                                </div>
+                            <a href={`/gifs/${gif.id}`} style="width: 100%; height: auto;" class="gif-link">
+                                <GifPreviewSingle gif={gif} tryForceCache />
+                                <SearchHighlight gif={gif} query={query()}></SearchHighlight>
                             </a>
                         )}
                     </For>

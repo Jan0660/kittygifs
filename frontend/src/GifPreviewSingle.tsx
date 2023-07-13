@@ -22,7 +22,7 @@ export const GifPreviewSingle: Component<Props> = (props: Props) => {
             .catch(e => { });
     }
     const extraProps = {};
-    let style = { "width": "100%", "height": "100%", "object-fit": "cover" };
+    let style = { "width": "100%", "height": "80%", "object-fit": "contain" };
     // if (gif.size) {
     //     // sizeProps["width"] = gif.size.width;
     //     // sizeProps["height"] = gif.size.height;

@@ -1,4 +1,4 @@
-import { createSignal, type Component, createEffect } from "solid-js";
+import { createSignal, type Component, createEffect, For } from "solid-js";
 import { Gif } from "../client/Client";
 import "../index.css";
 import { invoke } from "@tauri-apps/api/tauri";
@@ -18,6 +18,24 @@ const PopupPage: Component = () => {
         queryInput.focus();
     })
 
+    const shorten = (url: string) => {
+        let match = /^https:\/\/tenor.com\/view\/.*-(?<id>\d+)$/gi.exec(url);
+        if (match) {
+            return `https://tenor.com/view/${match.groups?.id}`;
+        }
+        return url;
+    };
+
+    const selected = (gif) => {
+        invoke("selected", { url: shorten(gif.url) });
+        const queryInput = document.getElementById(
+            "queryInput",
+        ) as HTMLInputElement;
+        queryInput.value = "";
+        queryInput.focus();
+        setGifs([]);
+    };
+
     return (
         <>
             <div class="content-header" style="padding-top: 20px">
@@ -29,44 +47,17 @@ const PopupPage: Component = () => {
                 </style>
 
                 <QueryInput setGifs={setGifs} setQuery={setQuery} />
+                Pro tip: you can use tab and shift + tab to cycle between gifs, and use enter to send
 
                 <div class="gifs">
-                    {(() => {
-                        let tabIndex = 0;
-                        const columnCount = 3;
-                        const columns = [];
-                        for (let i = 0; i < columnCount; i++) {
-                            columns.push([]);
-                        }
-                        gifs().forEach((gif, i) => {
-                            const shorten = (url: string) => {
-                                let match = /^https:\/\/tenor.com\/view\/.*-(?<id>\d+)$/gi.exec(url);
-                                if (match) {
-                                    return `https://tenor.com/view/${match.groups?.id}`;
-                                }
-                                return url;
-                            };
-                            const selected = () => {
-                                invoke("selected", { url: shorten(gif.url) });
-                                const queryInput = document.getElementById(
-                                    "queryInput",
-                                ) as HTMLInputElement;
-                                queryInput.value = "";
-                                queryInput.focus();
-                                setGifs([]);
-                            };
-                            columns[i % columnCount].push(
-                                <GifPreviewSingle gif={gif} onClick={selected} tryForceCache tabIndex={tabIndex++} />,
-                                <SearchHighlight gif={gif} query={query()} />
-                            );
-                            return;
-                        });
-                        return columns.map(col => (
-                            <div class="col" style={{ "max-width": `calc(100% / ${columnCount})` }}>
-                                {col}
-                            </div>
-                        ));
-                    })()}
+                    <For each={gifs()}>
+                        {(gif, i) => (
+                            <a href='#' style="width: 100%; height: auto;" onClick={() => (selected(gif))} class="gif-link">
+                                <GifPreviewSingle gif={gif} tryForceCache />
+                                <SearchHighlight gif={gif} query={query()}></SearchHighlight>
+                            </a>
+                        )}
+                    </For>
                 </div>
             </div>
         </>
