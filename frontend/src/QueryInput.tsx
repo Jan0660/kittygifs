@@ -1,4 +1,4 @@
-import { Component, Setter } from "solid-js";
+import { Component, Setter, onMount } from "solid-js";
 import { client } from "./index";
 import { Gif } from "./client/Client";
 
@@ -9,6 +9,11 @@ type Props = {
 
 const QueryInput: Component<Props> = (props: Props) => {
     let abortLast: AbortController | null = null;
+    onMount(() => {
+        client.searchGifs('').then(res => {
+            props.setGifs(res);
+        });
+    })
     return (
         <>
             <input

@@ -1,13 +1,9 @@
 .gifs {
-    display: flex;
-    /* flex-wrap: wrap-reverse;
-    justify-content: center; */
-    margin: 0 auto;
-    max-width: 100vw;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 300px));
+    grid-gap: 20px;
 }
-.col {
-    flex: 1;
-}
+
 .gifPreview {
     max-width: 100%;
     background-color: gray;

@@ -20,29 +20,16 @@ const IndexPage: Component = () => {
                 <QueryInput setGifs={setGifs} setQuery={setQuery} />
 
                 <div class="gifs">
-                    {(() => {
-                        const columnCount = 3;
-                        const columns = [];
-                        for (let i = 0; i < columnCount; i++) {
-                            columns.push([]);
-                        }
-                        gifs().forEach((gif, i) => {
-                            columns[i % columnCount].push(
-                                <a href={`/gifs/${gif.id}`}>
-                                    <div style="display: grid; grid-template-rows: auto auto">
-                                        <GifPreviewSingle gif={gif} tryForceCache />
-                                        <SearchHighlight gif={gif} query={query()}></SearchHighlight>
-                                    </div>
-                                </a>,
-                            );
-                            return;
-                        });
-                        return columns.map(col => (
-                            <div class="col" style={{ "max-width": `calc(100% / ${columnCount})` }}>
-                                {col}
-                            </div>
-                        ));
-                    })()}
+                    <For each={gifs()}>
+                        {(gif, i) => (
+                            <a href={`/gifs/${gif.id}`}>
+                                <div style="width: 100%; height: auto;">
+                                    <GifPreviewSingle gif={gif} tryForceCache />
+                                    <SearchHighlight gif={gif} query={query()}></SearchHighlight>
+                                </div>
+                            </a>
+                        )}
+                    </For>
                 </div>
             </div>
         </>

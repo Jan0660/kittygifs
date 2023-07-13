@@ -23,15 +23,15 @@ const App: Component = () => {
                     <ul class="navbar-links">
                         <li>
                             <Show when={config.token == null}>
-                                <a href="/login" class="link">Login</a> or {" "}
-                                <a href="/signup" class="link">Signup</a>
+                                <a href="/login" class="button">Login</a> or {" "}
+                                <a href="/signup" class="button">Signup</a>
                             </Show>
                             <Show when={config.token != null}>
-                                <a href="/logout" class="link">Log out</a> or {" "}
-                                <a href="/resetPassword" class="link">Reset Password</a>
+                                <a href="/logout" class="button">Log out</a>
+                                <a href="/resetPassword" class="button">Reset Password</a>
+                                <a href="/gifs/post" class="button">Post</a>
                             </Show>
                             <Show when={config.token != null}>
-                                <a href="/gifs/post">Post</a>
                                 <br />
                             </Show>
                         </li>
