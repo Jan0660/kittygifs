@@ -17,17 +17,17 @@ export const GifPreviewSingle: Component<Props> = (props: Props) => {
         caches
             .open("kitty-gifs")
             .then(cache => {
-                cache.add(previewUrl).catch(e => {});
+                cache.add(previewUrl).catch(e => { });
             })
-            .catch(e => {});
+            .catch(e => { });
     }
     const extraProps = {};
-    let style = { "max-width": "100%" };
-    if (gif.size) {
-        // sizeProps["width"] = gif.size.width;
-        // sizeProps["height"] = gif.size.height;
-        style["max-height"] = `${gif.size.height}px`;
-    }
+    let style = { "width": "100%", "height": "80%", "object-fit": "contain" };
+    // if (gif.size) {
+    //     // sizeProps["width"] = gif.size.width;
+    //     // sizeProps["height"] = gif.size.height;
+    //     style["max-height"] = `${gif.size.height}px`;
+    // }
     if (props.tabIndex != null) {
         extraProps["tabindex"] = props.tabIndex;
     }
