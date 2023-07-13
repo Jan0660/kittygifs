@@ -1,10 +1,11 @@
-import { createSignal, type Component, createEffect, For } from "solid-js";
+import { createSignal, type Component, createEffect, For, Show } from "solid-js";
 import { Gif } from "../client/Client";
 import "../index.css";
 import { invoke } from "@tauri-apps/api/tauri";
 import { GifPreviewSingle } from "../GifPreviewSingle";
 import QueryInput from "../QueryInput";
 import { SearchHighlight } from "../components/SearchHighlight";
+import { config } from "..";
 
 const PopupPage: Component = () => {
     const [gifs, setGifs] = createSignal([] as Gif[]);
@@ -53,8 +54,10 @@ const PopupPage: Component = () => {
                     <For each={gifs()}>
                         {(gif, i) => (
                             <a href='#' style="width: 100%; height: auto;" onClick={() => (selected(gif))} class="gif-link">
-                                <GifPreviewSingle gif={gif} tryForceCache />
-                                <SearchHighlight gif={gif} query={query()}></SearchHighlight>
+                                <GifPreviewSingle gif={gif} tryForceCache height={config.searchHighlightInPopup ? null : "100%"} />
+                                <Show when={config.searchHighlightInPopup}>
+                                    <SearchHighlight gif={gif} query={query()}></SearchHighlight>
+                                </Show>
                             </a>
                         )}
                     </For>

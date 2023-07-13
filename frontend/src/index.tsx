@@ -9,12 +9,17 @@ import './skybord-main.css'
 
 interface Config {
     token?: string;
+    searchHighlight: boolean;
+    searchHighlightInPopup: boolean;
 }
 
 let item = (await localforage.getItem("kittygifs.config")) as Config;
 
 if (!item) {
-    item = {};
+    item = {
+        searchHighlight: true,
+        searchHighlightInPopup: false,
+    };
     await localforage.setItem("kittygifs.config", item);
 }
 

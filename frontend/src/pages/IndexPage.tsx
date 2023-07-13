@@ -24,7 +24,9 @@ const IndexPage: Component = () => {
                         {(gif, i) => (
                             <a href={`/gifs/${gif.id}`} style="width: 100%; height: auto;" class="gif-link">
                                 <GifPreviewSingle gif={gif} tryForceCache />
-                                <SearchHighlight gif={gif} query={query()}></SearchHighlight>
+                                <Show when={config.searchHighlight}>
+                                    <SearchHighlight gif={gif} query={query()}></SearchHighlight>
+                                </Show>
                             </a>
                         )}
                     </For>
