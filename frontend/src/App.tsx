@@ -1,4 +1,4 @@
-import { lazy, type Component, createResource, ErrorBoundary, Show } from "solid-js";
+import { lazy, type Component, createResource, ErrorBoundary, Show, For } from "solid-js";
 import { Route, Routes } from "@solidjs/router";
 import { client, getErrorString, config } from ".";
 
@@ -41,7 +41,36 @@ const App: Component = () => {
             <ErrorBoundary
                 fallback={e => {
                     console.error(e);
-                    return <h1>Failed to load :( - {getErrorString(e)}</h1>;
+                    return (
+                        <div class="content">
+                            <div class="content-header">
+                                <h2>
+                                    Page failed to load! :(
+                                </h2>
+                            </div>
+                            <div class="content-content">
+                                <div class="error">
+                                    <p>
+
+                                        {getErrorString(e)}
+                                    </p>
+                                </div>
+                                <For each={e.stack.split('\n')}>
+                                    {line => (
+                                        <>
+                                            <div style="font-weight: bold">
+                                                {line.match(/(?<=at ).+(?= \()/)}
+                                            </div>
+                                            <code>
+                                                {line.match(/(?<=\().+(?=\))/)}
+                                            </code>
+                                        </>
+                                    )}
+                                </For>
+                            </div>
+                        </div>
+
+                    )
                 }}
             >
                 <div class="content">
