@@ -49,9 +49,9 @@ const App: Component = () => {
                                 </h2>
                             </div>
                             <div class="content-content">
+                                <code>{location.href}</code>
                                 <div class="error">
                                     <p>
-
                                         {getErrorString(e)}
                                     </p>
                                 </div>
