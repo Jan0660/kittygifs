@@ -1,4 +1,4 @@
-import { createSignal, type Component } from "solid-js";
+import { createSignal, type Component, createEffect } from "solid-js";
 import { Gif } from "../client/Client";
 import "../index.css";
 import { invoke } from "@tauri-apps/api/tauri";
@@ -8,6 +8,15 @@ import { SearchHighlight } from "../components/SearchHighlight";
 
 const PopupPage: Component = () => {
     const [gifs, setGifs] = createSignal([] as Gif[]);
+    const [query, setQuery] = createSignal('');
+
+    createEffect(() => { //Focus search bar after window opens
+        const queryInput = document.getElementById(
+            "queryInput",
+        ) as HTMLInputElement;
+        queryInput.value = "";
+        queryInput.focus();
+    })
 
     return (
         <>
