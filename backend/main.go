@@ -56,8 +56,8 @@ func main() {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		if config.AccessControlAllowOrigin == "" {
-			config.AccessControlAllowOrigin = "*" // default to allow all origins
+		if config.AccessControlAllowOrigin == nil {
+			config.AccessControlAllowOrigin = &[]string{"*"} // default to allow all origins
 		}
 	}
 	var client *mongo.Client
@@ -98,7 +98,23 @@ func main() {
 
 	r := gin.Default()
 	r.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", config.AccessControlAllowOrigin)
+		if config.AccessControlAllowOrigin != nil {
+			acao := config.AccessControlAllowOrigin
+			if len(*acao) == 1 {
+				c.Header("Access-Control-Allow-Origin", (*acao)[0])
+			} else {
+				c.Header("Vary", "Origin")
+				origin := c.GetHeader("Origin")
+				if origin != "" {
+					for _, allowedOrigin := range *acao {
+						if origin == allowedOrigin {
+							c.Header("Access-Control-Allow-Origin", origin)
+							break
+						}
+					}
+				}
+			}
+		}
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, x-session-token, accept, origin, Cache-Control, X-Requested-With")
 		c.Header("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, PATCH, DELETE")
 		c.Header("Access-Control-Max-Age", "86400")
@@ -727,8 +743,8 @@ type UserSession struct {
 type Config struct {
 	MongoUrl string `json:"mongoUrl"`
 	// todo: rename to databaseName
-	MongoDatabase            string `json:"mongoDatabase"`
-	Address                  string `json:"address"`
-	AllowSignup              bool   `json:"allowSignup"`
-	AccessControlAllowOrigin string `json:"accessControlAllowOrigin"`
+	MongoDatabase            string    `json:"mongoDatabase"`
+	Address                  string    `json:"address"`
+	AllowSignup              bool      `json:"allowSignup"`
+	AccessControlAllowOrigin *[]string `json:"accessControlAllowOrigin"`
 }
