@@ -7,29 +7,28 @@ use global_hotkey::{
     hotkey::{Code, HotKey, Modifiers},
     GlobalHotKeyEvent, GlobalHotKeyManager,
 };
-use std::sync::Mutex;
+use serde::{Deserialize, Serialize};
+use std::{str::FromStr, sync::Mutex};
 use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
     WindowEvent,
 };
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct Config {
+    // should be of keyboard_types::Modifiers type
+    modifiers: Modifiers,
+    // should be of keyboard_types::Code type
+    code: Code,
+}
+
 lazy_static::lazy_static! {
     static ref APP_HANDLE: Mutex<Option<tauri::AppHandle>> = Mutex::new(None);
+    static ref CONFIG_PATH: Mutex<Option<std::path::PathBuf>> = Mutex::new(None);
+    static ref CONFIG: Mutex<Option<Config>> = Mutex::new(None);
 }
 
 fn main() {
-    let hotkey_manager = GlobalHotKeyManager::new().unwrap();
-    hotkey_manager
-        .register(HotKey::new(Some(Modifiers::CONTROL), Code::KeyD))
-        .unwrap();
-    GlobalHotKeyEvent::set_event_handler(Some(move |_event| {
-        // println!("hotkey pressed: {:?}", event);
-        let app = APP_HANDLE.lock().unwrap().as_ref().unwrap().clone();
-        let window = app.get_window("popup").unwrap();
-        window.show().unwrap();
-        window.unminimize().unwrap();
-        window.set_focus().unwrap();
-    }));
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let hide = CustomMenuItem::new("hide".to_string(), "Hide");
     let hide_popup = CustomMenuItem::new("hide_popup".to_string(), "Hide Popup");
@@ -84,9 +83,37 @@ fn main() {
                     _ => {}
                 }
             });
+            // load the config
+            let config_dir = app.path_resolver().app_config_dir().unwrap();
+            std::fs::create_dir_all(&config_dir).unwrap();
+            let config = config_dir.join("config.json");
+            println!("config path: {:?}", config);
+            CONFIG_PATH.lock().unwrap().replace(config.clone());
+            let config = match std::fs::File::open(config) {
+                Ok(file) => serde_json::from_reader::<std::fs::File, Config>(file)
+                    .expect("Failed to parse config file"),
+                Err(_) => Config {
+                    modifiers: Modifiers::CONTROL | Modifiers::SHIFT,
+                    code: Code::KeyG,
+                },
+            };
+            CONFIG.lock().unwrap().replace(config.clone());
+            // register hotkeys
+            let hotkey_manager = GlobalHotKeyManager::new().unwrap();
+            hotkey_manager
+                .register(HotKey::new(Some(config.modifiers), config.code))
+                .unwrap();
+            GlobalHotKeyEvent::set_event_handler(Some(move |_event| {
+                // println!("hotkey pressed: {:?}", event);
+                let app = APP_HANDLE.lock().unwrap().as_ref().unwrap().clone();
+                let window = app.get_window("popup").unwrap();
+                window.show().unwrap();
+                window.unminimize().unwrap();
+                window.set_focus().unwrap();
+            }));
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![selected])
+        .invoke_handler(tauri::generate_handler![selected, set_hotkey, get_config])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -110,4 +137,26 @@ fn selected(url: &str, window: tauri::Window) {
     //     ctx.set_contents(previous.unwrap());
     // }
     window.hide().unwrap();
+}
+
+#[tauri::command]
+fn set_hotkey(modifiers: u32, code: &str) {
+    let modifiers = Modifiers::from_bits(modifiers).unwrap();
+    let code = Code::from_str(code).unwrap();
+    let mut binding = CONFIG.lock().unwrap();
+    let mut config = binding.as_mut().unwrap();
+    config.modifiers = modifiers;
+    config.code = code;
+    save_config(&config);
+}
+
+#[tauri::command]
+async fn get_config() -> Config {
+    CONFIG.lock().unwrap().clone().unwrap()
+}
+
+fn save_config(config: &Config) {
+    let config_path = CONFIG_PATH.lock().unwrap().as_ref().unwrap().clone();
+    let file = std::fs::File::create(config_path).unwrap();
+    serde_json::to_writer(file, &config).unwrap();
 }

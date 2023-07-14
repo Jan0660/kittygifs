@@ -23,13 +23,27 @@ const App: Component = () => {
                     <ul class="navbar-links">
                         <li>
                             <Show when={config.token == null}>
-                                <a href="/login" class="button">Login</a> or {" "}
-                                <a href="/signup" class="button">Signup</a>
+                                <a href="/login" class="button">
+                                    Login
+                                </a>{" "}
+                                or{" "}
+                                <a href="/signup" class="button">
+                                    Signup
+                                </a>
                             </Show>
                             <Show when={config.token != null}>
-                                <a href="/logout" class="button">Log out</a>
-                                <a href="/resetPassword" class="button">Reset Password</a>
-                                <a href="/gifs/post" class="button">Post</a>
+                                <a href="/gifs/post" class="button">
+                                    Post
+                                </a>
+                                <a href="/settings" class="button">
+                                    Settings
+                                </a>
+                                <a href="/resetPassword" class="button">
+                                    Reset Password
+                                </a>
+                                <a href="/logout" class="button">
+                                    Log out
+                                </a>
                             </Show>
                             <Show when={config.token != null}>
                                 <br />
@@ -44,33 +58,26 @@ const App: Component = () => {
                     return (
                         <div class="content">
                             <div class="content-header">
-                                <h2>
-                                    Page failed to load! :(
-                                </h2>
+                                <h2>Page failed to load! :(</h2>
                             </div>
                             <div class="content-content">
                                 <code>{location.href}</code>
                                 <div class="error">
-                                    <p>
-                                        {getErrorString(e)}
-                                    </p>
+                                    <p>{getErrorString(e)}</p>
                                 </div>
-                                <For each={e.stack.split('\n')}>
+                                <For each={e.stack.split("\n")}>
                                     {line => (
                                         <>
                                             <div style="font-weight: bold">
                                                 {line.match(/(?<=at ).+(?= \()/)}
                                             </div>
-                                            <code>
-                                                {line.match(/(?<=\().+(?=\))/)}
-                                            </code>
+                                            <code>{line.match(/(?<=\().+(?=\))/)}</code>
                                         </>
                                     )}
                                 </For>
                             </div>
                         </div>
-
-                    )
+                    );
                 }}
             >
                 <div class="content">
@@ -92,11 +99,21 @@ const App: Component = () => {
                             component={lazy(() => import("./pages/PostGifPage"))}
                         />
                         <Route path="/login" component={lazy(() => import("./pages/LoginPage"))} />
-                        <Route path="/logout" component={lazy(() => import("./pages/LogoutPage"))} />
-                        <Route path="/signup" component={lazy(() => import("./pages/SignupPage"))} />
+                        <Route
+                            path="/logout"
+                            component={lazy(() => import("./pages/LogoutPage"))}
+                        />
+                        <Route
+                            path="/signup"
+                            component={lazy(() => import("./pages/SignupPage"))}
+                        />
                         <Route
                             path="/resetPassword"
                             component={lazy(() => import("./pages/ResetPasswordPage"))}
+                        />
+                        <Route
+                            path="/settings"
+                            component={lazy(() => import("./pages/SettingsPage"))}
                         />
                     </Routes>
                 </div>

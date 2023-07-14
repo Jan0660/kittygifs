@@ -11,6 +11,7 @@ interface Config {
     token?: string;
     searchHighlight: boolean;
     searchHighlightInPopup: boolean;
+    apiUrl: string;
 }
 
 let item = (await localforage.getItem("kittygifs.config")) as Config;
@@ -19,6 +20,7 @@ if (!item) {
     item = {
         searchHighlight: true,
         searchHighlightInPopup: false,
+        apiUrl: import.meta.env.VITE_API_URL,
     };
     await localforage.setItem("kittygifs.config", item);
 }
@@ -29,7 +31,10 @@ export const saveConfig = async () => {
     await localforage.setItem("kittygifs.config", config);
 };
 
-export const client = new KittyGifsClient("http://localhost:8234", config.token);
+globalThis.config = config;
+globalThis.saveConfig = saveConfig;
+
+export const client = new KittyGifsClient(config.apiUrl, config.token);
 
 export function getErrorString(e: Error): string {
     if (e instanceof AxiosError) {

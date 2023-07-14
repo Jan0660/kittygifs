@@ -77,6 +77,7 @@ version = "0.1.0"
 dependencies = [
  "enigo",
  "global-hotkey",
+ "keyboard-types",
  "lazy_static",
  "notify-rust",
  "serde",

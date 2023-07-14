@@ -26,6 +26,7 @@ global-hotkey = "0.2.2"
 lazy_static = "1.4.0"
 # tauri-plugin-global-shortcut = "2.0.0-alpha.0"
 notify-rust = "4.8.0"
+keyboard-types = {version = "0.6.2", features = ["serde"] }
 
 [features]
 default = ["custom-protocol"]
