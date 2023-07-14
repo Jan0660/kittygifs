@@ -36,7 +36,7 @@ const LoginPage: Component = () => {
                 />
                 <br />
                 <button
-                    class="button"
+                    class="button confirm"
                     onClick={async () => {
                         try {
                             const token = await client.createSession(username(), password());
