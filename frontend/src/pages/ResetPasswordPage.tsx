@@ -8,11 +8,9 @@ const ResetPasswordPage: Component = () => {
     return (
         <>
             <div class="content-header">
-                <h1>Are you sure you want to log out?</h1>
+                <h1>Password Reset</h1>
             </div>
             <div class="content-content">
-
-                <h1>Password Reset</h1>
                 <div class="error">
                     {error() == "" ? <></> : <p>{error()}</p>}
                 </div>
