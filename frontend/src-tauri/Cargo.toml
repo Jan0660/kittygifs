@@ -12,12 +12,12 @@ build = "src/build.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.4", features = [] }
+tauri-build = { version = "2.0.0-alpha.6", features = ["tauri-codegen"] }
 
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.4.1", features = ["api-all", "default", "devtools", "system-tray"] }
+tauri = { version = "2.0.0-alpha.10", features = ["default", "devtools", "system-tray"] }
 # enigo = "0.1.2"
 # enigo = { path = "C:\\Users\\Jan\\source\\enigo" }
 enigo = { git = "https://github.com/Jan0660/enigo.git", hash = "96c894435acbada65156e38a10ba8dfa78652267"}
@@ -26,7 +26,8 @@ global-hotkey = "0.2.2"
 lazy_static = "1.4.0"
 # tauri-plugin-global-shortcut = "2.0.0-alpha.0"
 notify-rust = "4.8.0"
-keyboard-types = {version = "0.6.2", features = ["serde"] }
+keyboard-types = { version = "0.6.2", features = ["serde"] }
+clap = { version = "4.3.12", features = ["derive"] }
 
 [features]
 default = ["custom-protocol"]

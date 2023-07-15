@@ -38,4 +38,4 @@ Whether to allow users to sign up. If set to `false`, only users that are alread
 
 ### `accessControlAllowOrigin`
 
-Values for the `Access-Control-Allow-Origin` header. Set to `["*"]` to allow all origins. See [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) for more info. If multiple origins are provided the one that matches the `Origin` header will be sent on the requests. Remember to include `https://tauri.localhost` if you want the Tauri app to work.
+Values for the `Access-Control-Allow-Origin` header. Set to `["*"]` to allow all origins. See [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) for more info. If multiple origins are provided the one that matches the `Origin` header will be sent on the requests. Remember to include `https://tauri.localhost` and `tauri://localhost` if you want the Tauri app to work.

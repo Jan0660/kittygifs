@@ -35,9 +35,6 @@ const App: Component = () => {
                                 <a href="/gifs/post" class="button">
                                     Post
                                 </a>
-                                <a href="/settings" class="button">
-                                    Settings
-                                </a>
                                 <a href="/resetPassword" class="button">
                                     Reset Password
                                 </a>
@@ -45,6 +42,9 @@ const App: Component = () => {
                                     Log out
                                 </a>
                             </Show>
+                            <a href="/settings" class="button">
+                                Settings
+                            </a>
                             <Show when={config.token != null}>
                                 <br />
                             </Show>

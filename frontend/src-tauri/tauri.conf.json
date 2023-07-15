@@ -9,9 +9,6 @@
     "version": "0.1.0"
   },
   "tauri": {
-    "allowlist": {
-      "all": true
-    },
     "systemTray": {
       "iconPath": "icons/icon.png",
       "iconAsTemplate": true
@@ -30,7 +27,7 @@
       "resources": [],
       "externalBin": [],
       "copyright": "",
-      "category": "DeveloperTool",
+      "category": "Utility",
       "shortDescription": "",
       "longDescription": "",
       "deb": {
@@ -52,9 +49,6 @@
           "type": "downloadBootstrapper"
         }
       }
-    },
-    "updater": {
-      "active": false
     },
     "windows": [
       {

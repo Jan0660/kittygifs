@@ -12,7 +12,9 @@ export type Props = {
 export const GifPreviewSingle: Component<Props> = (props: Props) => {
     const { gif, onClick } = props;
     // force indefinite caching
-    const previewVideoUrl = gif.previewVideoWebm ?? gif.previewVideo;
+    // use webm if not on webkit
+    const canUseWebm = navigator.userAgent.toLowerCase().indexOf("webkit") > -1;
+    const previewVideoUrl = canUseWebm ? gif.previewVideoWebm ?? gif.previewVideo : gif.previewVideo;
     const previewUrl = previewVideoUrl != null ? previewVideoUrl : gif.previewGif ?? gif.url;
     if (props.tryForceCache) {
         caches
