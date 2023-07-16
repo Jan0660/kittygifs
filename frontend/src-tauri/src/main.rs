@@ -80,7 +80,7 @@ fn main() {
         })
         .setup(|app| {
             APP_HANDLE.lock().unwrap().replace(app.handle());
-            app.get_window("main").unwrap().open_devtools();
+            // app.get_window("main").unwrap().open_devtools();
             // hide the popup window when it loses focus or is minimized or is closed
             let window = app.get_window("popup").unwrap();
             window.on_window_event(|event| {
