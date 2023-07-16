@@ -199,11 +199,15 @@ func main() {
 		c.Set("user", &user)
 		c.Next()
 	})
-	r.GET("/gifs/search", func(c *gin.Context) {
+	sessioned.GET("/gifs/search", func(c *gin.Context) {
 		queryString := c.Query("q")
 		if len(queryString) > 256 {
 			c.JSON(400, gin.H{"error": "query too long(>256)"})
 			return
+		}
+		var user *User
+		if userGet, ok := c.Get("user"); ok {
+			user = userGet.(*User)
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), 16*time.Second)
 		defer cancel()
@@ -231,6 +235,11 @@ func main() {
 		}
 		search := map[string]interface{}{}
 		search["private"] = false
+		if query.Groups == nil && query.IncludeGroups == nil {
+			search["groups"] = bson.M{"$exists": false}
+		} else {
+			search["groups"] = map[string]interface{}{}
+		}
 		if query.Uploader != "" {
 			search["uploader"] = query.Uploader
 		}
@@ -256,6 +265,37 @@ func main() {
 			}
 			tagsQuery["$all"] = append(arr, primitive.Regex{Pattern: "^" + tags[len(tags)-1] + ".*$"})
 			search["tags"] = tagsQuery
+		}
+		if query.IncludeGroups != nil || query.Groups != nil {
+			groupsSearch := search["groups"].(map[string]interface{})
+			if query.IncludeGroups != nil {
+				if !user.HasGroups(*query.IncludeGroups) {
+					c.JSON(403, gin.H{"error": "you do not have access to this group"})
+					return
+				}
+				groupsOr := make([]bson.M, 0, 2)
+				var includeGroups *[]string
+				if len(*query.IncludeGroups) == 0 {
+					if user != nil && user.Groups != nil {
+						includeGroups = user.Groups
+					}
+				} else {
+					includeGroups = query.IncludeGroups
+				}
+				groupsOr = append(groupsOr, bson.M{"groups": bson.M{"$exists": false}})
+				groupsOr = append(groupsOr, bson.M{"groups": bson.M{"$in": includeGroups}})
+				search["$or"] = groupsOr
+			}
+			if query.Groups != nil {
+				if !user.HasGroups(*query.Groups) {
+					c.JSON(403, gin.H{"error": "you do not have access to this group"})
+					return
+				}
+				groupsSearch["$all"] = query.Groups
+			}
+			if len(groupsSearch) == 0 {
+				delete(search, "groups")
+			}
 		}
 		gifs := make([]Gif, 0, maxNum)
 		cursor, err := gifsCol.Find(ctx, search, &options.FindOptions{
@@ -718,16 +758,17 @@ func ErrorStr(str string) gin.H {
 }
 
 type Gif struct {
-	Id               string   `json:"id" bson:"_id"`
-	Url              string   `json:"url" bson:"url"`
-	PreviewGif       *string  `json:"previewGif,omitempty" bson:"previewGif,omitempty"`
-	PreviewVideo     *string  `json:"previewVideo,omitempty" bson:"previewVideo,omitempty"`
-	PreviewVideoWebm *string  `json:"previewVideoWebm,omitempty" bson:"previewVideoWebm,omitempty"`
-	Size             *Size    `json:"size,omitempty" bson:"size,omitempty"`
-	Tags             []string `json:"tags" bson:"tags"`
-	Uploader         string   `json:"uploader" bson:"uploader"`
-	Private          bool     `json:"private" bson:"private"`
-	Note             string   `json:"note" bson:"note"`
+	Id               string    `json:"id" bson:"_id"`
+	Url              string    `json:"url" bson:"url"`
+	PreviewGif       *string   `json:"previewGif,omitempty" bson:"previewGif,omitempty"`
+	PreviewVideo     *string   `json:"previewVideo,omitempty" bson:"previewVideo,omitempty"`
+	PreviewVideoWebm *string   `json:"previewVideoWebm,omitempty" bson:"previewVideoWebm,omitempty"`
+	Size             *Size     `json:"size,omitempty" bson:"size,omitempty"`
+	Tags             []string  `json:"tags" bson:"tags"`
+	Uploader         string    `json:"uploader" bson:"uploader"`
+	Private          bool      `json:"private" bson:"private"`
+	Note             string    `json:"note" bson:"note"`
+	Groups           *[]string `json:"groups,omitempty" bson:"groups,omitempty"`
 }
 
 type Size struct {
