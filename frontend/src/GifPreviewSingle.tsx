@@ -1,5 +1,6 @@
 import { Component } from "solid-js";
 import { Gif } from "./client/Client";
+import UAParser from "ua-parser-js";
 
 export type Props = {
     gif: Gif;
@@ -12,8 +13,8 @@ export type Props = {
 export const GifPreviewSingle: Component<Props> = (props: Props) => {
     const { gif, onClick } = props;
     // force indefinite caching
-    // use webm if not on webkit
-    const canUseWebm = navigator.userAgent.toLowerCase().indexOf("webkit") > -1;
+    // use webm if not on webkit/Safari (including the Tauri app on Linux/Mac)
+    const canUseWebm = new UAParser().getBrowser().name !== "Safari";
     const previewVideoUrl = canUseWebm ? gif.previewVideoWebm ?? gif.previewVideo : gif.previewVideo;
     const previewUrl = previewVideoUrl != null ? previewVideoUrl : gif.previewGif ?? gif.url;
     if (props.tryForceCache) {
