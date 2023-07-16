@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"github.com/JGLTechnologies/gin-rate-limit"
+	"github.com/alexedwards/argon2id"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/oklog/ulid/v2"
@@ -15,7 +15,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"golang.org/x/crypto/bcrypt"
 	"io"
 	"log"
 	"math/big"
@@ -95,6 +94,14 @@ func main() {
 	tenorPreviewVideoUrl = regexp.MustCompile("(?i)\"mp4\":{\"url\":(\"https:\\\\u002F\\\\u002Fmedia.tenor.com\\\\u002F.+?\\\\u002F.+?\\.mp4\")")
 	tenorPreviewVideoWebmUrl = regexp.MustCompile("(?i)\"webm\":{\"url\":(\"https:\\\\u002F\\\\u002Fmedia.tenor.com\\\\u002F.+?\\\\u002F.+?\\.webm\")")
 	tenorPreviewSize = regexp.MustCompile("(?i)\"details\":{\"width\":(\\d+),\"height\":(\\d+)")
+
+	argon2idParams := &argon2id.Params{
+		Memory:      128 * 1024,
+		Iterations:  6,
+		Parallelism: 4,
+		SaltLength:  16,
+		KeyLength:   32,
+	}
 
 	r := gin.Default()
 	r.Use(func(c *gin.Context) {
@@ -332,7 +339,7 @@ func main() {
 			return
 		}
 		// start creating account
-		hash, err := HashPassword(req.Password)
+		hash, err := argon2id.CreateHash(req.Password, argon2idParams)
 		if err != nil {
 			c.JSON(500, Error(err))
 			return
@@ -372,8 +379,7 @@ func main() {
 			c.JSON(401, ErrorStr("invalid username"))
 			return
 		}
-		if !CheckPasswordHash(request.Password, user.PasswordHash) {
-			c.JSON(401, ErrorStr("invalid password"))
+		if !CheckPassword(c, request.Password, user.PasswordHash) {
 			return
 		}
 		session, err := createSession(ctx, user.Username)
@@ -558,16 +564,48 @@ func main() {
 		}
 		userGet, _ := c.Get("user")
 		user := userGet.(*User)
-		if !CheckPasswordHash(req.OldPassword, user.PasswordHash) {
-			c.JSON(403, gin.H{"error": "current password is incorrect"})
+		if !CheckPassword(c, req.OldPassword, user.PasswordHash) {
 			return
 		}
-		hash, err := HashPassword(req.NewPassword)
+		hash, err := argon2id.CreateHash(req.NewPassword, argon2idParams)
 		if err != nil {
 			c.JSON(500, Error(err))
 			return
 		}
 		_, err = usersCol.UpdateOne(context.Background(), bson.M{"_id": user.Username}, bson.M{"$set": bson.M{"passwordHash": hash}})
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		c.Status(200)
+	})
+	authed.POST("/users/resetPasswordAdmin", func(c *gin.Context) {
+		type Request struct {
+			Username    string `json:"username"`
+			NewPassword string `json:"newPassword"`
+		}
+		var req Request
+		err := c.BindJSON(&req)
+		if err != nil {
+			c.JSON(400, Error(err))
+			return
+		}
+		if len(req.NewPassword) < 8 {
+			c.JSON(400, gin.H{"error": "new password too short(<8)"})
+			return
+		}
+		userGet, _ := c.Get("user")
+		user := userGet.(*User)
+		if !user.HasGroup("admin") {
+			c.JSON(403, gin.H{"error": "you are not admin"})
+			return
+		}
+		hash, err := argon2id.CreateHash(req.NewPassword, argon2idParams)
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		_, err = usersCol.UpdateOne(context.Background(), bson.M{"_id": req.Username}, bson.M{"$set": bson.M{"passwordHash": hash}})
 		if err != nil {
 			c.JSON(500, Error(err))
 			return
@@ -588,21 +626,18 @@ func main() {
 	_ = r.Run(config.Address)
 }
 
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	if err != nil {
-		return "", err
-	}
-	return base64.StdEncoding.EncodeToString(bytes), nil
-}
-
-func CheckPasswordHash(password, hash string) bool {
-	bytes, err := base64.StdEncoding.DecodeString(hash)
-	if err != nil {
+// CheckPassword checks if a password is correct, returns true if it is and false if it isn't and also sets the
+// appropriate status code and error message
+func CheckPassword(c *gin.Context, password, hash string) bool {
+	if match, err := argon2id.ComparePasswordAndHash(password, hash); !match || err != nil {
+		if err != nil {
+			c.JSON(500, Error(err))
+			return false
+		}
+		c.JSON(401, ErrorStr("invalid password"))
 		return false
 	}
-	err = bcrypt.CompareHashAndPassword(bytes, []byte(password))
-	return err == nil
+	return true
 }
 
 // thanks https://gist.github.com/dopey/c69559607800d2f2f90b1b1ed4e550fb?permalink_comment_id=3527095#gistcomment-3527095
