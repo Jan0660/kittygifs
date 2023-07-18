@@ -169,7 +169,7 @@ fn selected(url: &str, window: tauri::Window) {
     let mut enigo = Enigo::new();
     #[cfg(target_os = "linux")]
     {
-        enigo.set_delay(args.enigo_delay);
+        enigo.set_delay(enigo_delay);
     }
     // enigo.key_sequence_parse("{+CTRL}v{-CTRL}{RETURN}");
     if popup {
