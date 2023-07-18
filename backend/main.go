@@ -235,10 +235,8 @@ func main() {
 		}
 		search := map[string]interface{}{}
 		search["private"] = false
-		if query.Groups == nil && query.IncludeGroups == nil {
-			search["groups"] = bson.M{"$exists": false}
-		} else {
-			search["groups"] = map[string]interface{}{}
+		if query.Group == nil && query.IncludeGroups == nil {
+			search["group"] = bson.M{"$exists": false}
 		}
 		if query.Uploader != "" {
 			search["uploader"] = query.Uploader
@@ -266,11 +264,10 @@ func main() {
 			tagsQuery["$all"] = append(arr, primitive.Regex{Pattern: "^" + tags[len(tags)-1] + ".*$"})
 			search["tags"] = tagsQuery
 		}
-		if query.IncludeGroups != nil || query.Groups != nil {
-			groupsSearch := search["groups"].(map[string]interface{})
+		if query.IncludeGroups != nil || query.Group != nil {
 			if query.IncludeGroups != nil {
 				if !user.HasGroups(*query.IncludeGroups) {
-					c.JSON(403, gin.H{"error": "you do not have access to this group"})
+					c.JSON(403, gin.H{"error": "you do not have access to these groups"})
 					return
 				}
 				groupsOr := make([]bson.M, 0, 2)
@@ -282,19 +279,19 @@ func main() {
 				} else {
 					includeGroups = query.IncludeGroups
 				}
-				groupsOr = append(groupsOr, bson.M{"groups": bson.M{"$exists": false}})
-				groupsOr = append(groupsOr, bson.M{"groups": bson.M{"$in": includeGroups}})
+				groupsOr = append(groupsOr, bson.M{"group": bson.M{"$exists": false}})
+				{
+					thisOr := bson.M{"group": bson.M{"$in": includeGroups}}
+					groupsOr = append(groupsOr, thisOr)
+				}
 				search["$or"] = groupsOr
 			}
-			if query.Groups != nil {
-				if !user.HasGroups(*query.Groups) {
-					c.JSON(403, gin.H{"error": "you do not have access to this group"})
+			if query.Group != nil {
+				if !user.HasGroup(*query.Group) {
+					c.JSON(403, gin.H{"error": "you do not have access to these groups"})
 					return
 				}
-				groupsSearch["$all"] = query.Groups
-			}
-			if len(groupsSearch) == 0 {
-				delete(search, "groups")
+				search["group"] = query.Group
 			}
 		}
 		gifs := make([]Gif, 0, maxNum)
@@ -439,6 +436,8 @@ func main() {
 		c.Next()
 	})
 	authed.POST("/gifs", func(c *gin.Context) {
+		userGet, _ := c.Get("user")
+		user := userGet.(User)
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second*2)
 		defer cancel()
 		var gif Gif
@@ -456,6 +455,10 @@ func main() {
 		gif.PreviewVideoWebm = nil
 		if err = ValidateGif(gif); err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+		if !user.HasGroup(*gif.Group) {
+			c.JSON(403, gin.H{"error": "you do not have the group " + *gif.Group})
 			return
 		}
 		if isTenorUrl.MatchString(gif.Url) {
@@ -557,9 +560,14 @@ func main() {
 			c.JSON(403, gin.H{"error": "you are not the uploader of this gif nor do you have perm:edit_all_gifs"})
 			return
 		}
+		if !user.HasGroup(*edit.Group) {
+			c.JSON(403, gin.H{"error": "you do not have the group " + *edit.Group})
+			return
+		}
 		originalGif.Tags = edit.Tags
 		originalGif.Note = edit.Note
 		originalGif.Private = edit.Private
+		originalGif.Group = edit.Group
 		err = ValidateGif(originalGif)
 		if err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
@@ -758,17 +766,17 @@ func ErrorStr(str string) gin.H {
 }
 
 type Gif struct {
-	Id               string    `json:"id" bson:"_id"`
-	Url              string    `json:"url" bson:"url"`
-	PreviewGif       *string   `json:"previewGif,omitempty" bson:"previewGif,omitempty"`
-	PreviewVideo     *string   `json:"previewVideo,omitempty" bson:"previewVideo,omitempty"`
-	PreviewVideoWebm *string   `json:"previewVideoWebm,omitempty" bson:"previewVideoWebm,omitempty"`
-	Size             *Size     `json:"size,omitempty" bson:"size,omitempty"`
-	Tags             []string  `json:"tags" bson:"tags"`
-	Uploader         string    `json:"uploader" bson:"uploader"`
-	Private          bool      `json:"private" bson:"private"`
-	Note             string    `json:"note" bson:"note"`
-	Groups           *[]string `json:"groups,omitempty" bson:"groups,omitempty"`
+	Id               string   `json:"id" bson:"_id"`
+	Url              string   `json:"url" bson:"url"`
+	PreviewGif       *string  `json:"previewGif,omitempty" bson:"previewGif,omitempty"`
+	PreviewVideo     *string  `json:"previewVideo,omitempty" bson:"previewVideo,omitempty"`
+	PreviewVideoWebm *string  `json:"previewVideoWebm,omitempty" bson:"previewVideoWebm,omitempty"`
+	Size             *Size    `json:"size,omitempty" bson:"size,omitempty"`
+	Tags             []string `json:"tags" bson:"tags"`
+	Uploader         string   `json:"uploader" bson:"uploader"`
+	Private          bool     `json:"private" bson:"private"`
+	Note             string   `json:"note" bson:"note"`
+	Group            *string  `json:",omitempty" bson:"group,omitempty"`
 }
 
 type Size struct {

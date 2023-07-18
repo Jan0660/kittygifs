@@ -1,6 +1,9 @@
 package main
 
-import "strings"
+import (
+	"errors"
+	"strings"
+)
 
 type ComprehensiveQuery struct {
 	Tags     []string
@@ -10,8 +13,8 @@ type ComprehensiveQuery struct {
 	// if empty, search must include all grouped posts,
 	// if non-empty, search must include items belonging to any of the groups
 	IncludeGroups *[]string
-	// Groups search results must belong to all of these groups
-	Groups *[]string
+	// Groups search results must belong to this group
+	Group *string
 }
 
 func ParseQuery(query string) (*ComprehensiveQuery, error) {
@@ -19,7 +22,7 @@ func ParseQuery(query string) (*ComprehensiveQuery, error) {
 	uploader := ""
 	note := ""
 	var includeGroups *[]string
-	var groups *[]string
+	var group *string
 	{
 		start := strings.Index(query, "\"")
 		if start != -1 {
@@ -42,10 +45,11 @@ func ParseQuery(query string) (*ComprehensiveQuery, error) {
 			uploader = s[1:]
 		} else if s[0] == '#' {
 			if len(s) >= 2 && s[1] == '!' {
-				if groups == nil {
-					groups = &[]string{}
+				if group != nil {
+					return nil, errors.New("multiple groups specified")
 				}
-				*groups = append(*groups, s[2:])
+				sl := s[2:]
+				group = &sl
 			} else {
 				if includeGroups == nil {
 					includeGroups = &[]string{}
@@ -63,6 +67,6 @@ func ParseQuery(query string) (*ComprehensiveQuery, error) {
 		Uploader:      uploader,
 		Note:          note,
 		IncludeGroups: includeGroups,
-		Groups:        groups,
+		Group:         group,
 	}, nil
 }
