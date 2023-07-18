@@ -28,6 +28,7 @@ lazy_static = "1.4.0"
 notify-rust = "4.8.0"
 keyboard-types = { version = "0.6.2", features = ["serde"] }
 clap = { version = "4.3.12", features = ["derive"] }
+tauri-plugin-shell = "2.0.0-alpha"
 
 [features]
 default = ["custom-protocol"]

@@ -5,6 +5,7 @@ import QueryInput from "../QueryInput";
 import { GifPreviewSingle } from "../GifPreviewSingle";
 import { config } from "..";
 import { SearchHighlight } from "../components/SearchHighlight";
+import { A } from "@solidjs/router";
 
 const IndexPage: Component = () => {
     const [gifs, setGifs] = createSignal([] as Gif[]);
@@ -22,12 +23,12 @@ const IndexPage: Component = () => {
                 <div class="gifs">
                     <For each={gifs()}>
                         {(gif, i) => (
-                            <a href={`/gifs/${gif.id}`} style="width: 100%; height: auto;" class="gif-link">
+                            <A href={`/gifs/${gif.id}`} style="width: 100%; height: auto;" class="gif-link">
                                 <GifPreviewSingle gif={gif} tryForceCache />
                                 <Show when={config.searchHighlight}>
                                     <SearchHighlight gif={gif} query={query()}></SearchHighlight>
                                 </Show>
-                            </a>
+                            </A>
                         )}
                     </For>
                 </div>

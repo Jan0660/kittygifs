@@ -78,6 +78,7 @@ fn main() {
             },
             _ => {}
         })
+        .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             APP_HANDLE.lock().unwrap().replace(app.handle());
             // app.get_window("main").unwrap().open_devtools();

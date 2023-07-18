@@ -1,11 +1,12 @@
 import { Accessor, Component, For, Suspense, createSignal } from "solid-js";
 import { Gif } from "../client/Client";
-import { useRouteData } from "@solidjs/router";
+import { Navigate, useNavigate, useRouteData } from "@solidjs/router";
 import { GifPreviewSingle } from "../GifPreviewSingle";
 import { GifViewData } from "../App";
 import { client, config, getErrorString } from "..";
 
 const PostGifPage: Component = () => {
+    const navigate = useNavigate();
     const [error, setError] = createSignal("");
     const [url, setUrl] = createSignal("");
     const [tags, setTags] = createSignal([] as string[]);
@@ -72,7 +73,7 @@ const PostGifPage: Component = () => {
                                 private: false,
                                 group: group(),
                             });
-                            window.location.href = `/gifs/${gif.id}`;
+                            navigate(`/gifs/${gif.id}`);
                         } catch (e) {
                             setError(getErrorString(e));
                         }

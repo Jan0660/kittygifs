@@ -1,5 +1,5 @@
 import { Component, For, Show, Suspense, createEffect, createSignal } from "solid-js";
-import { useRouteData } from "@solidjs/router";
+import { useNavigate, useRouteData } from "@solidjs/router";
 import { GifViewData } from "../App";
 import GifPage from "./GifPage";
 import { client, getErrorString } from "..";
@@ -8,6 +8,7 @@ import { GifPreviewSingle } from "../GifPreviewSingle";
 
 const EditGifPage: Component = () => {
     const gif = useRouteData<typeof GifViewData>();
+    const navigate = useNavigate();
 
     const [tags, setTags] = createSignal([]);
     const [note, setNote] = createSignal('');
@@ -93,7 +94,7 @@ const EditGifPage: Component = () => {
                                     private: getPrivate(),
                                     group: group(),
                                 });
-                                window.location.href = `/gifs/${gif().id}`;
+                                navigate(`/gifs/${gif().id}`);
                             } catch (e) {
                                 setError(getErrorString(e));
                             }

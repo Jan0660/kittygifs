@@ -1,7 +1,9 @@
 import { Component, createSignal } from "solid-js";
 import { client, config, getErrorString, saveConfig } from "..";
+import { useNavigate } from "@solidjs/router";
 
 const LoginPage: Component = () => {
+    const navigate = useNavigate();
     const [error, setError] = createSignal("");
     const [username, setUsername] = createSignal("");
     const [password, setPassword] = createSignal("");
@@ -42,7 +44,7 @@ const LoginPage: Component = () => {
                             const token = await client.createSession(username(), password());
                             config.token = token;
                             await saveConfig();
-                            window.location.href = "/";
+                            navigate('/');
                         } catch (e) {
                             setError(getErrorString(e));
                         }

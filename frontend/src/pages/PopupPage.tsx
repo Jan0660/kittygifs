@@ -6,6 +6,7 @@ import { GifPreviewSingle } from "../GifPreviewSingle";
 import QueryInput from "../QueryInput";
 import { SearchHighlight } from "../components/SearchHighlight";
 import { config } from "..";
+import { A } from "@solidjs/router";
 
 const PopupPage: Component = () => {
     const [gifs, setGifs] = createSignal([] as Gif[]);
@@ -53,12 +54,12 @@ const PopupPage: Component = () => {
                 <div class="gifs">
                     <For each={gifs()}>
                         {(gif, i) => (
-                            <a href='#' style="width: 100%; height: auto;" onClick={() => (selected(gif))} class="gif-link">
+                            <A href='#' style="width: 100%; height: auto;" onClick={() => (selected(gif))} class="gif-link">
                                 <GifPreviewSingle gif={gif} tryForceCache height={config.searchHighlightInPopup ? null : "100%"} />
                                 <Show when={config.searchHighlightInPopup}>
                                     <SearchHighlight gif={gif} query={query()}></SearchHighlight>
                                 </Show>
-                            </a>
+                            </A>
                         )}
                     </For>
                 </div>

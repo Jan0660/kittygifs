@@ -1,6 +1,7 @@
 import { lazy, type Component, createResource, ErrorBoundary, Show, For } from "solid-js";
 import { Route, Routes } from "@solidjs/router";
 import { client, getErrorString, config } from ".";
+import { A } from "@solidjs/router";
 
 export function GifViewData({ params }) {
     const fetchGif = async () => {
@@ -16,35 +17,35 @@ const App: Component = () => {
             <div class="navbar">
                 <div class="navbar-content">
                     <span class="site-name">
-                        <a href="/" class="link">
+                        <A href="/" class="link">
                             kitties!!
-                        </a>
+                        </A>
                     </span>
                     <ul class="navbar-links">
                         <li>
                             <Show when={config.token == null}>
-                                <a href="/login" class="button">
+                                <A href="/login" class="button">
                                     Login
-                                </a>{" "}
+                                </A>{" "}
                                 or{" "}
-                                <a href="/signup" class="button">
+                                <A href="/signup" class="button">
                                     Signup
-                                </a>
+                                </A>
                             </Show>
                             <Show when={config.token != null}>
-                                <a href="/gifs/post" class="button">
+                                <A href="/gifs/post" class="button">
                                     Post
-                                </a>
-                                <a href="/resetPassword" class="button">
+                                </A>
+                                <A href="/resetPassword" class="button">
                                     Reset Password
-                                </a>
-                                <a href="/logout" class="button">
+                                </A>
+                                <A href="/logout" class="button">
                                     Log out
-                                </a>
+                                </A>
                             </Show>
-                            <a href="/settings" class="button">
+                            <A href="/settings" class="button">
                                 Settings
-                            </a>
+                            </A>
                             <Show when={config.token != null}>
                                 <br />
                             </Show>
@@ -118,11 +119,11 @@ const App: Component = () => {
                     </Routes>
                     <div class="is-center">
                         The kittygifs project, available on{" "}
-                        <a href="https://github.com/Jan0660/kittygifs" class="link">
+                        <a href="https://github.com/Jan0660/kittygifs" target="_blank" class="link">
                             GitHub
                         </a>
                         . Licensed under{" "}
-                        <a href="https://www.gnu.org/licenses/agpl-3.0.en.html" class="link">
+                        <a href="https://www.gnu.org/licenses/agpl-3.0.en.html" target="_blank" class="link">
                             the GNU AGPLv3
                         </a>
                         .

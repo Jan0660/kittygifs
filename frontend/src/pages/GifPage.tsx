@@ -1,12 +1,13 @@
 import { Accessor, Component, ErrorBoundary, For, Show, Suspense, createSignal } from "solid-js";
 import { Gif } from "../client/Client";
-import { useRouteData } from "@solidjs/router";
+import { useNavigate, useRouteData } from "@solidjs/router";
 import { GifPreviewSingle } from "../GifPreviewSingle";
 import { GifViewData } from "../App";
 import { client, config, getErrorString } from "..";
 
 const GifPage: Component = () => {
     const gif = useRouteData<typeof GifViewData>();
+    const navigate = useNavigate();
     const [deleteAreYouSure, setDeleteAreYouSure] = createSignal(false);
     return (
         <>
@@ -61,7 +62,7 @@ const GifPage: Component = () => {
                                         onClick={async () => {
                                             try {
                                                 await client.deleteGif(gif().id);
-                                                window.location.href = "/";
+                                                navigate("/");
                                             } catch (e) {
                                                 alert(getErrorString(e));
                                             }
