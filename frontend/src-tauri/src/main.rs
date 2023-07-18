@@ -152,11 +152,17 @@ fn main() {
 fn selected(url: &str, window: tauri::Window) {
     let popup: bool;
     let popup_delay: u64;
+    #[allow(unused_variables)]
+    let enigo_delay: u64;
     {
         let binding = ARGS.lock().unwrap();
         let args = binding.as_ref().unwrap();
         popup = args.popup;
         popup_delay = args.popup_delay;
+        #[allow(unused_assignments)]
+        {
+            enigo_delay = args.enigo_delay;
+        }
     }
     
     // hide the window
