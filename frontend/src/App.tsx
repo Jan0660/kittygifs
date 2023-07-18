@@ -116,6 +116,17 @@ const App: Component = () => {
                             component={lazy(() => import("./pages/SettingsPage"))}
                         />
                     </Routes>
+                    <div class="is-center">
+                        The kittygifs project, available on{" "}
+                        <a href="https://github.com/Jan0660/kittygifs" class="link">
+                            GitHub
+                        </a>
+                        . Licensed under{" "}
+                        <a href="https://www.gnu.org/licenses/agpl-3.0.en.html" class="link">
+                            the GNU AGPLv3
+                        </a>
+                        .
+                    </div>
                 </div>
             </ErrorBoundary>
         </>
