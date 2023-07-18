@@ -437,7 +437,7 @@ func main() {
 	})
 	authed.POST("/gifs", func(c *gin.Context) {
 		userGet, _ := c.Get("user")
-		user := userGet.(User)
+		user := userGet.(*User)
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second*2)
 		defer cancel()
 		var gif Gif
@@ -457,7 +457,7 @@ func main() {
 			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
-		if !user.HasGroup(*gif.Group) {
+		if user != nil && gif.Group != nil && !user.HasGroup(*gif.Group) {
 			c.JSON(403, gin.H{"error": "you do not have the group " + *gif.Group})
 			return
 		}
@@ -776,7 +776,7 @@ type Gif struct {
 	Uploader         string   `json:"uploader" bson:"uploader"`
 	Private          bool     `json:"private" bson:"private"`
 	Note             string   `json:"note" bson:"note"`
-	Group            *string  `json:",omitempty" bson:"group,omitempty"`
+	Group            *string  `json:"group,omitempty" bson:"group,omitempty"`
 }
 
 type Size struct {
