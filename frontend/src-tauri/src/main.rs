@@ -150,8 +150,15 @@ fn main() {
 #[tauri::command]
 // should be called from the popup window
 fn selected(url: &str, window: tauri::Window) {
-    let binding = ARGS.lock().unwrap();
-    let args = binding.as_ref().unwrap();
+    let popup: bool;
+    let popup_delay: u64;
+    {
+        let binding = ARGS.lock().unwrap();
+        let args = binding.as_ref().unwrap();
+        popup = args.popup;
+        popup_delay = args.popup_delay;
+    }
+    
     // hide the window
     window.minimize().unwrap();
     // write the url to clipboard, then paste it
@@ -165,8 +172,6 @@ fn selected(url: &str, window: tauri::Window) {
         enigo.set_delay(args.enigo_delay);
     }
     // enigo.key_sequence_parse("{+CTRL}v{-CTRL}{RETURN}");
-    let popup = args.popup;
-    let popup_delay = args.popup_delay;
     if popup {
         let url_clone = url.to_string();
         std::thread::spawn(move || {
@@ -184,10 +189,12 @@ fn selected(url: &str, window: tauri::Window) {
     // if previous.is_ok() {
     //     ctx.set_contents(previous.unwrap());
     // }
-    std::thread::spawn(|| {
-        std::thread::sleep(Duration::from_millis(800));
-        exit_if_popup();
-    });
+    if popup {
+        std::thread::spawn(|| {
+            std::thread::sleep(Duration::from_millis(800));
+            exit_if_popup();
+        });
+    }
 }
 
 #[tauri::command]
