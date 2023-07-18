@@ -6,7 +6,7 @@
   },
   "package": {
     "productName": "kittygifs",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "tauri": {
     "systemTray": {
@@ -52,7 +52,7 @@
     },
     "windows": [
       {
-        "title": "kittygifs-desktop",
+        "title": "kittygifs",
         "width": 800,
         "height": 600,
         "resizable": true,
@@ -60,7 +60,7 @@
         "label": "main"
       },
       {
-        "title": "kittygifs-desktop popup",
+        "title": "kittygifs popup",
         "width": 800,
         "height": 600,
         "resizable": true,
