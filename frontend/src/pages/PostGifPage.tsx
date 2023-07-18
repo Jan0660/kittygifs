@@ -10,6 +10,7 @@ const PostGifPage: Component = () => {
     const [url, setUrl] = createSignal("");
     const [tags, setTags] = createSignal([] as string[]);
     const [note, setNote] = createSignal("");
+    const [group, setGroup] = createSignal("");
     return (
         <>
             <div class="content-header">
@@ -46,12 +47,19 @@ const PostGifPage: Component = () => {
                     onInput={e => setTags(e.currentTarget.value.split(" "))}
                 />
                 <br />
-                <input
-                    type="text"
+                <textarea
                     placeholder="Note"
                     value={note()}
                     class="input"
                     onInput={e => setNote(e.currentTarget.value)}
+                />
+                <br />
+                <input
+                    type="text"
+                    placeholder="Group"
+                    value={group() ? group() : ""}
+                    class="input"
+                    onInput={e => setGroup(e.currentTarget.value)}
                 />
                 <br />
                 <button
@@ -62,6 +70,7 @@ const PostGifPage: Component = () => {
                                 tags: tags(),
                                 note: note(),
                                 private: false,
+                                group: group(),
                             });
                             window.location.href = `/gifs/${gif.id}`;
                         } catch (e) {

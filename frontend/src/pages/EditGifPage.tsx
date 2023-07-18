@@ -13,12 +13,14 @@ const EditGifPage: Component = () => {
     const [note, setNote] = createSignal('');
     const [getPrivate, setPrivate] = createSignal(false);
     const [error, setError] = createSignal("");
+    const [group, setGroup] = createSignal("");
 
     createEffect(() => {
         if (gif()) {
             setTags(gif().tags)
             setNote(gif().note)
             setPrivate(gif().private)
+            setGroup(gif().group)
         }
     })
 
@@ -73,6 +75,14 @@ const EditGifPage: Component = () => {
                         Private
                     </label>
                     <br />
+                    <input
+                        type="text"
+                        placeholder="Group"
+                        value={group() ? group() : ""}
+                        class="input"
+                        onInput={e => setGroup(e.currentTarget.value)}
+                    />
+                    <br />
                     <button
                         onClick={async () => {
                             setError("");
@@ -81,6 +91,7 @@ const EditGifPage: Component = () => {
                                     tags: tags(),
                                     note: note(),
                                     private: getPrivate(),
+                                    group: group(),
                                 });
                                 window.location.href = `/gifs/${gif().id}`;
                             } catch (e) {

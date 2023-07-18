@@ -38,9 +38,13 @@ export class KittyGifsClient {
             tags: string[];
             private: boolean;
             note: string;
+            group: string | null;
         },
         signal?: AbortSignal,
     ): Promise<void> {
+        if (props.group == "") {
+            props.group = null;
+        }
         await this._axios.patch("/gifs/" + encodeURIComponent(id), props, {
             signal: signal,
         });
@@ -52,6 +56,7 @@ export class KittyGifsClient {
             tags: string[];
             private: boolean;
             note: string;
+            group: string | null;
         },
         signal?: AbortSignal,
     ): Promise<Gif> {
@@ -123,6 +128,7 @@ export type Gif = {
     uploader: string;
     private: boolean;
     note: string | null;
+    group: string | null;
 };
 
 export type Size = {
