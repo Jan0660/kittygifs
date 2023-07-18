@@ -1,5 +1,5 @@
 import { Component, Setter, onMount } from "solid-js";
-import { client } from "./index";
+import { client, config } from "./index";
 import { Gif } from "./client/Client";
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
 const QueryInput: Component<Props> = (props: Props) => {
     let abortLast: AbortController | null = null;
     onMount(() => {
-        client.searchGifs('').then(res => {
+        client.searchGifs(config.queryPrepend ?? "").then(res => {
             props.setGifs(res);
         });
     })
@@ -29,7 +29,11 @@ const QueryInput: Component<Props> = (props: Props) => {
                     }
                     abortLast = new AbortController();
                     props.setQuery(e.currentTarget.value)
-                    client.searchGifs(e.currentTarget.value, abortLast.signal).then(res => {
+                    let query = e.currentTarget.value;
+                    if (config.queryPrepend) {
+                        query = config.queryPrepend + " " + query;
+                    }
+                    client.searchGifs(query, abortLast.signal).then(res => {
                         console.log(res);
                         props.setGifs(res);
                     });

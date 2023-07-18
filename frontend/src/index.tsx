@@ -12,6 +12,8 @@ interface Config {
     searchHighlight: boolean;
     searchHighlightInPopup: boolean;
     apiUrl: string;
+    defaultGroup: string;
+    queryPrepend: string;
 }
 
 let item = (await localforage.getItem("kittygifs.config")) as Config;
@@ -21,6 +23,8 @@ if (!item) {
         searchHighlight: true,
         searchHighlightInPopup: false,
         apiUrl: import.meta.env.VITE_API_URL,
+        defaultGroup: "",
+        queryPrepend: "",
     };
     await localforage.setItem("kittygifs.config", item);
 }

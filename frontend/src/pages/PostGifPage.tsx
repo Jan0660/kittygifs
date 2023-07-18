@@ -3,14 +3,14 @@ import { Gif } from "../client/Client";
 import { useRouteData } from "@solidjs/router";
 import { GifPreviewSingle } from "../GifPreviewSingle";
 import { GifViewData } from "../App";
-import { client, getErrorString } from "..";
+import { client, config, getErrorString } from "..";
 
 const PostGifPage: Component = () => {
     const [error, setError] = createSignal("");
     const [url, setUrl] = createSignal("");
     const [tags, setTags] = createSignal([] as string[]);
     const [note, setNote] = createSignal("");
-    const [group, setGroup] = createSignal("");
+    const [group, setGroup] = createSignal(config.defaultGroup ?? "");
     return (
         <>
             <div class="content-header">

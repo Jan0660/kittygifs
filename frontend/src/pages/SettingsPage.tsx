@@ -80,6 +80,27 @@ const SettingsPage: Component = () => {
                     />{" "}
                     Show Search Highlight
                 </label>
+                <h3>Other</h3>
+                <label>Query Prepend - Prepended to every search behind the scenes.</label> <br />
+                <input
+                    type="text"
+                    value={config.queryPrepend ?? ""}
+                    onChange={e => {
+                        config.queryPrepend = e.target.value;
+                        saveConfig();
+                    }}
+                    class="input"
+                /><br/>
+                <label>Default Group for Posting</label> <br />
+                <input
+                    type="text"
+                    value={config.defaultGroup ?? ""}
+                    onChange={e => {
+                        config.defaultGroup = e.target.value;
+                        saveConfig();
+                    }}
+                    class="input"
+                />
                 <Show when={runningTauri && desktopConfig() != null}>
                     <h3>Desktop Settings</h3>
                     <label>
