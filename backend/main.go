@@ -222,7 +222,8 @@ func main() {
 			}
 		}
 		if c.Query("skip") != "" {
-			skip, err := strconv.ParseInt(c.Query("skip"), 10, 64)
+			skipInner, err := strconv.ParseInt(c.Query("skip"), 10, 64)
+			skip = skipInner
 			if err != nil || skip < 0 {
 				c.JSON(400, gin.H{"error": "invalid skip"})
 				return
