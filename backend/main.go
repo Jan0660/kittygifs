@@ -159,22 +159,6 @@ func main() {
 		return &session, nil
 	}
 
-	r.GET("/gifs", func(c *gin.Context) {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		var gifs []Gif
-		cursor, err := gifsCol.Find(ctx, bson.M{"private": false})
-		if err != nil {
-			c.JSON(500, Error(err))
-			return
-		}
-		err = cursor.All(ctx, &gifs)
-		if err != nil {
-			c.JSON(500, Error(err))
-			return
-		}
-		c.JSON(200, gifs)
-	})
 	sessioned := r.Group("/", func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
