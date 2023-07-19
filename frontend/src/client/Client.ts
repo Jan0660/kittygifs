@@ -20,8 +20,18 @@ export class KittyGifsClient {
         });
     }
 
-    public async searchGifs(query: string, signal?: AbortSignal): Promise<Gif[]> {
-        let res = await this._axios.get("/gifs/search?q=" + encodeURIComponent(query), {
+    public async searchGifs(query: string, signal?: AbortSignal, props?: {
+        skip?: number;
+        max?: number;
+    }): Promise<Gif[]> {
+        let url = "/gifs/search?q=" + encodeURIComponent(query);
+        if (props?.skip != null) {
+            url += "&skip=" + props.skip;
+        }
+        if (props?.max != null) {
+            url += "&max=" + props.max;
+        }
+        let res = await this._axios.get(url, {
             signal,
         });
         return res.data;

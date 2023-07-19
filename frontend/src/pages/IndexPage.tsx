@@ -1,9 +1,9 @@
-import { createSignal, type Component, Show, For } from "solid-js";
+import { createSignal, type Component, Show, For, createEffect } from "solid-js";
 import { Gif } from "../client/Client";
 import "../index.css";
 import QueryInput from "../QueryInput";
 import { GifPreviewSingle } from "../GifPreviewSingle";
-import { config } from "..";
+import { client, config } from "..";
 import { SearchHighlight } from "../components/SearchHighlight";
 import { A } from "@solidjs/router";
 
@@ -32,6 +32,9 @@ const IndexPage: Component = () => {
                         )}
                     </For>
                 </div>
+                <button class="button" onClick={async () => {
+                    setGifs(gifs().concat(await client.searchGifs(query(), null, {skip: gifs().length})));
+                }}>Load more</button>
             </div>
         </>
     );
