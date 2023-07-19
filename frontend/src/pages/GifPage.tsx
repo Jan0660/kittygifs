@@ -32,7 +32,9 @@ const GifPage: Component = () => {
                             </For>
                         </p>
                         <div style="word-wrap: break-word">
-                            Url: <code>
+                            Url: <code style={{"cursor": "pointer"}} onClick={() => {
+                                navigator.clipboard.writeText(gif().url);
+                            }}>
                                 {gif().url}
                             </code>
                         </div>
@@ -40,6 +42,10 @@ const GifPage: Component = () => {
                         <Show when={gif().note}>
                             <h4>Note</h4>
                             <p>{gif().note}</p>
+                        </Show>
+
+                        <Show when={gif().group}>
+                            Group: <code>{gif().group}</code>
                         </Show>
 
                         <div class="card-footer">
