@@ -434,6 +434,9 @@ func main() {
 		if gif.Tags == nil {
 			gif.Tags = []string{}
 		}
+		if gif.Group != nil && *gif.Group == "" {
+			gif.Group = nil
+		}
 		gif.Size = nil
 		gif.PreviewGif = nil
 		gif.PreviewVideo = nil
@@ -553,6 +556,9 @@ func main() {
 		originalGif.Note = edit.Note
 		originalGif.Private = edit.Private
 		originalGif.Group = edit.Group
+		if originalGif.Group != nil && *originalGif.Group == "" {
+			originalGif.Group = nil
+		}
 		err = ValidateGif(originalGif)
 		if err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
@@ -728,6 +734,9 @@ func ValidateGif(gif Gif) error {
 	}
 	if err := ValidateTags(gif.Tags); err != nil {
 		return err
+	}
+	if gif.Group != nil && *gif.Group == "" {
+		return errors.New("group is empty")
 	}
 	return nil
 }
