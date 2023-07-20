@@ -32,7 +32,12 @@ const GifPage: Component = () => {
                             </For>
                         </p>
                         <div style="word-wrap: break-word">
-                            Url: <code style={{"cursor": "pointer"}} onClick={() => {
+                            <div class="tooltip">
+                                <div class="tooltiptext">
+                                    Click to copy!
+                                </div>
+                            </div>
+                            Url: <code style={{ "cursor": "pointer" }} onClick={() => {
                                 navigator.clipboard.writeText(gif().url);
                             }}>
                                 {gif().url}
