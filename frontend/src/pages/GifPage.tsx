@@ -36,12 +36,12 @@ const GifPage: Component = () => {
                                 <div class="tooltiptext">
                                     Click to copy!
                                 </div>
+                                Url: <code style={{ "cursor": "pointer" }} onClick={() => {
+                                    navigator.clipboard.writeText(gif().url);
+                                }}>
+                                    {gif().url}
+                                </code>
                             </div>
-                            Url: <code style={{ "cursor": "pointer" }} onClick={() => {
-                                navigator.clipboard.writeText(gif().url);
-                            }}>
-                                {gif().url}
-                            </code>
                         </div>
 
                         <Show when={gif().note}>
