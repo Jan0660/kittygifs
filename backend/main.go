@@ -548,7 +548,7 @@ func main() {
 			c.JSON(403, gin.H{"error": "you are not the uploader of this gif nor do you have perm:edit_all_gifs"})
 			return
 		}
-		if !user.HasGroup(*edit.Group) {
+		if edit.Group != nil && !user.HasGroup(*edit.Group) {
 			c.JSON(403, gin.H{"error": "you do not have the group " + *edit.Group})
 			return
 		}
@@ -564,7 +564,7 @@ func main() {
 			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
-		gifsCol.FindOneAndUpdate(ctx, bson.M{"_id": c.Param("id")}, bson.M{"$set": originalGif})
+		gifsCol.FindOneAndReplace(ctx, bson.M{"_id": c.Param("id")}, originalGif)
 		c.JSON(200, originalGif)
 	})
 	authed.DELETE("/gifs/:id", func(c *gin.Context) {
