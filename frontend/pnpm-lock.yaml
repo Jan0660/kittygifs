@@ -26,6 +26,9 @@ dependencies:
   ua-parser-js:
     specifier: ^1.0.35
     version: 1.0.35
+  ulid:
+    specifier: ^2.3.0
+    version: 2.3.0
 
 devDependencies:
   '@types/node':
@@ -2091,6 +2094,11 @@ packages:
 
   /ua-parser-js@1.0.35:
     resolution: {integrity: sha512-fKnGuqmTBnIE+/KXSzCn4db8RTigUzw1AN0DmdU6hJovUTbYJKyqj+8Mt1c4VfRDnOVJnENmfYkIPZ946UrSAA==}
+    dev: false
+
+  /ulid@2.3.0:
+    resolution: {integrity: sha512-keqHubrlpvT6G2wH0OEfSW4mquYRcbe/J8NMmveoQOjUqmo+hXtO+ORCpWhdbZ7k72UtY61BL7haGxW6enBnjw==}
+    hasBin: true
     dev: false
 
   /update-browserslist-db@1.0.11(browserslist@4.21.9):

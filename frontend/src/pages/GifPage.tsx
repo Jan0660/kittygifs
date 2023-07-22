@@ -4,6 +4,7 @@ import { useNavigate, useRouteData } from "@solidjs/router";
 import { GifPreviewSingle } from "../GifPreviewSingle";
 import { GifViewData } from "../App";
 import { client, config, getErrorString } from "..";
+import { decodeTime } from "ulid";
 
 const GifPage: Component = () => {
     const gif = useRouteData<typeof GifViewData>();
@@ -54,7 +55,7 @@ const GifPage: Component = () => {
                         </Show>
 
                         <div class="card-footer">
-                            {gif().id}
+                            {gif().id} - {(new Date(decodeTime(gif().id))).toLocaleString()}
                         </div>
                     </div>
                     <br />

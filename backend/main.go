@@ -736,7 +736,7 @@ func ValidateGif(gif Gif) error {
 		return err
 	}
 	if gif.Group != nil && *gif.Group == "" {
-		return errors.New("group is empty")
+		return errors.New("group is empty string, use null instead")
 	}
 	return nil
 }
