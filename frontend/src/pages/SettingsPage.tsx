@@ -86,6 +86,7 @@ const SettingsPage: Component = () => {
                     type="text"
                     value={config.queryPrepend ?? ""}
                     onChange={e => {
+                        e.target.value = e.target.value.toLocaleLowerCase().trimStart();
                         config.queryPrepend = e.target.value;
                         saveConfig();
                     }}
@@ -96,6 +97,7 @@ const SettingsPage: Component = () => {
                     type="text"
                     value={config.defaultGroup ?? ""}
                     onChange={e => {
+                        e.target.value = e.target.value.toLocaleLowerCase().trim();
                         config.defaultGroup = e.target.value;
                         saveConfig();
                     }}

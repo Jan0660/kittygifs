@@ -28,6 +28,7 @@ const QueryInput: Component<Props> = (props: Props) => {
                         abortLast.abort();
                     }
                     abortLast = new AbortController();
+                    e.currentTarget.value = e.currentTarget.value.toLocaleLowerCase().trimStart();
                     props.setQuery(e.currentTarget.value)
                     let query = e.currentTarget.value;
                     if (config.queryPrepend) {
