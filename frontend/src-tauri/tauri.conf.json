@@ -71,7 +71,18 @@
       }
     ],
     "security": {
-      "csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self' img-src: 'self'"
+      "csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self' img-src: 'self'",
+      "dangerousRemoteDomainIpcAccess": [
+        {
+          "domain": "tauri.localhost",
+          "windows": ["main", "popup"]
+        },
+        {
+          "domain": "localhost",
+          "scheme": "tauri",
+          "windows": ["main", "popup"]
+        }
+      ]
     }
   },
   "plugins": {
