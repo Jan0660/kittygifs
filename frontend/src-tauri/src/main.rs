@@ -52,11 +52,13 @@ fn main() {
 
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let hide = CustomMenuItem::new("hide".to_string(), "Hide");
+    let show = CustomMenuItem::new("show".to_string(), "Show");
     let hide_popup = CustomMenuItem::new("hide_popup".to_string(), "Hide Popup");
     let tray_menu = SystemTrayMenu::new()
         .add_item(quit)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(hide)
+        .add_item(show)
         .add_item(hide_popup);
     let tray = SystemTray::new().with_menu(tray_menu);
     tauri::Builder::default()
@@ -69,6 +71,10 @@ fn main() {
                 "hide" => {
                     let window = app.get_window("main").unwrap();
                     window.hide().unwrap();
+                }
+                "show" => {
+                    let window = app.get_window("main").unwrap();
+                    window.show().unwrap();
                 }
                 "hide_popup" => {
                     let window = app.get_window("popup").unwrap();
