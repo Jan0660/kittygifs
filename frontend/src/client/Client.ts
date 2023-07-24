@@ -46,7 +46,6 @@ export class KittyGifsClient {
         id: string,
         props: {
             tags: string[];
-            private: boolean;
             note: string;
             group: string | null;
         },
@@ -64,7 +63,6 @@ export class KittyGifsClient {
         props: {
             url: string;
             tags: string[];
-            private: boolean;
             note: string;
             group: string | null;
         },
@@ -159,7 +157,6 @@ export type Gif = {
     size: Size | null;
     tags: string[];
     uploader: string;
-    private: boolean;
     note: string | null;
     group: string | null;
 };

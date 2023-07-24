@@ -13,7 +13,6 @@ const EditGifPage: Component = () => {
 
     const [tags, setTags] = createSignal([]);
     const [note, setNote] = createSignal('');
-    const [getPrivate, setPrivate] = createSignal(false);
     const [error, setError] = createSignal("");
     const [group, setGroup] = createSignal("none");
 
@@ -21,7 +20,6 @@ const EditGifPage: Component = () => {
         if (gif()) {
             setTags(gif().tags)
             setNote(gif().note)
-            setPrivate(gif().private)
             setGroup(gif().group == `@${userInfo?.info?.username}` ? "private" : gif().group ?? "none")
         }
     })
@@ -66,17 +64,6 @@ const EditGifPage: Component = () => {
                         }}
                     />
                     <br />
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={getPrivate()}
-                            onInput={e => {
-                                setPrivate(e.currentTarget.checked);
-                            }}
-                        />
-                        Private
-                    </label>
-                    <br />
                     <GroupSelect groupAccessor={group} groupSetter={setGroup} />
                     <br />
                     <button
@@ -86,7 +73,6 @@ const EditGifPage: Component = () => {
                                 await client.patchGif(gif().id, {
                                     tags: tags(),
                                     note: note(),
-                                    private: getPrivate(),
                                     group: group() == "none" ? "" : group(),
                                 });
                                 navigate(`/gifs/${gif().id}`);

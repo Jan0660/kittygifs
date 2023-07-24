@@ -65,7 +65,6 @@ const PostGifPage: Component = () => {
                                 url: url(),
                                 tags: tags(),
                                 note: note(),
-                                private: false,
                                 group: group() == "none" ? "" : group(),
                             });
                             navigate(`/gifs/${gif.id}`);
