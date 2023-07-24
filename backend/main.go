@@ -88,7 +88,7 @@ func main() {
 	sessionsCol := db.Collection("sessions")
 
 	usernameValidation = regexp.MustCompile("^[a-z0-9_]{3,20}$")
-	tagValidation = regexp.MustCompile("^[a-z0-9_]{3,20}$")
+	tagValidation = regexp.MustCompile("^[a-z0-9_]{2,20}$")
 	isTenorUrl = regexp.MustCompile("(?i)^https://tenor.com/view/(?:.*-)?(?P<id>\\d+)$")
 	tenorPreviewGifUrl = regexp.MustCompile("(?i)\"mediumgif\":{\"url\":(\"https:\\\\u002F\\\\u002Fmedia.tenor.com\\\\u002F.+?\\\\u002F.+?\\.gif\")")
 	tenorPreviewVideoUrl = regexp.MustCompile("(?i)\"mp4\":{\"url\":(\"https:\\\\u002F\\\\u002Fmedia.tenor.com\\\\u002F.+?\\\\u002F.+?\\.mp4\")")
