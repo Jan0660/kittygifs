@@ -10,6 +10,9 @@ Request and response bodies are in JSON format.
 - `#group` - includes gifs from the specified group(s), `#private` includes private gifs
 - `$ig` - includes gifs from your groups and private gifs, overridden by `#group`
 - `#!group` - search for only gifs in the specified group, `#!private` searches for only private gifs
+- `sort:sort`
+  - `sort:new` - sort by upload date, newest first
+  - `sort:old` - sort by upload date, oldest first
 
 An odd one is searching for text in the note.
 This is done by using a doublequoted section in the query, e.g. `"this is a note"`.

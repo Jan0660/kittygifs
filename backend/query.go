@@ -2,8 +2,14 @@ package main
 
 import (
 	"errors"
+	"go.mongodb.org/mongo-driver/bson"
 	"strings"
 )
+
+var Sorts = map[string]interface{}{
+	"new": bson.M{"_id": -1},
+	"old": bson.M{"_id": 1},
+}
 
 type ComprehensiveQuery struct {
 	Tags     []string
@@ -15,6 +21,7 @@ type ComprehensiveQuery struct {
 	IncludeGroups *[]string
 	// Groups search results must belong to this group
 	Group *string
+	Sort  interface{}
 }
 
 func ParseQuery(query string, searcherUsername *string) (*ComprehensiveQuery, error) {
@@ -23,6 +30,7 @@ func ParseQuery(query string, searcherUsername *string) (*ComprehensiveQuery, er
 	note := ""
 	var includeGroups *[]string
 	var group *string
+	var sort interface{}
 	{
 		start := strings.Index(query, "\"")
 		if start != -1 {
@@ -71,6 +79,13 @@ func ParseQuery(query string, searcherUsername *string) (*ComprehensiveQuery, er
 			}
 		} else if s == "$ig" {
 			includeGroups = &[]string{}
+		} else if strings.HasPrefix(s, "sort:") {
+			name := s[5:]
+			sortLocal, ok := Sorts[name]
+			if !ok {
+				return nil, errors.New("invalid sort name")
+			}
+			sort = sortLocal
 		} else {
 			tags = append(tags, s)
 		}
@@ -81,5 +96,6 @@ func ParseQuery(query string, searcherUsername *string) (*ComprehensiveQuery, er
 		Note:          note,
 		IncludeGroups: includeGroups,
 		Group:         group,
+		Sort:          sort,
 	}, nil
 }

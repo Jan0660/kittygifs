@@ -288,6 +288,7 @@ func main() {
 		cursor, err := gifsCol.Find(ctx, search, &options.FindOptions{
 			Skip:      &skip,
 			BatchSize: &maxNum,
+			Sort:      query.Sort,
 		})
 		if err != nil {
 			c.JSON(500, Error(err))
