@@ -75,7 +75,7 @@ func main() {
 		}
 	}()
 	// create database if not exists
-	db := client.Database(config.MongoDatabase)
+	db := client.Database(config.DatabaseName)
 	{
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
@@ -888,9 +888,8 @@ type UserSession struct {
 }
 
 type Config struct {
-	MongoUrl string `json:"mongoUrl"`
-	// todo: rename to databaseName
-	MongoDatabase            string    `json:"mongoDatabase"`
+	MongoUrl                 string    `json:"mongoUrl"`
+	DatabaseName             string    `json:"databaseName"`
 	Address                  string    `json:"address"`
 	AllowSignup              bool      `json:"allowSignup"`
 	AccessControlAllowOrigin *[]string `json:"accessControlAllowOrigin"`

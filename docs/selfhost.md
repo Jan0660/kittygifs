@@ -9,7 +9,7 @@
    ```json
    {
      "mongoUrl": "",
-     "mongoDatabase": "kittygifs",
+     "databaseName": "kittygifs",
      "address": ":8234",
      "allowSignup": true,
      "accessControlAllowOrigin": ["*"]
@@ -24,7 +24,7 @@
 
 Connection string to your MongoDB instance. See [MongoDB docs](https://docs.mongodb.com/manual/reference/connection-string/) for more info.
 
-### `mongoDatabase`
+### `databaseName`
 
 Name of the database to use, will be created if it doesn't exist.
 
