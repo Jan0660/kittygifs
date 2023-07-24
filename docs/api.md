@@ -43,15 +43,6 @@ Permission groups:
 
 ### Public
 
-#### GET /gifs/:id
-
-Returns a gif by the specified ID.
-
-Responses:
-
-- 200: [Gif](#gif)
-- 500: [Error](#error)
-
 #### POST /users
 
 Creates a new user. This endpoint may be disabled in the backend's configuration.
@@ -84,6 +75,16 @@ Responses:
 - 200: [UserSession](#usersession)
 
 ### Sessioned
+
+#### GET /gifs/:id
+
+Returns a gif by the specified ID. If the gif is in a group, the user must be in that group.
+
+Responses:
+
+- 200: [Gif](#gif)
+- 403: you are not in the group ([Error](#error))
+- 500: [Error](#error)
 
 #### GET /gifs/search
 

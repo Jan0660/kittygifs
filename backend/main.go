@@ -358,12 +358,15 @@ func main() {
 		}
 		c.JSON(200, info)
 	})
-	r.GET("/gifs/:id", func(c *gin.Context) {
+	sessioned.GET("/gifs/:id", func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		var gif Gif
-		// todo: check if private
 		err := gifsCol.FindOne(ctx, bson.M{"_id": c.Param("id")}).Decode(&gif)
+		if user := GetUser(c); gif.Group != nil && ((user != nil && !user.HasGroup(*gif.Group)) || user == nil) {
+			c.JSON(403, gin.H{"error": "you do not have access to this gif"})
+			return
+		}
 		if err != nil {
 			c.JSON(500, Error(err))
 			return
@@ -811,6 +814,9 @@ func ErrorStr(str string) gin.H {
 
 func GetUser(c *gin.Context) *User {
 	userGet, _ := c.Get("user")
+	if userGet == nil {
+		return nil
+	}
 	return userGet.(*User)
 }
 
@@ -840,6 +846,9 @@ type User struct {
 
 // HasGroups Returns true if user has all the specified groups or is admin, otherwise returns false
 func (user *User) HasGroups(groups []string) bool {
+	if user == nil {
+		return false
+	}
 	if user.HasGroup("admin") {
 		return true
 	}
@@ -853,6 +862,9 @@ func (user *User) HasGroups(groups []string) bool {
 
 // HasGroup Returns true if user has the specified group or is admin, otherwise returns false
 func (user *User) HasGroup(group string) bool {
+	if user == nil {
+		return false
+	}
 	if user.Groups == nil {
 		return false
 	}
