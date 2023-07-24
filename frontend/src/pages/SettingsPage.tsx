@@ -186,6 +186,7 @@ const SettingsPage: Component = () => {
                     placeholder="http(s)://host:port"
                     class="input"
                 />
+                <br />
                 <label>
                     <input
                         type="checkbox"
