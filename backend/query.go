@@ -17,7 +17,7 @@ type ComprehensiveQuery struct {
 	Group *string
 }
 
-func ParseQuery(query string) (*ComprehensiveQuery, error) {
+func ParseQuery(query string, searcherUsername *string) (*ComprehensiveQuery, error) {
 	tags := []string{}
 	uploader := ""
 	note := ""
@@ -49,12 +49,25 @@ func ParseQuery(query string) (*ComprehensiveQuery, error) {
 					return nil, errors.New("multiple groups specified")
 				}
 				sl := s[2:]
+				if sl == "private" {
+					if searcherUsername == nil {
+						return nil, errors.New("cannot search private group without username")
+					}
+					sl = "@" + *searcherUsername
+				}
 				group = &sl
 			} else {
 				if includeGroups == nil {
 					includeGroups = &[]string{}
 				}
-				*includeGroups = append(*includeGroups, s[1:])
+				sl := s[1:]
+				if sl == "private" {
+					if searcherUsername == nil {
+						return nil, errors.New("cannot search private group without username")
+					}
+					sl = "@" + *searcherUsername
+				}
+				*includeGroups = append(*includeGroups, sl)
 			}
 		} else if s == "$ig" {
 			includeGroups = &[]string{}

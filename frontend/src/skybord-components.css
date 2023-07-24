@@ -253,3 +253,22 @@ td {
     border: 1px solid var(--foreground-border);
     padding: 5px;
 }
+
+.select, .select option {
+    color: #ddd;
+    color: var(--foreground-primary);
+    padding: 7px;
+}
+.select {
+    background-color: #222;
+    background-color: var(--background-tertiary);
+    border: 1px solid #383838;
+    border: 1px solid var(--foreground-border);
+    border-radius: 4px;
+    margin: 5px;
+}
+.select option {
+    background-color: #1a1a1a;
+    background-color: var(--background-secondary);
+    border-radius: 4px;
+}

@@ -125,6 +125,29 @@ export class KittyGifsClient {
             { signal },
         );
     }
+
+    /**
+     * Gets the info of a user
+     * 
+     * @param username the username to get info for, if "self" then the info of the current user is returned
+     */
+    public async getUserInfo(
+        username: string,
+        props?: {
+            /**
+             * if true, the stats of the user are returned
+             */
+            stats: boolean
+        },
+        signal?: AbortSignal,
+    ): Promise<UserInfo> {
+        let url = "/users/" + encodeURIComponent(username) + "/info";
+        if (props?.stats) {
+            url += "?stats=true";
+        }
+        const res = await this._axios.get(url, { signal });
+        return res.data;
+    }
 }
 
 export type Gif = {
@@ -149,4 +172,14 @@ export type Size = {
 export type UserSession = {
     token: string;
     username: string;
+}
+
+export type UserInfo = {
+    username: string;
+    groups?: string[];
+    stats?: UserStats;
+}
+
+export type UserStats = {
+    uploads: number;
 }

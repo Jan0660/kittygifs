@@ -23,7 +23,7 @@ export const SearchHighlight = ({ gif, query }: { gif: Gif, query: string }) => 
                             return list;
                         }, [])
                     parts.pop()
-                    console.log(parts)
+                    // console.log(parts)
                     return (
                         <span class="tag">
                             <For each={parts}>

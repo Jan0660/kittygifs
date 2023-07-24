@@ -4,6 +4,7 @@ import { Navigate, useNavigate, useRouteData } from "@solidjs/router";
 import { GifPreviewSingle } from "../GifPreviewSingle";
 import { GifViewData } from "../App";
 import { client, config, getErrorString } from "..";
+import { GroupSelect } from "../components/GroupSelect";
 
 const PostGifPage: Component = () => {
     const navigate = useNavigate();
@@ -11,7 +12,7 @@ const PostGifPage: Component = () => {
     const [url, setUrl] = createSignal("");
     const [tags, setTags] = createSignal([] as string[]);
     const [note, setNote] = createSignal("");
-    const [group, setGroup] = createSignal(config.defaultGroup ?? "");
+    const [group, setGroup] = createSignal(config.defaultGroup ?? "none");
     return (
         <>
             <div class="content-header">
@@ -55,13 +56,7 @@ const PostGifPage: Component = () => {
                     onInput={e => setNote(e.currentTarget.value)}
                 />
                 <br />
-                <input
-                    type="text"
-                    placeholder="Group"
-                    value={group() ? group() : ""}
-                    class="input"
-                    onInput={e => setGroup(e.currentTarget.value)}
-                />
+                <GroupSelect groupAccessor={group} groupSetter={setGroup} />
                 <br />
                 <button
                     onClick={async () => {
@@ -71,7 +66,7 @@ const PostGifPage: Component = () => {
                                 tags: tags(),
                                 note: note(),
                                 private: false,
-                                group: group(),
+                                group: group() == "none" ? "" : group(),
                             });
                             navigate(`/gifs/${gif.id}`);
                         } catch (e) {

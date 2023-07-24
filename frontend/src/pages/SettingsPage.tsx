@@ -2,6 +2,7 @@ import { type Component, Show, For, createSignal } from "solid-js";
 import "../index.css";
 import { config, saveConfig } from "..";
 import { invoke } from "@tauri-apps/api/tauri";
+import { GroupSelect } from "../components/GroupSelect";
 
 const ModifierKeys = {
     Alt: 0x01,
@@ -91,14 +92,15 @@ const SettingsPage: Component = () => {
                         saveConfig();
                     }}
                     class="input"
-                /><br/>
+                />
+                <br />
                 <label>Default Group for Posting</label> <br />
                 <input
                     type="text"
                     value={config.defaultGroup ?? ""}
                     onChange={e => {
                         e.target.value = e.target.value.toLocaleLowerCase().trim();
-                        config.defaultGroup = e.target.value;
+                        config.defaultGroup = e.target.value == "" ? null : e.target.value;
                         saveConfig();
                     }}
                     class="input"
@@ -184,6 +186,17 @@ const SettingsPage: Component = () => {
                     placeholder="http(s)://host:port"
                     class="input"
                 />
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={config.groupTextInput}
+                        onChange={e => {
+                            config.groupTextInput = e.target.checked;
+                            saveConfig();
+                        }}
+                    />
+                    Use a text input for group selection instead of a dropdown
+                </label>
             </div>
         </>
     );

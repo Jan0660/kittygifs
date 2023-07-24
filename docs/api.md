@@ -4,11 +4,12 @@ Request and response bodies are in JSON format.
 
 ## Searching
 
-- `tag` - search for gifs with the specified tag, if multiple specified, gifs must have all tags
+- `tag` - search for gifs with the specified tag, if multiple specified, gifs must have all tags,
+  the last tag matches gifs where a tag starts with the specified string, e.g. `ki` matches `kitty`
 - `@username` - search for gifs uploaded by the specified user
-- `#group` - includes gifs from the specified group(s)
-- `$ig` - includes gifs from your groups
-- `#!group` - search for only gifs in the specified group
+- `#group` - includes gifs from the specified group(s), `#private` includes private gifs
+- `$ig` - includes gifs from your groups and private gifs, overridden by `#group`
+- `#!group` - search for only gifs in the specified group, `#!private` searches for only private gifs
 
 An odd one is searching for text in the note.
 This is done by using a doublequoted section in the query, e.g. `"this is a note"`.
@@ -24,6 +25,19 @@ The kittygifs API has 3 types of endpoints:
 - Public endpoints: These endpoints do not require authentication.
 - Sessioned endpoints: These endpoints unlock extra functionality if authenticated.
 - Authed endpoints: These endpoints require authentication.
+
+## Groups
+
+Groups are used to restrict access to gifs and for permission management.
+A user can have multiple groups, but a gif can only be in one group.
+
+If `group` on a gif is `@{username}`, the gif is private to that user.
+
+Permission groups:
+
+- `admin` - can do anything, treated as having every group (except for `$ig` in search)
+- `perm:edit_all_gifs`
+- `perm:delete_all_gifs`
 
 ## Routes
 
@@ -88,6 +102,21 @@ Responses:
 - 500: [Error](#error)
 - 200: array of [Gif](#gif)
 
+#### GET /users/:username/info
+
+Gets information about the specified user.
+If `username` is `self`, the information about the authenticated user is returned.
+
+Query parameters:
+
+- stats: bool? - if true, the user's stats are included in the response
+
+Responses:
+
+- 400: invalid query parameters ([Error](#error))
+- 500: [Error](#error)
+- 200: [UserInfo](#userinfo)
+
 ### Authed
 
 All endpoints in this section respond with 401 if not authenticated.
@@ -108,6 +137,7 @@ Responses:
 #### PATCH /gifs/:id
 
 Updates a gif.
+The authenticated user must be the uploader of the gif or have the `perm:edit_all_gifs` group.
 
 Request body:
 
@@ -125,6 +155,7 @@ Responses:
 #### DELETE /gifs/:id
 
 Deletes a gif.
+The authenticated user must be the uploader of the gif or have the `perm:delete_all_gifs` group.
 
 Responses:
 
@@ -192,7 +223,6 @@ type Gif struct {
 	Size             *Size    `json:"size,omitempty" bson:"size,omitempty"`
 	Tags             []string `json:"tags" bson:"tags"`
 	Uploader         string   `json:"uploader" bson:"uploader"`
-	Private          bool     `json:"private" bson:"private"`
 	Note             string   `json:"note" bson:"note"`
 	Group            *string  `json:"group,omitempty" bson:"group,omitempty"`
 }
@@ -223,5 +253,23 @@ Just an error string.
 ```go
 type Error struct {
     Error string `json:"error"
+}
+```
+
+### UserInfo
+
+```go
+type UserInfo struct {
+	Username string     `json:"username"`
+	Groups   *[]string  `json:"groups,omitempty"`
+	Stats    *UserStats `json:"stats,omitempty"`
+}
+```
+
+### UserStats
+
+```go
+type UserStats struct {
+	Uploads int64 `json:"uploads"`
 }
 ```

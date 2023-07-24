@@ -2,9 +2,10 @@ import { Component, For, Show, Suspense, createEffect, createSignal } from "soli
 import { useNavigate, useRouteData } from "@solidjs/router";
 import { GifViewData } from "../App";
 import GifPage from "./GifPage";
-import { client, getErrorString } from "..";
+import { client, getErrorString, userInfo } from "..";
 import { AxiosError } from "axios";
 import { GifPreviewSingle } from "../GifPreviewSingle";
+import { GroupSelect } from "../components/GroupSelect";
 
 const EditGifPage: Component = () => {
     const gif = useRouteData<typeof GifViewData>();
@@ -14,14 +15,14 @@ const EditGifPage: Component = () => {
     const [note, setNote] = createSignal('');
     const [getPrivate, setPrivate] = createSignal(false);
     const [error, setError] = createSignal("");
-    const [group, setGroup] = createSignal("");
+    const [group, setGroup] = createSignal("none");
 
     createEffect(() => {
         if (gif()) {
             setTags(gif().tags)
             setNote(gif().note)
             setPrivate(gif().private)
-            setGroup(gif().group)
+            setGroup(gif().group == `@${userInfo?.info?.username}` ? "private" : gif().group ?? "none")
         }
     })
 
@@ -76,13 +77,7 @@ const EditGifPage: Component = () => {
                         Private
                     </label>
                     <br />
-                    <input
-                        type="text"
-                        placeholder="Group"
-                        value={group() ? group() : ""}
-                        class="input"
-                        onInput={e => setGroup(e.currentTarget.value)}
-                    />
+                    <GroupSelect groupAccessor={group} groupSetter={setGroup} />
                     <br />
                     <button
                         onClick={async () => {
@@ -92,7 +87,7 @@ const EditGifPage: Component = () => {
                                     tags: tags(),
                                     note: note(),
                                     private: getPrivate(),
-                                    group: group(),
+                                    group: group() == "none" ? "" : group(),
                                 });
                                 navigate(`/gifs/${gif().id}`);
                             } catch (e) {

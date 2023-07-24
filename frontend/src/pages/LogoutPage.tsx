@@ -1,5 +1,5 @@
 import { Component, createSignal } from "solid-js";
-import { client, config, getErrorString, saveConfig } from "..";
+import { client, config, deleteUserInfo, getErrorString, saveConfig } from "..";
 import { useNavigate } from "@solidjs/router";
 
 const LogoutPage: Component = () => {
@@ -23,6 +23,7 @@ const LogoutPage: Component = () => {
                             await client.deleteSession(config.token);
                             config.token = null;
                             await saveConfig();
+                            await deleteUserInfo();
                             navigate("/");
                         } catch (e) {
                             setError(getErrorString(e));

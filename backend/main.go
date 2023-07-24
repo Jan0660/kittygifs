@@ -193,6 +193,10 @@ func main() {
 		if userGet, ok := c.Get("user"); ok {
 			user = userGet.(*User)
 		}
+		var username *string
+		if user != nil {
+			username = &user.Username
+		}
 		ctx, cancel := context.WithTimeout(context.Background(), 16*time.Second)
 		defer cancel()
 		var maxNum int32 = 100
@@ -213,13 +217,12 @@ func main() {
 				return
 			}
 		}
-		query, err := ParseQuery(queryString)
+		query, err := ParseQuery(queryString, username)
 		if err != nil {
 			c.JSON(400, gin.H{"error": "failed to parse query: " + err.Error()})
 			return
 		}
 		search := map[string]interface{}{}
-		search["private"] = false
 		if query.Group == nil && query.IncludeGroups == nil {
 			search["group"] = bson.M{"$exists": false}
 		}
@@ -260,6 +263,8 @@ func main() {
 				if len(*query.IncludeGroups) == 0 {
 					if user != nil && user.Groups != nil {
 						includeGroups = user.Groups
+						tmp := append(*includeGroups, "@"+user.Username)
+						includeGroups = &tmp
 					}
 				} else {
 					includeGroups = query.IncludeGroups
@@ -310,6 +315,48 @@ func main() {
 		}
 		c.JSON(200, gifs)
 		return
+	})
+	sessioned.GET("/users/:username/info", func(c *gin.Context) {
+		type Request struct {
+			Stats bool `form:"stats"`
+		}
+		var req Request
+		err := c.ShouldBindQuery(&req)
+		if err != nil {
+			c.JSON(400, Error(err))
+			return
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		var user User
+		username := c.Param("username")
+		if username == "self" {
+			if GetUser(c) == nil {
+				c.JSON(403, gin.H{"error": "you must be logged in to view your own info"})
+				return
+			}
+			user = *GetUser(c)
+		} else {
+			err = usersCol.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+			if err != nil {
+				c.JSON(500, Error(err))
+				return
+			}
+		}
+		info := UserInfo{
+			Username: user.Username,
+			Groups:   user.Groups,
+		}
+		if req.Stats {
+			info.Stats = &UserStats{}
+			uploadCount, err := gifsCol.CountDocuments(ctx, bson.M{"uploader": user.Username}, &options.CountOptions{})
+			info.Stats.Uploads = uploadCount
+			if err != nil {
+				c.JSON(500, Error(err))
+				return
+			}
+		}
+		c.JSON(200, info)
 	})
 	r.GET("/gifs/:id", func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -421,8 +468,7 @@ func main() {
 		c.Next()
 	})
 	authed.POST("/gifs", func(c *gin.Context) {
-		userGet, _ := c.Get("user")
-		user := userGet.(*User)
+		user := GetUser(c)
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second*2)
 		defer cancel()
 		var gif Gif
@@ -445,7 +491,10 @@ func main() {
 			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
-		if user != nil && gif.Group != nil && !user.HasGroup(*gif.Group) {
+		if gif.Group != nil && *gif.Group == "private" {
+			privateGroup := "@" + c.GetString("username")
+			gif.Group = &privateGroup
+		} else if gif.Group != nil && !user.HasGroup(*gif.Group) {
 			c.JSON(403, gin.H{"error": "you do not have the group " + *gif.Group})
 			return
 		}
@@ -548,17 +597,19 @@ func main() {
 			c.JSON(403, gin.H{"error": "you are not the uploader of this gif nor do you have perm:edit_all_gifs"})
 			return
 		}
-		if edit.Group != nil && !user.HasGroup(*edit.Group) {
+
+		originalGif.Group = edit.Group
+		if originalGif.Group != nil && *originalGif.Group == "" {
+			originalGif.Group = nil
+		} else if originalGif.Group != nil && *originalGif.Group == "private" {
+			privateGroup := "@" + c.GetString("username")
+			originalGif.Group = &privateGroup
+		} else if edit.Group != nil && !user.HasGroup(*edit.Group) {
 			c.JSON(403, gin.H{"error": "you do not have the group " + *edit.Group})
 			return
 		}
 		originalGif.Tags = edit.Tags
 		originalGif.Note = edit.Note
-		originalGif.Private = edit.Private
-		originalGif.Group = edit.Group
-		if originalGif.Group != nil && *originalGif.Group == "" {
-			originalGif.Group = nil
-		}
 		err = ValidateGif(originalGif)
 		if err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
@@ -633,8 +684,7 @@ func main() {
 			c.JSON(400, gin.H{"error": "new password too short(<8)"})
 			return
 		}
-		userGet, _ := c.Get("user")
-		user := userGet.(*User)
+		user := GetUser(c)
 		if !user.HasGroup("admin") {
 			c.JSON(403, gin.H{"error": "you are not admin"})
 			return
@@ -759,6 +809,11 @@ func ErrorStr(str string) gin.H {
 	return gin.H{"error": str}
 }
 
+func GetUser(c *gin.Context) *User {
+	userGet, _ := c.Get("user")
+	return userGet.(*User)
+}
+
 type Gif struct {
 	Id               string   `json:"id" bson:"_id"`
 	Url              string   `json:"url" bson:"url"`
@@ -768,7 +823,6 @@ type Gif struct {
 	Size             *Size    `json:"size,omitempty" bson:"size,omitempty"`
 	Tags             []string `json:"tags" bson:"tags"`
 	Uploader         string   `json:"uploader" bson:"uploader"`
-	Private          bool     `json:"private" bson:"private"`
 	Note             string   `json:"note" bson:"note"`
 	Group            *string  `json:"group,omitempty" bson:"group,omitempty"`
 }
@@ -805,6 +859,9 @@ func (user *User) HasGroup(group string) bool {
 	if group != "admin" && user.HasGroup("admin") {
 		return true
 	}
+	if group[0] == '@' && user.Username == group[1:] {
+		return true
+	}
 	for _, userGroup := range *user.Groups {
 		if userGroup == group {
 			return true
@@ -825,4 +882,14 @@ type Config struct {
 	Address                  string    `json:"address"`
 	AllowSignup              bool      `json:"allowSignup"`
 	AccessControlAllowOrigin *[]string `json:"accessControlAllowOrigin"`
+}
+
+type UserInfo struct {
+	Username string     `json:"username"`
+	Groups   *[]string  `json:"groups,omitempty"`
+	Stats    *UserStats `json:"stats,omitempty"`
+}
+
+type UserStats struct {
+	Uploads int64 `json:"uploads"`
 }
