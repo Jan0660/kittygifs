@@ -338,7 +338,7 @@ func main() {
 			}
 			user = *GetUser(c)
 		} else {
-			err = usersCol.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+			err = usersCol.FindOne(ctx, bson.M{"_id": username}).Decode(&user)
 			if err != nil {
 				c.JSON(500, Error(err))
 				return
