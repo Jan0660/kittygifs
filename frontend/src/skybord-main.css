@@ -91,7 +91,7 @@ body {
 
 .content-header {
     margin-block-start: 0;
-    padding: 20px 20px;
+    padding: 0px 20px;
     padding-top: 75px;
     border-bottom: 1px solid var(--foreground-border);
     background-color: var(--background-tertiary);

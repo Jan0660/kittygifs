@@ -14,7 +14,7 @@ const IndexPage: Component = () => {
     return (
         <>
             <div class="content-header">
-                <h2>Home page</h2>
+                <h1>Home page</h1>
             </div>
             <div class="content-content">
 

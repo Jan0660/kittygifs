@@ -13,7 +13,7 @@ const GifPage: Component = () => {
     return (
         <>
             <div class="content-header">
-                <h2>Viewing Gif information</h2>
+                <h1>Viewing Gif information</h1>
             </div>
             <div class="content-content">
                 <Show when={gif()} fallback={<h1>Loading... :)</h1>}>

@@ -116,17 +116,50 @@ const App: Component = () => {
                             path="/settings"
                             component={lazy(() => import("./pages/SettingsPage"))}
                         />
+                        <Route
+                            path="/settings/accountDeletion"
+                            component={lazy(() => import("./pages/AccountDeletionPage"))}
+                        />
+                        <Route path="/legal">
+                            <Route
+                                path="/privacy"
+                                component={lazy(() => import("./pages/legal/PrivacyPage"))}
+                            />
+                            <Route
+                                path="/terms"
+                                component={lazy(() => import("./pages/legal/TermsPage"))}
+                            />
+                        </Route>
                     </Routes>
                     <div class="is-center">
-                        The kittygifs project, available on{" "}
-                        <a href="https://github.com/Jan0660/kittygifs" target="_blank" class="link">
-                            GitHub
-                        </a>
-                        . Licensed under{" "}
-                        <a href="https://www.gnu.org/licenses/agpl-3.0.en.html" target="_blank" class="link">
-                            the GNU AGPLv3
-                        </a>
-                        .
+                        <span>
+                            The kittygifs project, available on{" "}
+                            <a
+                                href="https://github.com/Jan0660/kittygifs"
+                                target="_blank"
+                                class="link"
+                            >
+                                GitHub
+                            </a>
+                            . Licensed under{" "}
+                            <a
+                                href="https://www.gnu.org/licenses/agpl-3.0.en.html"
+                                target="_blank"
+                                class="link"
+                            >
+                                the GNU AGPLv3
+                            </a>
+                            .
+                        </span>
+                        <br />
+                        <span>
+                            <a href="/legal/privacy" class="link">
+                                Privacy Policy
+                            </a>{" | "}
+                            <a href="/legal/terms" class="link">
+                                Terms of Service
+                            </a>
+                        </span>
                     </div>
                 </div>
             </ErrorBoundary>

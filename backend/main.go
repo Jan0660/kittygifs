@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/JGLTechnologies/gin-rate-limit"
 	"github.com/alexedwards/argon2id"
 	"github.com/gin-contrib/gzip"
@@ -82,10 +83,12 @@ func main() {
 		_ = db.CreateCollection(ctx, "gifs")
 		_ = db.CreateCollection(ctx, "users")
 		_ = db.CreateCollection(ctx, "sessions")
+		_ = db.CreateCollection(ctx, "issues")
 	}
 	gifsCol := db.Collection("gifs")
 	usersCol := db.Collection("users")
 	sessionsCol := db.Collection("sessions")
+	issuesCol := db.Collection("issues")
 
 	usernameValidation = regexp.MustCompile("^[a-z0-9_]{3,20}$")
 	tagValidation = regexp.MustCompile("^[a-z0-9_]{2,20}$")
@@ -715,6 +718,53 @@ func main() {
 		}
 		c.Status(200)
 	})
+	authed.POST("/users/gdprRequest", passwordRL, func(c *gin.Context) {
+		type Request struct {
+			Password   string `json:"password"`
+			IsDeletion bool   `json:"isDeletion"`
+			KeepPosts  bool   `json:"keepPosts"`
+			Note       string `json:"note"`
+		}
+		var req Request
+		err := c.BindJSON(&req)
+		if err != nil {
+			c.JSON(400, Error(err))
+			return
+		}
+		if len(req.Note) > 2048 {
+			c.JSON(400, gin.H{"error": "note too long(>2048)"})
+			return
+		}
+		user := GetUser(c)
+		if !CheckPassword(c, req.Password, user.PasswordHash) {
+			return
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		typeString := "request"
+		if req.IsDeletion {
+			typeString = "deletion"
+		}
+		_, err = issuesCol.InsertOne(ctx, bson.M{
+			"type":      typeString,
+			"username":  user.Username,
+			"keepPosts": req.KeepPosts,
+			"note":      req.Note,
+		})
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		go func() {
+			if config.IssueDiscordWebhook == nil {
+				return
+			}
+			_, _ = http.DefaultClient.Post(*config.IssueDiscordWebhook,
+				"application/json",
+				bytes.NewBuffer([]byte(fmt.Sprintf(`{"content": "New GDPR %s request"}`, typeString))))
+		}()
+		c.Status(200)
+	})
 
 	_ = r.Run(config.Address)
 }
@@ -894,6 +944,7 @@ type Config struct {
 	Address                  string    `json:"address"`
 	AllowSignup              bool      `json:"allowSignup"`
 	AccessControlAllowOrigin *[]string `json:"accessControlAllowOrigin"`
+	IssueDiscordWebhook      *string   `json:"issueDiscordWebhook"`
 }
 
 type UserInfo struct {

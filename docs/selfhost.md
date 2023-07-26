@@ -12,7 +12,7 @@
      "databaseName": "kittygifs",
      "address": ":8234",
      "allowSignup": true,
-     "accessControlAllowOrigin": ["*"]
+     "accessControlAllowOrigin": ["*"],
    }
    ```
 
@@ -22,7 +22,8 @@
 
 ### `mongoUrl`
 
-Connection string to your MongoDB instance. See [MongoDB docs](https://docs.mongodb.com/manual/reference/connection-string/) for more info.
+Connection string to your MongoDB instance.
+See [MongoDB docs](https://docs.mongodb.com/manual/reference/connection-string/) for more info.
 
 ### `databaseName`
 
@@ -34,8 +35,17 @@ Address to listen on.
 
 ### `allowSignup`
 
-Whether to allow users to sign up. If set to `false`, only users that are already in the database can log in.
+Whether to allow users to sign up.
+If set to `false`, only users that are already in the database can log in.
 
 ### `accessControlAllowOrigin`
 
-Values for the `Access-Control-Allow-Origin` header. Set to `["*"]` to allow all origins. See [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) for more info. If multiple origins are provided the one that matches the `Origin` header will be sent on the requests. Remember to include `https://tauri.localhost` and `tauri://localhost` if you want the Tauri app to work.
+Values for the `Access-Control-Allow-Origin` header. Set to `["*"]` to allow all origins.
+See [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) for more info.
+If multiple origins are provided the one that matches the `Origin` header will be sent on the requests.
+Remember to include `https://tauri.localhost` and `tauri://localhost` if you want the Tauri app to work.
+
+### `issueDiscordWebhook`
+
+Discord webhook URL too send notifications of GDPR requests to.
+If not set, no notifications will be sent.

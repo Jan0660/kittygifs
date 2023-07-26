@@ -146,6 +146,16 @@ export class KittyGifsClient {
         const res = await this._axios.get(url, { signal });
         return res.data;
     }
+
+    public async createGDPRRequest(
+        props: {
+            password: string,
+            isDeletion: boolean,
+            keepPosts: boolean,
+            note: string,
+        }): Promise<void> {
+        await this._axios.post("/users/gdprRequest", props);
+    }
 }
 
 export type Gif = {

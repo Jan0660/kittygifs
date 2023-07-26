@@ -3,6 +3,7 @@ import "../index.css";
 import { config, saveConfig } from "..";
 import { invoke } from "@tauri-apps/api/tauri";
 import { GroupSelect } from "../components/GroupSelect";
+import { useNavigate } from "@solidjs/router";
 
 const ModifierKeys = {
     Alt: 0x01,
@@ -49,6 +50,7 @@ type DesktopConfig = {
 };
 
 const SettingsPage: Component = () => {
+    const navigate = useNavigate();
     const runningTauri = window.__TAURI_IPC__ != null;
     const [modifiers, setModifiers] = createSignal(0);
     const [keyCode, setKeyCode] = createSignal("");
@@ -66,7 +68,7 @@ const SettingsPage: Component = () => {
     return (
         <>
             <div class="content-header">
-                <h2>Settings</h2>
+                <h1>Settings</h1>
             </div>
             <div class="content-content">
                 <h3>Appearance</h3>
@@ -198,6 +200,14 @@ const SettingsPage: Component = () => {
                     />
                     Use a text input for group selection instead of a dropdown
                 </label>
+                <br />
+                <br />
+                <button
+                    class="button danger"
+                    onclick={() => {
+                        navigate("/settings/accountDeletion");
+                    }}
+                >Request Account Deletion or Other GDPR Request</button>
             </div>
         </>
     );
