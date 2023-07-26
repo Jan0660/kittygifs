@@ -61,3 +61,17 @@ jobs:
             - name: Build 🔧
               working-directory: ./frontend
               run: pnpm build:tauri
+    build-backend:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout 🛎️
+              uses: actions/checkout@v3
+
+            - name: Setup Go
+              uses: actions/setup-go@v2
+              with:
+                  go-version: 1.20
+            
+            - name: Build
+              working-directory: ./backend
+              run: go build
