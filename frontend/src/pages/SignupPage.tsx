@@ -8,6 +8,7 @@ const SignupPage: Component = () => {
     const [username, setUsername] = createSignal("");
     const [password, setPassword] = createSignal("");
     const [passwordConfirm, setPasswordConfirm] = createSignal("");
+    const [consent, setConsent] = createSignal(false);
     return (
         <>
             <div class="content-header">
@@ -45,6 +46,17 @@ const SignupPage: Component = () => {
                     class="input"
                 />
                 <br />
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={consent()}
+                        onInput={e => {
+                            setConsent(e.currentTarget.checked);
+                        }}
+                    />
+                    I consent to the <a class="link" href="/legal/terms">terms of service</a> and <a class="link" href="/legal/privacy">privacy policy</a>.
+                </label>
+                <br />
                 <button
                     class="button confirm"
                     onClick={async () => {
@@ -61,6 +73,7 @@ const SignupPage: Component = () => {
                             setError(getErrorString(e));
                         }
                     }}
+                    disabled={!consent()}
                 >
                     Sign up
                 </button>
