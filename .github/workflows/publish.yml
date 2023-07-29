@@ -73,7 +73,7 @@ jobs:
             - name: Make PKGBUILD for AUR(-bin)
               if: matrix.platform == 'ubuntu-latest'
               working-directory: ./frontend
-              run: chmod a+x ./MAKE_PKGBUILD; ./MAKE_PKGBUILD.sh "$VERSION" ./src-tauri/target
+              run: chmod a+x ./MAKE_PKGBUILD.sh; ./MAKE_PKGBUILD.sh "$VERSION" ./src-tauri/target
             - name: Publish AUR package(-bin)
               if: matrix.platform == 'ubuntu-latest'
               uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
