@@ -76,7 +76,7 @@ jobs:
               run: chmod a+x ./MAKE_PKGBUILD; ./MAKE_PKGBUILD.sh "$VERSION" ./src-tauri/target
             - name: Publish AUR package(-bin)
               if: matrix.platform == 'ubuntu-latest'
-              uses: KSXGitHub/github-actions-deploy-aur@v0.4.3
+              uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
               with:
                 pkgname: kittygifs-bin
                 pkgbuild: ./frontend/PKGBUILD
