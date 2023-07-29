@@ -51,6 +51,7 @@ jobs:
 
             - name: Build 🔧
               uses: tauri-apps/tauri-action@v0
+              id: tauri
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
@@ -63,3 +64,24 @@ jobs:
                   projectPath: ./frontend/src-tauri
                   # distPath: ./frontend/dist
                   # iconPath: src-tauri/icons/icon.png
+            - name: Set output url to version
+              if: matrix.platform == 'ubuntu-latest'
+              run: |
+                echo -n "VERSION=" >> "$GITHUB_ENV"
+                echo "${{ steps.tauri.outputs.releaseHtmlUrl }}" | grep -o -E '[0-9]+\.[0-9]+\.[0-9]+' >> "$GITHUB_ENV"
+            
+            - name: Make PKGBUILD for AUR(-bin)
+              if: matrix.platform == 'ubuntu-latest'
+              working-directory: ./frontend
+              run: chmod a+x ./MAKE_PKGBUILD; ./MAKE_PKGBUILD.sh "$VERSION" ./src-tauri/target
+            - name: Publish AUR package(-bin)
+              if: matrix.platform == 'ubuntu-latest'
+              uses: KSXGitHub/github-actions-deploy-aur@v0.4.3
+              with:
+                pkgname: kittygifs-bin
+                pkgbuild: ./frontend/PKGBUILD
+                commit_username: ${{ secrets.AUR_USERNAME }}
+                commit_email: ${{ secrets.AUR_EMAIL }}
+                ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+                commit_message: Update AUR package from GitHub Actions
+                ssh_keyscan_types: ed25519
