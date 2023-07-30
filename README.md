@@ -9,7 +9,8 @@ because you can open it with a keyboard shortcut and send a gif with utmost hast
 
 ### Linux
 
-If you are on Arch Linux or a derivative, you can install `kittygifs-bin` from the AUR.
+If you are on Arch Linux or a derivative,
+you can install `kittygifs-bin` or `kittygifs-git` from the AUR.
 
 You can download the AppImage and `.deb` from [the releases page](https://github.com/Jan0660/kittygifs/releases).
 
