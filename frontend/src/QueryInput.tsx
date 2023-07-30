@@ -10,7 +10,9 @@ type Props = {
 const QueryInput: Component<Props> = (props: Props) => {
     let abortLast: AbortController | null = null;
     onMount(() => {
-        client.searchGifs(config.queryPrepend ?? "").then(res => {
+        client.searchGifs(config.queryPrepend ?? "", null, {
+            max: config.limit,
+        }).then(res => {
             props.setGifs(res);
         });
     });
@@ -34,7 +36,9 @@ const QueryInput: Component<Props> = (props: Props) => {
                     if (config.queryPrepend) {
                         query = config.queryPrepend + " " + query;
                     }
-                    client.searchGifs(query, abortLast.signal).then(res => {
+                    client.searchGifs(query, abortLast.signal, {
+                        max: config.limit,
+                    }).then(res => {
                         console.log(res);
                         props.setGifs(res);
                     });

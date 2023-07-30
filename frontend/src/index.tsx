@@ -15,6 +15,7 @@ interface Config {
     apiUrl: string;
     defaultGroup?: string;
     queryPrepend: string;
+    limit: number;
 }
 
 let item = (await localforage.getItem("kittygifs.config")) as Config;
@@ -27,9 +28,12 @@ if (!item) {
         apiUrl: import.meta.env.VITE_API_URL,
         defaultGroup: null,
         queryPrepend: "",
+        limit: 50,
     };
     await localforage.setItem("kittygifs.config", item);
 }
+
+item.limit ??= 50;
 
 export const config = item;
 

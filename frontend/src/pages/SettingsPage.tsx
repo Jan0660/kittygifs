@@ -107,6 +107,12 @@ const SettingsPage: Component = () => {
                     }}
                     class="input"
                 />
+                <br />
+                <label>Gifs Limit</label><br/>
+                <input type="number" value={config.limit} onChange={(e) => {
+                    config.limit = parseInt(e.target.value);
+                    saveConfig();
+                }}/>
                 <Show when={runningTauri && desktopConfig() != null}>
                     <h3>Desktop Settings</h3>
                     <label>
