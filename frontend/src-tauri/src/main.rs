@@ -35,6 +35,12 @@ struct Args {
     /// delay to pass to enigo for inputting text
     #[arg(long, default_value = "12000")]
     enigo_delay: u64,
+    /// use ydotool instead of enigo(xdotool) on Linux
+    #[arg(long)]
+    ydotool: bool,
+    /// extra arguments to pass to ydotool
+    #[clap(long, value_parser, num_args = 0.., value_delimiter = ' ', default_value = "--key-delay=8 --key-hold=2")]
+    pub ydotool_args: Vec<String>,
 }
 
 lazy_static::lazy_static! {
@@ -157,10 +163,13 @@ fn main() {
 #[tauri::command]
 // should be called from the popup window
 fn selected(url: &str, window: tauri::Window) {
+    // todo: couldn't we just clone the args entirely at this point?
     let popup: bool;
     let popup_delay: u64;
     #[allow(unused_variables)]
     let enigo_delay: u64;
+    let ydotool: bool;
+    let ydotool_args: Vec<String>;
     {
         let binding = ARGS.lock().unwrap();
         let args = binding.as_ref().unwrap();
@@ -170,38 +179,41 @@ fn selected(url: &str, window: tauri::Window) {
         {
             enigo_delay = args.enigo_delay;
         }
+        ydotool = args.ydotool;
+        ydotool_args = args.ydotool_args.clone();
     }
-    
+
     // hide the window
     window.minimize().unwrap();
-    // write the url to clipboard, then paste it
-    // let mut ctx = ClipboardContext::new().unwrap();
-    // let previous = ctx.get_contents();
-    // ctx.set_contents(url.to_string()).unwrap();
-    // std::thread::sleep(Duration::from_millis(100));
-    let mut enigo = Enigo::new();
-    #[cfg(target_os = "linux")]
-    {
-        enigo.set_delay(enigo_delay);
-    }
-    // enigo.key_sequence_parse("{+CTRL}v{-CTRL}{RETURN}");
+    let type_url = move |url: &str, enigo_delay: u64, ydotool: bool| {
+        if ydotool {
+            std::process::Command::new("ydotool")
+                .arg("type")
+                .arg(url.to_owned() + "\n")
+                .args(&ydotool_args)
+                .status()
+                .expect("failed to execute ydotool");
+        } else {
+            let mut enigo = Enigo::new();
+            #[cfg(target_os = "linux")]
+            {
+                enigo.set_delay(enigo_delay);
+            }
+            enigo.key_sequence(url);
+            enigo.key_sequence_parse("{RETURN}")
+        }
+    };
     if popup {
         let url_clone = url.to_string();
         std::thread::spawn(move || {
             std::thread::sleep(Duration::from_millis(popup_delay));
-            enigo.key_sequence(url_clone.as_str());
-            enigo.key_sequence_parse("{RETURN}");
+            type_url(url_clone.as_str(), enigo_delay, ydotool);
             window.hide().unwrap();
         });
     } else {
-        enigo.key_sequence(url);
-        enigo.key_sequence_parse("{RETURN}");
+        type_url(url, enigo_delay, ydotool);
         window.hide().unwrap();
     }
-    // restore the previous clipboard contents
-    // if previous.is_ok() {
-    //     ctx.set_contents(previous.unwrap());
-    // }
     if popup {
         std::thread::spawn(|| {
             std::thread::sleep(Duration::from_millis(800));
