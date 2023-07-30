@@ -68,7 +68,7 @@ jobs:
               if: matrix.platform == 'ubuntu-latest'
               run: |
                 echo -n "VERSION=" >> "$GITHUB_ENV"
-                echo "${{ steps.tauri.outputs.releaseHtmlUrl }}" | grep -o -E '[0-9]+\.[0-9]+\.[0-9]+' >> "$GITHUB_ENV"
+                cat ./frontend/src-tauri/tauri.conf.json | grep -o -E '[0-9]+\.[0-9]+\.[0-9]+' >> "$GITHUB_ENV"
             
             - name: Make PKGBUILD for AUR(-bin)
               if: matrix.platform == 'ubuntu-latest'
