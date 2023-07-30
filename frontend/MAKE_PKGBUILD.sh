@@ -19,7 +19,8 @@ url=\"https://github.com/Jan0660/kittygifs\"
 license=(\"AGPL3\")
 groups=()
 makedepends=()
-depends=(\"webkit2gtk-4.1\" \"appmenu-gtk-module\" \"gtk3\" \"libappindicator-gtk3\" \"xdotool\")
+depends=(\"webkit2gtk-4.1\" \"appmenu-gtk-module\" \"gtk3\" \"libappindicator-gtk3\")
+optdepends=(\"xdotool: for automatic posting on Xorg\" \"ydotool: for automatic posting on Wayland(and Xorg)\")
 source=(\"https://github.com/Jan0660/kittygifs/releases/download/v$version/kittygifs_${version}_amd64.deb\")
 sha256sums=(\"$sha256sum\")
 
