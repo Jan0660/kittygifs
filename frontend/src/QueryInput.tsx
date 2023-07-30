@@ -13,7 +13,7 @@ const QueryInput: Component<Props> = (props: Props) => {
         client.searchGifs(config.queryPrepend ?? "").then(res => {
             props.setGifs(res);
         });
-    })
+    });
     return (
         <>
             <input
@@ -29,7 +29,7 @@ const QueryInput: Component<Props> = (props: Props) => {
                     }
                     abortLast = new AbortController();
                     e.currentTarget.value = e.currentTarget.value.toLocaleLowerCase().trimStart();
-                    props.setQuery(e.currentTarget.value)
+                    props.setQuery(e.currentTarget.value);
                     let query = e.currentTarget.value;
                     if (config.queryPrepend) {
                         query = config.queryPrepend + " " + query;
@@ -40,6 +40,15 @@ const QueryInput: Component<Props> = (props: Props) => {
                     });
                 }}
             />
+
+            <a
+                href="https://github.com/Jan0660/kittygifs/blob/main/docs/api.md#searching"
+                target="_blank"
+                rel="noreferrer"
+                tabindex={-1}
+            >
+                ???
+            </a>
         </>
     );
 };

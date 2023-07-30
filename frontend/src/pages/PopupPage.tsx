@@ -40,7 +40,7 @@ const PopupPage: Component = () => {
 
     return (
         <>
-            <div class="content-header" style="padding-top: 20px">
+            <div class="content-header" style="padding-top: 0px">
                 <h1>Search for gifs...</h1>
             </div>
             <div class="content-content">
@@ -49,7 +49,8 @@ const PopupPage: Component = () => {
                 </style>
 
                 <QueryInput setGifs={setGifs} setQuery={setQuery} />
-                Pro tip: you can use tab and shift + tab to cycle between gifs, and use enter to send
+                <br/>
+                Use tab and shift + tab to cycle between gifs, and use enter to send
 
                 <div class="gifs">
                     <For each={gifs()}>
