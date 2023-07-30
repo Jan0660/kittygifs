@@ -3,10 +3,7 @@ import { client, config, deleteUserInfo, getErrorString, saveConfig } from "..";
 import { useNavigate } from "@solidjs/router";
 
 const LogoutPage: Component = () => {
-    const navigate = useNavigate();
     const [error, setError] = createSignal("");
-    const [username, setUsername] = createSignal("");
-    const [password, setPassword] = createSignal("");
     return (
         <>
             <div class="content-header">
@@ -24,7 +21,8 @@ const LogoutPage: Component = () => {
                             config.token = null;
                             await saveConfig();
                             await deleteUserInfo();
-                            navigate("/");
+                            // not using navigate because it doesn't reload the page
+                            window.location.href = "/";
                         } catch (e) {
                             setError(getErrorString(e));
                         }
