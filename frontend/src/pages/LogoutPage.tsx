@@ -27,6 +27,7 @@ const LogoutPage: Component = () => {
                             setError(getErrorString(e));
                         }
                     }}
+                    class="button confirm"
                 >
                     Log out
                 </button>

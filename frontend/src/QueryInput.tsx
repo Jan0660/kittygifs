@@ -50,6 +50,7 @@ const QueryInput: Component<Props> = (props: Props) => {
                 target="_blank"
                 rel="noreferrer"
                 tabindex={-1}
+                class="link"
             >
                 ???
             </a>

@@ -80,6 +80,7 @@ const EditGifPage: Component = () => {
                                 setError(getErrorString(e));
                             }
                         }}
+                        class="button primary"
                     >
                         Save
                     </button>

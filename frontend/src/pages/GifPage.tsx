@@ -71,6 +71,7 @@ const GifPage: Component = () => {
                                     fallback={<button class="button danger" onClick={() => setDeleteAreYouSure(true)}>Delete</button>}
                                 >
                                     <button
+                                        class="button confirm"
                                         onClick={async () => {
                                             try {
                                                 await client.deleteGif(gif().id);
