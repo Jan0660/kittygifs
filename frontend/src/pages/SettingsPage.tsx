@@ -109,7 +109,7 @@ const SettingsPage: Component = () => {
                 />
                 <br />
                 <label>Gifs Limit</label><br/>
-                <input type="number" value={config.limit} onChange={(e) => {
+                <input class="input" type="number" value={config.limit} onChange={(e) => {
                     config.limit = parseInt(e.target.value);
                     saveConfig();
                 }}/>
