@@ -72,6 +72,7 @@ const PostGifPage: Component = () => {
                             setError(getErrorString(e));
                         }
                     }}
+                    class="button confirm"
                 >
                     Post Gif
                 </button>
