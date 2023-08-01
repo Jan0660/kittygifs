@@ -162,6 +162,15 @@ func main() {
 		return &session, nil
 	}
 
+	// Deletes all sessions except the current one given by the token
+	deleteAllOtherSessions := func(ctx context.Context, username string, token string) error {
+		_, err := sessionsCol.DeleteMany(ctx, bson.M{"_id": bson.M{"$ne": token}, "username": username})
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
 	sessioned := r.Group("/", func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
@@ -464,6 +473,18 @@ func main() {
 			return
 		}
 		c.JSON(200, session)
+	})
+
+	sessioned.DELETE("/users/sessions", func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		user := GetUser(c)
+		err := deleteAllOtherSessions(ctx, user.Username, c.GetHeader(("x-session-token")))
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		c.Status(204)
 	})
 
 	authed := sessioned.Group("/", func(c *gin.Context) {
