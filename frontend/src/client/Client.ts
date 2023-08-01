@@ -112,6 +112,12 @@ export class KittyGifsClient {
         await this._axios.delete("/users/sessions/" + encodeURIComponent(token), { signal },);
     }
 
+    public async deleteAllOtherSessions(
+        signal?: AbortSignal
+    ): Promise<void> {
+        await this._axios.delete("/users/sessions", { signal })
+    }
+
     public async resetPassword(
         oldPassword: string,
         newPassword: string,
