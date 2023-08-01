@@ -7,6 +7,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/JGLTechnologies/gin-rate-limit"
+	"github.com/alexedwards/argon2id"
+	"github.com/gin-contrib/gzip"
+	"github.com/gin-gonic/gin"
+	"github.com/oklog/ulid/v2"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"io"
 	"log"
 	"math/big"
@@ -18,16 +27,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	ratelimit "github.com/JGLTechnologies/gin-rate-limit"
-	"github.com/alexedwards/argon2id"
-	"github.com/gin-contrib/gzip"
-	"github.com/gin-gonic/gin"
-	"github.com/oklog/ulid/v2"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var usernameValidation *regexp.Regexp
