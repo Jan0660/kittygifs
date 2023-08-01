@@ -164,7 +164,7 @@ func main() {
 
 	// Deletes all sessions except the current one given by the token
 	deleteAllOtherSessions := func(ctx context.Context, username string, token string) error {
-		_, err := sessionsCol.DeleteMany(ctx, bson.M{"_id": bson.M{"$ne": token}})
+		_, err := sessionsCol.DeleteMany(ctx, bson.M{"_id": bson.M{"$ne": token}, "username": username})
 		if err != nil {
 			return err
 		}
