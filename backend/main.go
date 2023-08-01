@@ -7,15 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/JGLTechnologies/gin-rate-limit"
-	"github.com/alexedwards/argon2id"
-	"github.com/gin-contrib/gzip"
-	"github.com/gin-gonic/gin"
-	"github.com/oklog/ulid/v2"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"io"
 	"log"
 	"math/big"
@@ -27,6 +18,16 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	ratelimit "github.com/JGLTechnologies/gin-rate-limit"
+	"github.com/alexedwards/argon2id"
+	"github.com/gin-contrib/gzip"
+	"github.com/gin-gonic/gin"
+	"github.com/oklog/ulid/v2"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var usernameValidation *regexp.Regexp
@@ -160,6 +161,15 @@ func main() {
 			return nil, err
 		}
 		return &session, nil
+	}
+
+	// Deletes all sessions except the current one given by the token
+	deleteAllOtherSessions := func(ctx context.Context, username string, token string) error {
+		_, err := sessionsCol.DeleteMany(ctx, bson.M{"_id": bson.M{"$ne": token}})
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
 	sessioned := r.Group("/", func(c *gin.Context) {
@@ -464,6 +474,18 @@ func main() {
 			return
 		}
 		c.JSON(200, session)
+	})
+
+	sessioned.DELETE("/users/sessions", func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		user := GetUser(c)
+		err := deleteAllOtherSessions(ctx, user.Username, c.GetHeader(("x-session-token")))
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		c.Status(204)
 	})
 
 	authed := sessioned.Group("/", func(c *gin.Context) {
