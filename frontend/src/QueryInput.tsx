@@ -10,10 +10,15 @@ type Props = {
 const QueryInput: Component<Props> = (props: Props) => {
     let abortLast: AbortController | null = null;
     onMount(() => {
-        client.searchGifs(config.queryPrepend ?? "", null, {
+        abortLast = new AbortController();
+        client.searchGifs(config.queryPrepend ?? "", abortLast.signal, {
             max: config.limit,
         }).then(res => {
             props.setGifs(res);
+        }).catch(e => {
+            if (e.name != "CanceledError") {
+                console.error(e);
+            }
         });
     });
     return (
@@ -41,6 +46,10 @@ const QueryInput: Component<Props> = (props: Props) => {
                     }).then(res => {
                         console.log(res);
                         props.setGifs(res);
+                    }).catch(e => {
+                        if (e.name != "CanceledError") {
+                            console.error(e);
+                        }
                     });
                 }}
             />
