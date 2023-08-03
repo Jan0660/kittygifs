@@ -17,10 +17,10 @@ const LogoutPage: Component = () => {
                 <button
                     onClick={async () => {
                         try {
-                            await client.deleteSession(config.token);
                             config.token = null;
                             await saveConfig();
                             await deleteUserInfo();
+                            await client.deleteSession(config.token);
                             // not using navigate because it doesn't reload the page
                             window.location.href = "/";
                         } catch (e) {
