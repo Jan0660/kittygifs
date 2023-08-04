@@ -18,6 +18,10 @@ An odd one is searching for text in the note.
 This is done by using a doublequoted section in the query, e.g. `"this is a note"`.
 If there is no ending quote the rest of the query is treated as part of the note.
 Note text search is case insensitive, but is sensitive to diacritics and interpunction.
+This double quoted note search is done using MongoDB's "like" regex.
+
+There is also note search using MongoDB's text index, but it is kinda wack.
+It uses single quotes instead of double quotes.
 
 ## Authentication
 

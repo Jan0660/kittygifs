@@ -12,9 +12,10 @@ var Sorts = map[string]interface{}{
 }
 
 type ComprehensiveQuery struct {
-	Tags     []string
-	Uploader string
-	Note     string
+	Tags      []string
+	Uploader  string
+	NoteRegex string
+	NoteText  string
 	// IncludeGroups if nil, search must not include grouped posts,
 	// if empty, search must include all grouped posts,
 	// if non-empty, search must include items belonging to any of the groups
@@ -27,24 +28,28 @@ type ComprehensiveQuery struct {
 func ParseQuery(query string, searcherUsername *string) (*ComprehensiveQuery, error) {
 	tags := []string{}
 	uploader := ""
-	note := ""
+	noteRegex := ""
+	noteText := ""
 	var includeGroups *[]string
 	var group *string
 	var sort interface{}
-	{
-		start := strings.Index(query, "\"")
+	getQuoted := func(quote string) string {
+		start := strings.Index(query, quote)
 		if start != -1 {
 			afterStart := query[start+1:]
-			end := strings.LastIndex(afterStart, "\"")
+			end := strings.LastIndex(afterStart, quote)
 			if end == -1 {
-				note = afterStart
 				query = query[:start]
+				return afterStart
 			} else {
-				note = afterStart[:end]
 				query = query[:start] + query[start+end+2:]
+				return afterStart[:end]
 			}
 		}
+		return ""
 	}
+	noteText = getQuoted("'")
+	noteRegex = getQuoted("\"")
 	for _, s := range strings.Split(query, " ") {
 		if s == "" {
 			continue
@@ -93,7 +98,8 @@ func ParseQuery(query string, searcherUsername *string) (*ComprehensiveQuery, er
 	return &ComprehensiveQuery{
 		Tags:          tags,
 		Uploader:      uploader,
-		Note:          note,
+		NoteRegex:     noteRegex,
+		NoteText:      noteText,
 		IncludeGroups: includeGroups,
 		Group:         group,
 		Sort:          sort,

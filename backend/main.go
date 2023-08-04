@@ -241,8 +241,11 @@ func main() {
 		if query.Uploader != "" {
 			search["uploader"] = query.Uploader
 		}
-		if query.Note != "" {
-			search["note"] = primitive.Regex{Pattern: query.Note, Options: "i"}
+		if query.NoteRegex != "" {
+			search["note"] = primitive.Regex{Pattern: query.NoteRegex, Options: "i"}
+		}
+		if query.NoteText != "" {
+			search["$text"] = bson.M{"$search": query.NoteText}
 		}
 		tags := query.Tags
 		if len(tags) > 0 {
