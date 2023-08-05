@@ -20,6 +20,7 @@ type Mounting struct {
 }
 
 func RunGin(config *Configuration) error {
+	Config = config
 	r := gin.Default()
 	r.Use(func(c *gin.Context) {
 		if config.AccessControlAllowOrigin != nil {
@@ -103,6 +104,7 @@ func RunGin(config *Configuration) error {
 	}
 	MountGifs(mounting)
 	MountUsers(mounting)
+	MountNotifications(mounting)
 
 	return r.Run(config.Address)
 }

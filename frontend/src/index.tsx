@@ -6,6 +6,7 @@ import localforage from "localforage";
 import { AxiosError } from "axios";
 import "./skybord-components.css";
 import "./skybord-main.css";
+import { createSignal } from "solid-js";
 
 interface Config {
     groupTextInput: boolean;
@@ -71,6 +72,27 @@ export const deleteUserInfo = async () => {
 
 globalThis.userInfoStored = userInfoStored;
 globalThis.deleteUserInfo = deleteUserInfo;
+
+export type NotificationStore = {
+    lastFetch: number;
+    count: number;
+};
+
+let notificationStoreInner = (await localforage.getItem("kittygifs.notificationStore")) as NotificationStore | null;
+const [getNotificationStore, setNotificationStore] = createSignal(notificationStoreInner);
+
+if ((!notificationStoreInner || notificationStoreInner.lastFetch < Date.now() - 5 * 60 * 1000) && config.token != null) {
+    client.getNotificationsCount().then(count => {
+        const store = {
+            lastFetch: Date.now(),
+            count,
+        };
+        localforage.setItem("kittygifs.notificationStore", store);
+        setNotificationStore(store);
+    });
+}
+
+export const notificationStore = getNotificationStore;
 
 export function getErrorString(e: Error): string {
     if (e instanceof AxiosError) {

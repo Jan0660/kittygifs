@@ -1,6 +1,6 @@
 import { lazy, type Component, createResource, ErrorBoundary, Show, For } from "solid-js";
 import { Route, Routes } from "@solidjs/router";
-import { client, getErrorString, config } from ".";
+import { client, getErrorString, config, notificationStore } from ".";
 import { A } from "@solidjs/router";
 
 export function GifViewData({ params }) {
@@ -33,6 +33,11 @@ const App: Component = () => {
                                 </A>
                             </Show>
                             <Show when={config.token != null}>
+                                <Show when={notificationStore()?.count}>
+                                    <A href="/notifications" class="button">
+                                        Notifications ({notificationStore().count})
+                                    </A>
+                                </Show>
                                 <A href="/gifs/post" class="button">
                                     Post
                                 </A>
@@ -130,6 +135,7 @@ const App: Component = () => {
                                 component={lazy(() => import("./pages/legal/TermsPage"))}
                             />
                         </Route>
+                        <Route path="/notifications" component={lazy(() => import("./pages/NotificationsPage"))} />
                     </Routes>
                     <div class="is-center">
                         <span>

@@ -9,11 +9,12 @@ import (
 )
 
 var (
-	MongoClient *mongo.Client
-	GifsCol     *mongo.Collection
-	UsersCol    *mongo.Collection
-	SessionsCol *mongo.Collection
-	IssuesCol   *mongo.Collection
+	MongoClient      *mongo.Client
+	GifsCol          *mongo.Collection
+	UsersCol         *mongo.Collection
+	SessionsCol      *mongo.Collection
+	IssuesCol        *mongo.Collection
+	NotificationsCol *mongo.Collection
 )
 
 // InitializeMongoDB initializes the MongoDB client and collections
@@ -36,9 +37,11 @@ func InitializeMongoDB(config *Configuration) {
 		_ = db.CreateCollection(ctx, "users")
 		_ = db.CreateCollection(ctx, "sessions")
 		_ = db.CreateCollection(ctx, "issues")
+		_ = db.CreateCollection(ctx, "notifications")
 	}
 	GifsCol = db.Collection("gifs")
 	UsersCol = db.Collection("users")
 	SessionsCol = db.Collection("sessions")
 	IssuesCol = db.Collection("issues")
+	NotificationsCol = db.Collection("notifications")
 }

@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	. "kittygifs/util"
+	"kittygifs/util/notifications"
 	"net/http"
 	"time"
 )
@@ -276,6 +277,10 @@ func MountUsers(mounting *Mounting) {
 				"application/json",
 				bytes.NewBuffer([]byte(fmt.Sprintf(`{"content": "New GDPR %s request"}`, typeString))))
 		}()
+		go notifications.MustNotifyGroup("admin", NewUlid(), notifications.GdprRequest,
+			map[string]interface{}{
+				"username": user.Username,
+			})
 		c.Status(200)
 	})
 }

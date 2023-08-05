@@ -162,6 +162,18 @@ export class KittyGifsClient {
         }): Promise<void> {
         await this._axios.post("/users/gdprRequest", props);
     }
+
+    public async getNotifications(): Promise<Notification[]> {
+        return (await this._axios.get("/notifications")).data;
+    }
+
+    public async getNotificationsCount(): Promise<number> {
+        return (await this._axios.get("/notifications/count")).data.count;
+    }
+
+    public async deleteNotification(id: string): Promise<void> {
+        await this._axios.delete("/notifications/" + id);
+    }
 }
 
 export type Gif = {
@@ -196,3 +208,13 @@ export type UserInfo = {
 export type UserStats = {
     uploads: number;
 }
+
+export type Notification = {
+    id: string,
+    username: string,
+    eventId: string,
+    data: {
+        type: "gdprRequest",
+        username: string,
+    },
+};
