@@ -1,9 +1,9 @@
 import { Accessor, Component, ErrorBoundary, For, Show, Suspense, createSignal } from "solid-js";
-import { Gif } from "../client/Client";
-import { useNavigate, useRouteData } from "@solidjs/router";
-import { GifPreviewSingle } from "../GifPreviewSingle";
-import { GifViewData } from "../App";
-import { client, config, getErrorString } from "..";
+import { Gif } from "../../client/Client";
+import { A, useNavigate, useRouteData } from "@solidjs/router";
+import { GifPreviewSingle } from "../../GifPreviewSingle";
+import { GifViewData } from "../../App";
+import { client, config, getErrorString } from "../..";
 import { decodeTime } from "ulid";
 
 const GifPage: Component = () => {
@@ -65,7 +65,8 @@ const GifPage: Component = () => {
                                 Actions
                             </div>
                             <span>
-                                <a class="button" href={`/gifs/${gif().id}/edit`}>Edit</a>
+                                <A class="button" href={`/gifs/${gif().id}/edit`}>Edit</A>
+                                <A class="button" href={`/gifs/${gif().id}/edit/suggest`}>Suggest Edit</A>
                                 <Show
                                     when={deleteAreYouSure()}
                                     fallback={<button class="button danger" onClick={() => setDeleteAreYouSure(true)}>Delete</button>}

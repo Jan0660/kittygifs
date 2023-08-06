@@ -1,15 +1,16 @@
-import { Component, For, Show, Suspense, createEffect, createSignal } from "solid-js";
-import { useNavigate, useRouteData } from "@solidjs/router";
-import { GifViewData } from "../App";
-import GifPage from "./GifPage";
-import { client, getErrorString, userInfo } from "..";
-import { AxiosError } from "axios";
-import { GifPreviewSingle } from "../GifPreviewSingle";
-import { GroupSelect } from "../components/GroupSelect";
+import { Component, For, Show, createEffect, createSignal } from "solid-js";
+import { useNavigate, useRouteData, useSearchParams } from "@solidjs/router";
+import { GifViewData } from "../../App";
+import { client, getErrorString, userInfo } from "../..";
+import { GifPreviewSingle } from "../../GifPreviewSingle";
+import { GroupSelect } from "../../components/GroupSelect";
+import { TagsDiff } from "../../components/TagsDiff";
 
 const EditGifPage: Component = () => {
     const gif = useRouteData<typeof GifViewData>();
     const navigate = useNavigate();
+    const [searchParams, _] = useSearchParams();
+    const gifEditSuggestion = searchParams["gifEditSuggestion"];
 
     const [tags, setTags] = createSignal([]);
     const [note, setNote] = createSignal('');
@@ -23,6 +24,14 @@ const EditGifPage: Component = () => {
             setGroup(gif().group == `@${userInfo?.info?.username}` ? "private" : gif().group ?? "none")
         }
     })
+    if (gifEditSuggestion) {
+        client.getNotificationByEventId(gifEditSuggestion).then((notif) => {
+            if (notif.data.type == "gifEditSuggestion") {
+                setTags(notif.data.tags)
+                setNote(notif.data.note)
+            }
+        })
+    }
 
     return (
         <>
@@ -36,16 +45,8 @@ const EditGifPage: Component = () => {
                     <div class="error">
                         {error() == "" ? <></> : <p>{error()}</p>}
                     </div>
-                    <For each={tags()}>
-                        {tag => {
-                            return (
-                                <span class="tag">
-                                    {tag}
-                                </span>
-                            )
-                        }}
-                    </For><br />
-                    <b>Tag</b>
+                    <TagsDiff oldTags={gif().tags} newTags={tags} />
+                    <b>Tags</b>
                     <input
                         type="text"
                         value={tags().join(" ")}
@@ -56,6 +57,10 @@ const EditGifPage: Component = () => {
                     />
                     <br />
                     <b>Note</b><br />
+                    <Show when={gif().note}>
+                        <h4>Note</h4>
+                        <p>{gif().note}</p>
+                    </Show>
                     <textarea
                         value={note()}
                         class="input"
@@ -74,7 +79,7 @@ const EditGifPage: Component = () => {
                                     tags: tags(),
                                     note: note(),
                                     group: group() == "none" ? "" : group(),
-                                });
+                                }, gifEditSuggestion);
                                 navigate(`/gifs/${gif().id}`);
                             } catch (e) {
                                 setError(getErrorString(e));

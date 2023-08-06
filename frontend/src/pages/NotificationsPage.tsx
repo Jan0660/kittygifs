@@ -1,20 +1,40 @@
 import { Component, For, Show, createSignal } from "solid-js";
 import { client, config, deleteUserInfo, getErrorString, saveConfig } from "..";
 import { useNavigate } from "@solidjs/router";
-import { Notification } from "../client/Client";
+import { Notification, isDeletableNotification } from "../client/Client";
 
 function NotificationToString(notif: Notification): string {
     switch (notif.data.type) {
         case "gdprRequest": {
-            return `New GDPR request by @${notif.data.username}`
+            return `New GDPR request by @${notif.data.username}`;
+        }
+        case "gifEditSuggestion": {
+            return `Gif edit suggestion by @${notif.data.username}`;
+        }
+        default: {
+            // @ts-ignore
+            return `Unknown notification type ${notif.data.type}`;
+        }
+    }
+}
+
+function GetNotificationLink(notif: Notification): string | null {
+    switch (notif.data.type) {
+        case "gifEditSuggestion": {
+            return `/gifs/${notif.data.gifId}/edit?gifEditSuggestion=${notif.eventId}`;
+        }
+        default: {
+            return null;
         }
     }
 }
 
 const NotificationsPage: Component = () => {
-    const [notifications, setNotifications] = createSignal(null as Notification[] | null, { equals: false });
+    const [notifications, setNotifications] = createSignal(null as Notification[] | null, {
+        equals: false,
+    });
     client.getNotifications().then(notifs => {
-        console.log(notifs)
+        console.log(notifs);
         setNotifications(notifs);
     });
     return (
@@ -31,15 +51,30 @@ const NotificationsPage: Component = () => {
                 </Show>
                 <Show when={notifications() !== null && notifications().length !== 0}>
                     <For each={notifications()}>
-                        {(notif, index) => (
-                            <div>
-                                <h3><a onclick={async () => {
-                                    await client.deleteNotification(notif.id);
-                                    notifications().splice(index(), 1)
-                                    setNotifications(notifications())
-                                }} style="cursor: pointer">X</a> {NotificationToString(notif)}</h3>
-                            </div>
-                        )}
+                        {(notif, index) => {
+                            const link = GetNotificationLink(notif);
+                            return (
+                                <div>
+                                    <h3>
+                                        <Show when={isDeletableNotification(notif)}>
+                                            <a
+                                                onclick={async () => {
+                                                    await client.deleteNotification(notif.id);
+                                                    notifications().splice(index(), 1);
+                                                    setNotifications(notifications());
+                                                }}
+                                                style="cursor: pointer"
+                                            >
+                                                X
+                                            </a>{" "}
+                                        </Show>
+                                        {link === null ? NotificationToString(notif) : <a class="link" href={link}>
+                                            {NotificationToString(notif)}
+                                            </a>}
+                                    </h3>
+                                </div>
+                            );
+                        }}
                     </For>
                 </Show>
             </div>

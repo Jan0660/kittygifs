@@ -5,6 +5,14 @@ import (
 	. "kittygifs/util"
 )
 
+func MustDeleteNotificationsByEventId(eventId string) {
+	MustDeleteNotifications(bson.M{"eventId": eventId})
+}
+
+func MustDeleteNotifications(filter bson.M) {
+	_, _ = NotificationsCol.DeleteMany(nil, filter)
+}
+
 func MustNotifyGroup(groupName, eventId, notificationType string, data map[string]interface{}, otherUsers ...string) {
 	_ = NotifyGroup(groupName, eventId, notificationType, data, otherUsers...)
 }
@@ -52,23 +60,25 @@ func NotifyUser(username, eventId, notificationType string, data map[string]inte
 }
 
 const (
-	GdprRequest = "gdprRequest"
+	GdprRequest       = "gdprRequest"
+	GifEditSuggestion = "gifEditSuggestion"
 )
 
 // NotificationTypes is a list of all notification types
-var NotificationTypes = []string{GdprRequest}
+var NotificationTypes = []string{GdprRequest, GifEditSuggestion}
 
 // NotificationTypesDeleteByEvent is a list of all notification types, where if the notification is deleted,
 // the notifications with the same event id(that other users may have gotten) will also be deleted
 var NotificationTypesDeleteByEvent = []string{GdprRequest}
+
+// NotificationTypesDeletable is a list of all notification types, that can be deleted by the user,
+// otherwise the notification is supposed to be deleted automatically by the server when the event is resolved,
+// e.g. tag edit request is resolved
+var NotificationTypesDeletable = []string{GdprRequest}
 
 type Notification struct {
 	Id       string                 `json:"id" bson:"_id"`
 	Username string                 `json:"username" bson:"username"`
 	EventId  string                 `json:"eventId" bson:"eventId"`
 	Data     map[string]interface{} `json:"data" bson:"data"`
-}
-
-type GdprRequestNotificationData struct {
-	Username string `json:"username" bson:"username"`
 }

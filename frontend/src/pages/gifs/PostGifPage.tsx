@@ -1,10 +1,10 @@
 import { Accessor, Component, For, Suspense, createSignal } from "solid-js";
-import { Gif } from "../client/Client";
+import { Gif } from "../../client/Client";
 import { Navigate, useNavigate, useRouteData } from "@solidjs/router";
-import { GifPreviewSingle } from "../GifPreviewSingle";
-import { GifViewData } from "../App";
-import { client, config, getErrorString } from "..";
-import { GroupSelect } from "../components/GroupSelect";
+import { GifPreviewSingle } from "../../GifPreviewSingle";
+import { GifViewData } from "../../App";
+import { client, config, getErrorString } from "../..";
+import { GroupSelect } from "../../components/GroupSelect";
 
 const PostGifPage: Component = () => {
     const navigate = useNavigate();

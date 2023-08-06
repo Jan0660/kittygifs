@@ -93,16 +93,21 @@ const App: Component = () => {
                         <Route
                             path="/gifs/:id"
                             data={GifViewData}
-                            component={lazy(() => import("./pages/GifPage"))}
+                            component={lazy(() => import("./pages/gifs/GifPage"))}
                         />
                         <Route
                             path="/gifs/:id/edit"
                             data={GifViewData}
-                            component={lazy(() => import("./pages/EditGifPage"))}
+                            component={lazy(() => import("./pages/gifs/EditGifPage"))}
+                        />
+                        <Route
+                            path="/gifs/:id/edit/suggest"
+                            data={GifViewData}
+                            component={lazy(() => import("./pages/gifs/SuggestEditGifPage"))}
                         />
                         <Route
                             path="/gifs/post"
-                            component={lazy(() => import("./pages/PostGifPage"))}
+                            component={lazy(() => import("./pages/gifs/PostGifPage"))}
                         />
                         <Route path="/login" component={lazy(() => import("./pages/LoginPage"))} />
                         <Route

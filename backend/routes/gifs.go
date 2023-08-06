@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"io"
 	. "kittygifs/util"
+	"kittygifs/util/notifications"
 	"net/http"
 	"strconv"
 	"time"
@@ -317,6 +318,9 @@ func MountGifs(mounting *Mounting) {
 			return
 		}
 		GifsCol.FindOneAndReplace(ctx, bson.M{"_id": c.Param("id")}, originalGif)
+		if gifEditRequest := c.Query("gifEditSuggestion"); gifEditRequest != "" {
+			go notifications.MustDeleteNotificationsByEventId(gifEditRequest)
+		}
 		c.JSON(200, originalGif)
 	})
 	mounting.Authed.DELETE("/gifs/:id", func(c *gin.Context) {
@@ -337,5 +341,34 @@ func MountGifs(mounting *Mounting) {
 		}
 		GifsCol.FindOneAndDelete(ctx, bson.M{"_id": c.Param("id")})
 		c.JSON(200, originalGif)
+	})
+	mounting.Authed.POST("/gifs/:id/edit/suggestions", func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		var gif Gif
+		err := GifsCol.FindOne(ctx, bson.M{"_id": c.Param("id")}).Decode(&gif)
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		type Request struct {
+			Tags []string `json:"tags"`
+			Note *string  `json:"note"`
+		}
+		var req Request
+		err = c.BindJSON(&req)
+		if err != nil {
+			c.JSON(400, Error(err))
+			return
+		}
+		data := make(map[string]interface{})
+		data["gifId"] = c.Param("id")
+		data["tags"] = req.Tags
+		data["username"] = c.GetString("username")
+		data["note"] = req.Note
+
+		go notifications.MustNotifyGroup("gifEditSuggestions", NewUlid(), notifications.GifEditSuggestion, data, gif.Uploader)
+		c.Status(200)
 	})
 }

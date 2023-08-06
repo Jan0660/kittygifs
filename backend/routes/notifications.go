@@ -49,6 +49,15 @@ func MountNotifications(mounting *Mounting) {
 			return
 		}
 		var filter bson.M
+		// todo(refactor): once Go 1.21 is released, use slices.Contains and no goto
+		for _, notificationType := range notifications.NotificationTypesDeletable {
+			if notification.Data["type"] == notificationType {
+				goto isDeletable
+			}
+		}
+		c.JSON(403, gin.H{"error": "this notification is not deletable"})
+		return
+	isDeletable:
 		// todo(refactor): once Go 1.21 is released, use slices.Contains
 		for _, notificationType := range notifications.NotificationTypesDeleteByEvent {
 			if notification.Data["type"] == notificationType {
@@ -65,5 +74,16 @@ func MountNotifications(mounting *Mounting) {
 			return
 		}
 		c.Status(204)
+	})
+	mounting.Authed.GET("/notifications/byEventId/:eventId", func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		var notif notifications.Notification
+		err := NotificationsCol.FindOne(ctx, bson.M{"eventId": c.Param("eventId"), "username": GetUser(c).Username}).Decode(&notif)
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		c.JSON(200, notif)
 	})
 }

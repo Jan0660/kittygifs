@@ -48,15 +48,26 @@ export class KittyGifsClient {
             tags: string[];
             note: string;
             group: string | null;
-        },
+        }, gifEditSuggestion?: string,
         signal?: AbortSignal,
     ): Promise<void> {
         if (props.group == "") {
             props.group = null;
         }
-        await this._axios.patch("/gifs/" + encodeURIComponent(id), props, {
+        let url = "/gifs/" + encodeURIComponent(id);
+        if (gifEditSuggestion != null) {
+            url += "?gifEditSuggestion=" + encodeURIComponent(gifEditSuggestion);
+        }
+        await this._axios.patch(url, props, {
             signal: signal,
         });
+    }
+
+    public async postGifEditSuggestion(id: string, props: {
+        tags: string[];
+        note: string;
+    }): Promise<void> {
+        await this._axios.post("/gifs/" + encodeURIComponent(id) + "/edit/suggestions", props);
     }
 
     public async postGif(
@@ -174,6 +185,10 @@ export class KittyGifsClient {
     public async deleteNotification(id: string): Promise<void> {
         await this._axios.delete("/notifications/" + id);
     }
+
+    public async getNotificationByEventId(eventId: string): Promise<Notification> {
+        return (await this._axios.get("/notifications/byEventId/" + eventId)).data;
+    }
 }
 
 export type Gif = {
@@ -216,5 +231,17 @@ export type Notification = {
     data: {
         type: "gdprRequest",
         username: string,
+    } | {
+        type: "gifEditSuggestion",
+        username: string,
+        gifId: string,
+        tags: string[],
+        note: string | null,
     },
 };
+
+const DeletableNotificationTypes = ["gdprRequest"];
+
+export function isDeletableNotification(notification: Notification): boolean {
+    return DeletableNotificationTypes.includes(notification.data.type);
+}
