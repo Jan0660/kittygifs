@@ -1,6 +1,6 @@
 import { Component, For, Show, createSignal } from "solid-js";
-import { client, config, deleteUserInfo, getErrorString, saveConfig } from "..";
-import { useNavigate } from "@solidjs/router";
+import { client } from "..";
+import { A } from "@solidjs/router";
 import { Notification, isDeletableNotification } from "../client/Client";
 
 function NotificationToString(notif: Notification): string {
@@ -68,9 +68,9 @@ const NotificationsPage: Component = () => {
                                                 X
                                             </a>{" "}
                                         </Show>
-                                        {link === null ? NotificationToString(notif) : <a class="link" href={link}>
+                                        {link === null ? NotificationToString(notif) : <A class="link" href={link}>
                                             {NotificationToString(notif)}
-                                            </a>}
+                                            </A>}
                                     </h3>
                                 </div>
                             );

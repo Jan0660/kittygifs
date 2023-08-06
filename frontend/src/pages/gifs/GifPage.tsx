@@ -1,5 +1,4 @@
-import { Accessor, Component, ErrorBoundary, For, Show, Suspense, createSignal } from "solid-js";
-import { Gif } from "../../client/Client";
+import { Component, For, Show, createSignal } from "solid-js";
 import { A, useNavigate, useRouteData } from "@solidjs/router";
 import { GifPreviewSingle } from "../../GifPreviewSingle";
 import { GifViewData } from "../../App";

@@ -1,4 +1,4 @@
-import { Component, For, Show, createEffect, createSignal } from "solid-js";
+import { Component, Show, createEffect, createSignal } from "solid-js";
 import { useNavigate, useRouteData, useSearchParams } from "@solidjs/router";
 import { GifViewData } from "../../App";
 import { client, getErrorString, userInfo } from "../..";

@@ -1,5 +1,4 @@
 import { Accessor, For, Setter, Show } from "solid-js";
-import { Gif } from "../client/Client";
 import { config, userInfo } from "..";
 
 export const GroupSelect = ({

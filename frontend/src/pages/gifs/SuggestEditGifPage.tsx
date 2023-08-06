@@ -1,10 +1,8 @@
-import { Accessor, Component, ErrorBoundary, For, Show, Suspense, createEffect, createSignal } from "solid-js";
-import { Gif } from "../../client/Client";
+import { Component, Show, createEffect, createSignal } from "solid-js";
 import { useNavigate, useRouteData } from "@solidjs/router";
 import { GifPreviewSingle } from "../../GifPreviewSingle";
 import { GifViewData } from "../../App";
-import { client, config, getErrorString } from "../..";
-import { decodeTime } from "ulid";
+import { client, getErrorString } from "../..";
 import { TagsDiff } from "../../components/TagsDiff";
 
 const TagEditSuggestPage: Component = () => {

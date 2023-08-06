@@ -1,6 +1,4 @@
-import { Accessor, For, JSX, Setter, Show, createEffect, createSignal } from "solid-js";
-import { Gif } from "../client/Client";
-import { config, userInfo } from "..";
+import { Accessor, For, JSX, createEffect, createSignal } from "solid-js";
 
 export const TagsDiff = ({
     oldTags,
