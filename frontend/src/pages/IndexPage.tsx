@@ -44,7 +44,7 @@ const IndexPage: Component = () => {
                     onClick={async () => {
                         setGifs(
                             gifs().concat(
-                                await client.searchGifs(query(), null, { skip: gifs().length }),
+                                await client.searchGifs(query(), null, { skip: gifs().length, max: config.limit }),
                             ),
                         );
                     }}

@@ -29,12 +29,12 @@ if (!item) {
         apiUrl: import.meta.env.VITE_API_URL,
         defaultGroup: null,
         queryPrepend: "",
-        limit: 50,
+        limit: 40,
     };
     await localforage.setItem("kittygifs.config", item);
 }
 
-item.limit ??= 50;
+item.limit ??= 40;
 
 export const config = item;
 
