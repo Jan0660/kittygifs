@@ -48,7 +48,7 @@ const PopupPage: Component = () => {
                     {".navbar { display: none; }"}
                 </style>
 
-                <QueryInput setGifs={setGifs} setQuery={setQuery} />
+                <QueryInput setGifs={setGifs} query={query} setQuery={setQuery} />
                 <br/>
                 Use tab and shift + tab to cycle between gifs, and use enter to send
 

@@ -14,10 +14,8 @@ const PostGifPage: Component = () => {
         <>
             <div class="content-header">
                 <h1>Post Gif</h1>
-
             </div>
             <div class="content-content">
-
                 <div class="error">
                     {error() == "" ? <></> : <p>{error()}</p>}
                 </div>

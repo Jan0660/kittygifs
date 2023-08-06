@@ -1,9 +1,10 @@
-import { Component, Setter, onMount } from "solid-js";
+import { Accessor, Component, Setter, onMount } from "solid-js";
 import { client, config } from "./index";
 import { Gif } from "./client/Client";
 
 type Props = {
     setGifs: Setter<Gif[]>;
+    query: Accessor<string>;
     setQuery: Setter<string>;
 };
 
@@ -11,7 +12,7 @@ const QueryInput: Component<Props> = (props: Props) => {
     let abortLast: AbortController | null = null;
     onMount(() => {
         abortLast = new AbortController();
-        client.searchGifs(config.queryPrepend ?? "", abortLast.signal, {
+        client.searchGifs(config.queryPrepend + " " + props.query(), abortLast.signal, {
             max: config.limit,
         }).then(res => {
             props.setGifs(res);
@@ -30,6 +31,7 @@ const QueryInput: Component<Props> = (props: Props) => {
                 autofocus
                 type="text"
                 placeholder="Search for gifs.."
+                value={props.query()}
                 onInput={e => {
                     if (abortLast) {
                         abortLast.abort();
