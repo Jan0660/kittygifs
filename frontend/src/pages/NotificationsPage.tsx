@@ -1,5 +1,5 @@
 import { Component, For, Show, createSignal } from "solid-js";
-import { client } from "..";
+import { client, setNotificationCount } from "..";
 import { A } from "@solidjs/router";
 import { Notification, isDeletableNotification } from "../client/Client";
 
@@ -36,6 +36,7 @@ const NotificationsPage: Component = () => {
     client.getNotifications().then(notifs => {
         console.log(notifs);
         setNotifications(notifs);
+        setNotificationCount(notifs.length);
     });
     return (
         <>

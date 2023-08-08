@@ -245,3 +245,9 @@ const DeletableNotificationTypes = ["gdprRequest"];
 export function isDeletableNotification(notification: Notification): boolean {
     return DeletableNotificationTypes.includes(notification.data.type);
 }
+
+export function hasGroup(group: string, groups: string[] | null) {
+    if (!groups) return false;
+    if (groups.indexOf("admin") != -1) return true;
+    return groups.indexOf(group) != -1;
+}

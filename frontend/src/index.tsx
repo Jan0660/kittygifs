@@ -6,7 +6,7 @@ import localforage from "localforage";
 import { AxiosError } from "axios";
 import "./skybord-components.css";
 import "./skybord-main.css";
-import { createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 
 interface Config {
     groupTextInput: boolean;
@@ -54,12 +54,12 @@ export type UserInfoStored = {
 
 let userInfoStored = (await localforage.getItem("kittygifs.userInfo")) as UserInfoStored | null;
 
-export const userInfo: UserInfoStored | null = userInfoStored;
+export let userInfo: UserInfoStored | null = userInfoStored;
 
 // if user info stored is older than 20m, fetch new user info
 if ((!userInfo || userInfo.lastFetch < Date.now() - 20 * 60 * 1000) && config.token != null) {
-    client.getUserInfo("self").then(info => {
-        localforage.setItem("kittygifs.userInfo", {
+    client.getUserInfo("self").then(async info => {
+        userInfo = await localforage.setItem("kittygifs.userInfo", {
             lastFetch: Date.now(),
             info: info,
         });
@@ -83,16 +83,24 @@ const [getNotificationStore, setNotificationStore] = createSignal(notificationSt
 
 if ((!notificationStoreInner || notificationStoreInner.lastFetch < Date.now() - 5 * 60 * 1000) && config.token != null) {
     client.getNotificationsCount().then(count => {
-        const store = {
-            lastFetch: Date.now(),
-            count,
-        };
-        localforage.setItem("kittygifs.notificationStore", store);
-        setNotificationStore(store);
+        setNotificationCount(count);
     });
 }
 
 export const notificationStore = getNotificationStore;
+
+export const deleteNotificationStore = async () => {
+    await localforage.removeItem("kittygifs.notificationStore");
+};
+
+export const setNotificationCount = async (count: number) => {
+    const store = {
+        lastFetch: Date.now(),
+        count,
+    };
+    localforage.setItem("kittygifs.notificationStore", store);
+    setNotificationStore(store);
+};
 
 export function getErrorString(e: Error): string {
     if (e instanceof AxiosError) {

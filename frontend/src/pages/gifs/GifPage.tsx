@@ -2,8 +2,9 @@ import { Component, For, Show, createSignal } from "solid-js";
 import { A, useNavigate, useRouteData } from "@solidjs/router";
 import { GifPreviewSingle } from "../../GifPreviewSingle";
 import { GifViewData } from "../../App";
-import { client, config, getErrorString } from "../..";
+import { client, config, getErrorString, userInfo } from "../..";
 import { decodeTime } from "ulid";
+import { hasGroup } from "../../client/Client";
 
 const GifPage: Component = () => {
     const gif = useRouteData<typeof GifViewData>();
@@ -64,25 +65,29 @@ const GifPage: Component = () => {
                                 Actions
                             </div>
                             <span>
-                                <A class="button" href={`/gifs/${gif().id}/edit`}>Edit</A>
                                 <A class="button" href={`/gifs/${gif().id}/edit/suggest`}>Suggest Edit</A>
-                                <Show
-                                    when={deleteAreYouSure()}
-                                    fallback={<button class="button danger" onClick={() => setDeleteAreYouSure(true)}>Delete</button>}
-                                >
-                                    <button
-                                        class="button confirm"
-                                        onClick={async () => {
-                                            try {
-                                                await client.deleteGif(gif().id);
-                                                navigate("/");
-                                            } catch (e) {
-                                                alert(getErrorString(e));
-                                            }
-                                        }}
+                                <Show when={hasGroup("perm:edit_all_gifs", userInfo.info.groups) || userInfo.info.username == gif().uploader}>
+                                    <A class="button" href={`/gifs/${gif().id}/edit`}>Edit</A>
+                                </Show>
+                                <Show when={hasGroup("perm:delete_all_gifs", userInfo.info.groups) || userInfo.info.username == gif().uploader}>
+                                    <Show
+                                        when={deleteAreYouSure()}
+                                        fallback={<button class="button danger" onClick={() => setDeleteAreYouSure(true)}>Delete</button>}
                                     >
-                                        Are you sure?
-                                    </button>
+                                        <button
+                                            class="button confirm"
+                                            onClick={async () => {
+                                                try {
+                                                    await client.deleteGif(gif().id);
+                                                    navigate("/");
+                                                } catch (e) {
+                                                    alert(getErrorString(e));
+                                                }
+                                            }}
+                                        >
+                                            Are you sure?
+                                        </button>
+                                    </Show>
                                 </Show>
                             </span>
                         </div>

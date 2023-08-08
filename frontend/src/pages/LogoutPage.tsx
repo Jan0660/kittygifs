@@ -1,6 +1,7 @@
 import { Component, createSignal } from "solid-js";
-import { client, config, deleteUserInfo, getErrorString, saveConfig } from "..";
+import { client, config, deleteNotificationStore, deleteUserInfo, getErrorString, saveConfig } from "..";
 import { useNavigate } from "@solidjs/router";
+import localforage from "localforage";
 
 const LogoutPage: Component = () => {
     const [error, setError] = createSignal("");
@@ -20,6 +21,7 @@ const LogoutPage: Component = () => {
                             config.token = null;
                             await saveConfig();
                             await deleteUserInfo();
+                            await deleteNotificationStore();
                             await client.deleteSession(config.token);
                             // not using navigate because it doesn't reload the page
                             window.location.href = "/";

@@ -57,8 +57,7 @@ const EditGifPage: Component = () => {
                     />
                     <br />
                     <b>Note</b><br />
-                    <Show when={gif().note}>
-                        <h4>Note</h4>
+                    <Show when={gif().note} fallback={<p><b>No note in original</b></p>}>
                         <p>{gif().note}</p>
                     </Show>
                     <textarea

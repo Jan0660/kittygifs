@@ -12,7 +12,7 @@ export const GroupSelect = ({
         <>
             <label>
                 Group:{" "}
-                <Show when={!config.groupTextInput}>
+                <Show when={!config.groupTextInput && userInfo?.info?.groups}>
                     <select
                         value={groupAccessor()}
                         class="input"
