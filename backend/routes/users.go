@@ -230,7 +230,7 @@ func MountUsers(mounting *Mounting) {
 			c.JSON(500, Error(err))
 			return
 		}
-		c.Status(200)
+		c.Status(204)
 	})
 	mounting.Authed.POST("/users/gdprRequest", mounting.PasswordRateLimit, func(c *gin.Context) {
 		type Request struct {
