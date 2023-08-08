@@ -9,6 +9,7 @@ use global_hotkey::{
     GlobalHotKeyEvent, GlobalHotKeyManager,
 };
 use serde::{Deserialize, Serialize};
+use tauri_plugin_autostart::MacosLauncher;
 use std::{str::FromStr, sync::Mutex, time::Duration};
 use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
@@ -26,7 +27,10 @@ struct Config {
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    /// show popup and exit after it closes
+    /// don't show main window on startup
+    #[arg(long)]
+    hide_main_window: bool,
+    /// show only popup and exit after it closes
     #[arg(short, long)]
     popup: bool,
     /// number of milliseconds to wait between minimizing popup and inputting the url
@@ -90,6 +94,7 @@ fn main() {
             },
             _ => {}
         })
+        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--hide-main-window"])))
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             APP_HANDLE.lock().unwrap().replace(app.handle());
@@ -124,6 +129,9 @@ fn main() {
                 app.get_window("main").unwrap().hide().unwrap();
                 app.get_window("popup").unwrap().show().unwrap();
                 return Ok(());
+            }
+            if !ARGS.lock().unwrap().as_ref().unwrap().hide_main_window {
+                app.get_window("main").unwrap().show().unwrap();
             }
             // load the config
             let config_dir = app.path().app_config_dir().unwrap();

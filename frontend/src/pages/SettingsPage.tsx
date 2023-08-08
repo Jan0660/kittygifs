@@ -4,6 +4,7 @@ import { config, saveConfig } from "..";
 import { invoke } from "@tauri-apps/api/tauri";
 import { GroupSelect } from "../components/GroupSelect";
 import { useNavigate } from "@solidjs/router";
+import { enable, isEnabled, disable } from "@tauri-apps/plugin-autostart";
 
 const ModifierKeys = {
     Alt: 0x01,
@@ -54,6 +55,7 @@ const SettingsPage: Component = () => {
     const runningTauri = window.__TAURI_IPC__ != null;
     const [modifiers, setModifiers] = createSignal(0);
     const [keyCode, setKeyCode] = createSignal("");
+    const [startupEnabled, setStartupEnabled] = createSignal(null);
     const [desktopConfig, setDesktopConfig] = createSignal<DesktopConfig>(null);
     console.log(runningTauri);
     if (runningTauri) {
@@ -63,6 +65,9 @@ const SettingsPage: Component = () => {
             setModifiers(config.modifiers.bits);
             setKeyCode(config.code);
         });
+        isEnabled().then(res => {
+            setStartupEnabled(res);
+        })
     }
 
     return (
@@ -126,6 +131,24 @@ const SettingsPage: Component = () => {
                         />{" "}
                         Show Search Highlight in Popup
                     </label>
+                    <br />
+                    <Show when={startupEnabled() != null} fallback={<b>Loading Autostart Options...</b>}>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={startupEnabled()}
+                                onChange={async e => {
+                                    if (e.target.checked) {
+                                        await enable();
+                                    } else {
+                                        await disable();
+                                    }
+                                    setStartupEnabled(e.target.checked);
+                                }}
+                            />{" "}
+                            Run on Startup
+                        </label>
+                    </Show>
                     <br />
                     <h4>Shortcut to Show Popup</h4>
                     Modifiers:
