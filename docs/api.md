@@ -40,11 +40,13 @@ A user can have multiple groups, but a gif can only be in one group.
 
 If `group` on a gif is `@{username}`, the gif is private to that user.
 
-Permission groups:
+Special groups:
 
 - `admin` - can do anything, treated as having every group (except for `$ig` in search)
-- `perm:edit_all_gifs`
-- `perm:delete_all_gifs`
+- `perm:edit_all_gifs` - permission to edit all gifs
+- `perm:delete_all_gifs` - permission to delete all gifs
+- `gifEditSuggestions` - receives notifications about gif edit suggestions,
+  still needs `perm:edit_all_gifs` to accept them
 
 ## Routes
 
@@ -147,6 +149,10 @@ Responses:
 Updates a gif.
 The authenticated user must be the uploader of the gif or have the `perm:edit_all_gifs` group.
 
+Query parameters:
+
+- `gifEditSuggestion`: string - the event ID of the gif edit suggestion to accept
+
 Request body:
 
 - tags: []string
@@ -170,6 +176,21 @@ Responses:
 - 403: you cannot delete this gif ([Error](#error))
 - 500: [Error](#error)
 - 200: [Gif](#gif)
+
+#### POST /gifs/:id/edit/suggestions
+
+Suggests an edit to a gif.
+
+Request body:
+
+- tags: []string
+- note: string
+
+Responses:
+
+- 500: [Error](#error)
+- 400: invalid request ([Error](#error))
+- 200
 
 #### POST /users/resetPassword
 
@@ -201,6 +222,15 @@ Responses:
 - 500: [Error](#error)
 - 200
 
+#### DELETE /users/sessions
+
+Deletes all other sessions for the authenticated user.
+
+Responses:
+
+- 500: [Error](#error)
+- 204
+
 #### DELETE /users/sessions/:token
 
 Deletes the specified session.
@@ -208,7 +238,45 @@ Deletes the specified session.
 Responses:
 
 - 500: [Error](#error)
+- 204
+
+#### GET /notifications
+
+Gets the authenticated user's notifications.
+
+Responses:
+
+- 500: [Error](#error)
+- 200: array of [Notification](#notification)
+
+#### GET /notifications/count
+
+Gets the number of notifications for the authenticated user.
+
+Responses:
+
+- 500: [Error](#error)
 - 200
+  - `count`: int64 - the number of notifications
+
+#### DELETE /notifications/:id
+
+Deletes the specified notification. See [Notifications](#notifications) for the deletion behavior.
+
+Responses:
+
+- 500: [Error](#error)
+- 403: you cannot delete this notification ([Error](#error))
+- 204
+
+#### GET /notifications/byEventId/:eventId
+
+Gets the notification with the specified event ID.
+
+Responses:
+
+- 500: [Error](#error)
+- 200: [Notification](#notification)
 
 ## Objects
 
@@ -280,4 +348,56 @@ type UserInfo struct {
 type UserStats struct {
 	Uploads int64 `json:"uploads"`
 }
+```
+
+### Notification
+
+```go
+type Notification struct {
+	Id       string                 `json:"id" bson:"_id"`
+	Username string                 `json:"username" bson:"username"`
+	EventId  string                 `json:"eventId" bson:"eventId"`
+	Data     map[string]interface{} `json:"data" bson:"data"`
+}
+```
+
+Typescript (includes `data`)
+
+```typescript
+export type Notification = {
+    id: string,
+    username: string,
+    eventId: string,
+    data: {
+        type: "gdprRequest",
+        username: string,
+    } | {
+        type: "gifEditSuggestion",
+        username: string,
+        gifId: string,
+        tags: string[],
+        note: string | null,
+    },
+};
+```
+
+## Notifications
+
+```golang
+const (
+	GdprRequest       = "gdprRequest"
+	GifEditSuggestion = "gifEditSuggestion"
+)
+
+// NotificationTypes is a list of all notification types
+var NotificationTypes = []string{GdprRequest, GifEditSuggestion}
+
+// NotificationTypesDeleteByEvent is a list of all notification types, where if the notification is deleted,
+// the notifications with the same event id(that other users may have gotten) will also be deleted
+var NotificationTypesDeleteByEvent = []string{GdprRequest}
+
+// NotificationTypesDeletable is a list of all notification types, that can be deleted by the user,
+// otherwise the notification is supposed to be deleted automatically by the server when the event is resolved,
+// e.g. tag edit request is resolved
+var NotificationTypesDeletable = []string{GdprRequest}
 ```
