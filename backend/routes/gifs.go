@@ -20,7 +20,7 @@ func MountGifs(mounting *Mounting) {
 	mounting.Sessioned.GET("/gifs/search", func(c *gin.Context) {
 		queryString := c.Query("q")
 		if len(queryString) > 256 {
-			c.JSON(400, gin.H{"error": "query too long(>256)"})
+			c.JSON(400, ErrorStr("query too long(>256)"))
 			return
 		}
 		var user *User
@@ -39,7 +39,7 @@ func MountGifs(mounting *Mounting) {
 			maxNumInt, err := strconv.ParseInt(c.Query("max"), 10, 32)
 			maxNum = int32(maxNumInt)
 			if err != nil || maxNum < 0 || maxNum > 500 {
-				c.JSON(400, gin.H{"error": "invalid max"})
+				c.JSON(400, ErrorStr("invalid max"))
 				return
 			}
 		}
@@ -47,13 +47,13 @@ func MountGifs(mounting *Mounting) {
 			skipInner, err := strconv.ParseInt(c.Query("skip"), 10, 64)
 			skip = skipInner
 			if err != nil || skip < 0 {
-				c.JSON(400, gin.H{"error": "invalid skip"})
+				c.JSON(400, ErrorStr("invalid skip"))
 				return
 			}
 		}
 		query, err := ParseQuery(queryString, username)
 		if err != nil {
-			c.JSON(400, gin.H{"error": "failed to parse query: " + err.Error()})
+			c.JSON(400, ErrorStr("failed to parse query: "+err.Error()))
 			return
 		}
 		search := map[string]interface{}{}
@@ -92,7 +92,7 @@ func MountGifs(mounting *Mounting) {
 		if query.IncludeGroups != nil || query.Group != nil {
 			if query.IncludeGroups != nil {
 				if !user.HasGroups(*query.IncludeGroups) {
-					c.JSON(403, gin.H{"error": "you do not have access to these groups"})
+					c.JSON(403, ErrorStr("you do not have access to these groups"))
 					return
 				}
 				groupsOr := make([]bson.M, 0, 2)
@@ -115,7 +115,7 @@ func MountGifs(mounting *Mounting) {
 			}
 			if query.Group != nil {
 				if !user.HasGroup(*query.Group) {
-					c.JSON(403, gin.H{"error": "you do not have access to these groups"})
+					c.JSON(403, ErrorStr("you do not have access to these groups"))
 					return
 				}
 				search["group"] = query.Group
@@ -160,7 +160,7 @@ func MountGifs(mounting *Mounting) {
 		var gif Gif
 		err := GifsCol.FindOne(ctx, bson.M{"_id": c.Param("id")}).Decode(&gif)
 		if user := GetUser(c); gif.Group != nil && ((user != nil && !user.HasGroup(*gif.Group)) || user == nil) {
-			c.JSON(403, gin.H{"error": "you do not have access to this gif"})
+			c.JSON(403, ErrorStr("you do not have access to this gif"))
 			return
 		}
 		if err != nil {
@@ -190,14 +190,14 @@ func MountGifs(mounting *Mounting) {
 		gif.PreviewVideo = nil
 		gif.PreviewVideoWebm = nil
 		if err = ValidateGif(gif); err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
+			c.JSON(400, Error(err))
 			return
 		}
 		if gif.Group != nil && *gif.Group == "private" {
 			privateGroup := "@" + c.GetString("username")
 			gif.Group = &privateGroup
 		} else if gif.Group != nil && !user.HasGroup(*gif.Group) {
-			c.JSON(403, gin.H{"error": "you do not have the group " + *gif.Group})
+			c.JSON(403, ErrorStr("you do not have the group "+*gif.Group))
 			return
 		}
 		if IsTenorUrl.MatchString(gif.Url) {
@@ -218,7 +218,7 @@ func MountGifs(mounting *Mounting) {
 			// PreviewGif
 			match = TenorPreviewGifUrl.FindStringSubmatch(bytes.NewBuffer(body).String())
 			if len(match) == 0 {
-				c.JSON(400, gin.H{"error": "could not find gif url for preview in tenor page"})
+				c.JSON(400, ErrorStr("could not find gif url for preview in tenor page"))
 				return
 			}
 			err = json.Unmarshal([]byte(match[1]), &gif.PreviewGif)
@@ -229,7 +229,7 @@ func MountGifs(mounting *Mounting) {
 			// PreviewVideo
 			match = TenorPreviewVideoUrl.FindStringSubmatch(bytes.NewBuffer(body).String())
 			if len(match) == 0 {
-				c.JSON(400, gin.H{"error": "could not find video url for preview in tenor page"})
+				c.JSON(400, ErrorStr("could not find video url for preview in tenor page"))
 				return
 			}
 			err = json.Unmarshal([]byte(match[1]), &gif.PreviewVideo)
@@ -240,7 +240,7 @@ func MountGifs(mounting *Mounting) {
 			// PreviewVideoWebm
 			match = TenorPreviewVideoWebmUrl.FindStringSubmatch(bytes.NewBuffer(body).String())
 			if len(match) == 0 {
-				c.JSON(400, gin.H{"error": "could not find webm video url for preview in tenor page"})
+				c.JSON(400, ErrorStr("could not find webm video url for preview in tenor page"))
 				return
 			}
 			err = json.Unmarshal([]byte(match[1]), &gif.PreviewVideoWebm)
@@ -296,7 +296,7 @@ func MountGifs(mounting *Mounting) {
 			return
 		}
 		if originalGif.Uploader != c.GetString("username") && !user.HasGroup("perm:edit_all_gifs") {
-			c.JSON(403, gin.H{"error": "you are not the uploader of this gif nor do you have perm:edit_all_gifs"})
+			c.JSON(403, ErrorStr("you are not the uploader of this gif nor do you have perm:edit_all_gifs"))
 			return
 		}
 
@@ -307,14 +307,14 @@ func MountGifs(mounting *Mounting) {
 			privateGroup := "@" + c.GetString("username")
 			originalGif.Group = &privateGroup
 		} else if edit.Group != nil && !user.HasGroup(*edit.Group) {
-			c.JSON(403, gin.H{"error": "you do not have the group " + *edit.Group})
+			c.JSON(403, ErrorStr("you do not have the group "+*edit.Group))
 			return
 		}
 		originalGif.Tags = edit.Tags
 		originalGif.Note = edit.Note
 		err = ValidateGif(originalGif)
 		if err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
+			c.JSON(400, Error(err))
 			return
 		}
 		GifsCol.FindOneAndReplace(ctx, bson.M{"_id": c.Param("id")}, originalGif)
@@ -336,7 +336,7 @@ func MountGifs(mounting *Mounting) {
 			return
 		}
 		if originalGif.Uploader != c.GetString("username") && !user.HasGroup("perm:delete_all_gifs") {
-			c.JSON(403, gin.H{"error": "you are not the uploader of this gif nor do you have perm:delete_all_gifs"})
+			c.JSON(403, ErrorStr("you are not the uploader of this gif nor do you have perm:delete_all_gifs"))
 			return
 		}
 		GifsCol.FindOneAndDelete(ctx, bson.M{"_id": c.Param("id")})

@@ -55,7 +55,7 @@ func MountNotifications(mounting *Mounting) {
 				goto isDeletable
 			}
 		}
-		c.JSON(403, gin.H{"error": "this notification is not deletable"})
+		c.JSON(403, ErrorStr("this notification is not deletable"))
 		return
 	isDeletable:
 		// todo(refactor): once Go 1.21 is released, use slices.Contains

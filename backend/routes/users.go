@@ -31,7 +31,7 @@ func MountUsers(mounting *Mounting) {
 		username := c.Param("username")
 		if username == "self" {
 			if GetUser(c) == nil {
-				c.JSON(403, gin.H{"error": "you must be logged in to view your own info"})
+				c.JSON(403, ErrorStr("you must be logged in to view your own info"))
 				return
 			}
 			user = *GetUser(c)
@@ -61,7 +61,7 @@ func MountUsers(mounting *Mounting) {
 	// login, signup, sessions stuff
 	mounting.Normal.POST("/users", mounting.PasswordRateLimit, func(c *gin.Context) {
 		if !Config.AllowSignup {
-			c.JSON(403, gin.H{"error": "signup is disabled by the server admin"})
+			c.JSON(403, ErrorStr("signup is disabled by the server admin"))
 			return
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -78,7 +78,7 @@ func MountUsers(mounting *Mounting) {
 		}
 		// validate username
 		if !UsernameValidation.MatchString(req.Username) {
-			c.JSON(400, gin.H{"error": "invalid username"})
+			c.JSON(400, ErrorStr("invalid username"))
 			return
 		}
 		// check if username exists
@@ -88,12 +88,12 @@ func MountUsers(mounting *Mounting) {
 			return
 		}
 		if count > 0 {
-			c.JSON(400, gin.H{"error": "username already exists"})
+			c.JSON(400, ErrorStr("username already exists"))
 			return
 		}
 		// validate password
 		if len(req.Password) < 8 {
-			c.JSON(400, gin.H{"error": "password too short(<8)"})
+			c.JSON(400, ErrorStr("password too short(<8)"))
 			return
 		}
 		// start creating account
@@ -151,7 +151,7 @@ func MountUsers(mounting *Mounting) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		user := GetUser(c)
-		err := deleteAllOtherSessions(ctx, user.Username, c.GetHeader(("x-session-token")))
+		err := deleteAllOtherSessions(ctx, user.Username, c.GetHeader("x-session-token"))
 		if err != nil {
 			c.JSON(500, Error(err))
 			return
@@ -170,7 +170,7 @@ func MountUsers(mounting *Mounting) {
 			return
 		}
 		if len(req.NewPassword) < 8 {
-			c.JSON(400, gin.H{"error": "new password too short(<8)"})
+			c.JSON(400, ErrorStr("new password too short(<8)"))
 			return
 		}
 		userGet, _ := c.Get("user")
@@ -202,12 +202,12 @@ func MountUsers(mounting *Mounting) {
 			return
 		}
 		if len(req.NewPassword) < 8 {
-			c.JSON(400, gin.H{"error": "new password too short(<8)"})
+			c.JSON(400, ErrorStr("new password too short(<8)"))
 			return
 		}
 		user := GetUser(c)
 		if !user.HasGroup("admin") {
-			c.JSON(403, gin.H{"error": "you are not admin"})
+			c.JSON(403, ErrorStr("you are not admin"))
 			return
 		}
 		hash, err := argon2id.CreateHash(req.NewPassword, Argon2idParams)
@@ -246,7 +246,7 @@ func MountUsers(mounting *Mounting) {
 			return
 		}
 		if len(req.Note) > 2048 {
-			c.JSON(400, gin.H{"error": "note too long(>2048)"})
+			c.JSON(400, ErrorStr("note too long(>2048)"))
 			return
 		}
 		user := GetUser(c)
