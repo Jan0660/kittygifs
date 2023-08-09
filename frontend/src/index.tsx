@@ -24,7 +24,7 @@ let item = (await localforage.getItem("kittygifs.config")) as Config;
 if (!item) {
     item = {
         groupTextInput: false,
-        searchHighlight: true,
+        searchHighlight: false,
         searchHighlightInPopup: false,
         apiUrl: import.meta.env.VITE_API_URL,
         defaultGroup: null,
