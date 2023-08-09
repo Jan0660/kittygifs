@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import { Gif } from "./client/Client";
+import { Gif } from "../client/Client";
 import UAParser from "ua-parser-js";
 
 export type Props = {

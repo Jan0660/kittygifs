@@ -1,6 +1,7 @@
 import { Accessor, Component, Setter, onMount } from "solid-js";
-import { client, config } from "./index";
-import { Gif } from "./client/Client";
+import { client, config } from "../index";
+import { appWindow } from '@tauri-apps/plugin-window';
+import { Gif } from "../client/Client";
 
 type Props = {
     setGifs: Setter<Gif[]>;
@@ -9,19 +10,33 @@ type Props = {
 };
 
 const QueryInput: Component<Props> = (props: Props) => {
+    const runningTauri = window.__TAURI_IPC__ != null;
     let abortLast: AbortController | null = null;
-    onMount(() => {
-        abortLast = new AbortController();
-        client.searchGifs(config.queryPrepend + " " + props.query(), abortLast.signal, {
-            max: config.limit,
-        }).then(res => {
-            props.setGifs(res);
-        }).catch(e => {
-            if (e.name != "CanceledError") {
-                console.error(e);
+    if (!(runningTauri && appWindow.isVisible())) {
+        onMount(() => {
+            abortLast = new AbortController();
+            client.searchGifs(config.queryPrepend + " " + props.query(), abortLast.signal, {
+                max: config.limit,
+            }).then(res => {
+                props.setGifs(res);
+            }).catch(e => {
+                if (e.name != "CanceledError") {
+                    console.error(e);
+                }
+            });
+        });
+    }
+    if (runningTauri) {
+        appWindow.listen("tauri://resize", event => {
+            // @ts-ignore
+            if (event.payload.height === 0 && event.payload.width === 0) {
+                props.setGifs([]);
             }
         });
-    });
+        appWindow.listen("tauri://close-requested", event => {
+            props.setGifs([]);
+        })
+    }
     return (
         <>
             <input

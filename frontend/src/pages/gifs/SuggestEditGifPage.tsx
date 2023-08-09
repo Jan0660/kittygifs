@@ -1,6 +1,6 @@
 import { Component, Show, createEffect, createSignal } from "solid-js";
 import { useNavigate, useRouteData } from "@solidjs/router";
-import { GifPreviewSingle } from "../../GifPreviewSingle";
+import { GifPreviewSingle } from "../../components/GifPreviewSingle";
 import { GifViewData } from "../../App";
 import { client, getErrorString } from "../..";
 import { TagsDiff } from "../../components/TagsDiff";

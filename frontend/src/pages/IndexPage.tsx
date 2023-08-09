@@ -1,8 +1,8 @@
 import { createSignal, type Component, Show, For, createEffect } from "solid-js";
 import { Gif } from "../client/Client";
 import "../index.css";
-import QueryInput from "../QueryInput";
-import { GifPreviewSingle } from "../GifPreviewSingle";
+import QueryInput from "../components/QueryInput";
+import { GifPreviewSingle } from "../components/GifPreviewSingle";
 import { client, config } from "..";
 import { SearchHighlight } from "../components/SearchHighlight";
 import { A, useSearchParams } from "@solidjs/router";

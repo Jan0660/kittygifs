@@ -2,7 +2,7 @@ import { Component, Show, createEffect, createSignal } from "solid-js";
 import { useNavigate, useRouteData, useSearchParams } from "@solidjs/router";
 import { GifViewData } from "../../App";
 import { client, getErrorString, userInfo } from "../..";
-import { GifPreviewSingle } from "../../GifPreviewSingle";
+import { GifPreviewSingle } from "../../components/GifPreviewSingle";
 import { GroupSelect } from "../../components/GroupSelect";
 import { TagsDiff } from "../../components/TagsDiff";
 

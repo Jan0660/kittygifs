@@ -2,8 +2,8 @@ import { createSignal, type Component, createEffect, For, Show } from "solid-js"
 import { Gif } from "../client/Client";
 import "../index.css";
 import { invoke } from "@tauri-apps/api/tauri";
-import { GifPreviewSingle } from "../GifPreviewSingle";
-import QueryInput from "../QueryInput";
+import { GifPreviewSingle } from "../components/GifPreviewSingle";
+import QueryInput from "../components/QueryInput";
 import { SearchHighlight } from "../components/SearchHighlight";
 import { config } from "..";
 import { A } from "@solidjs/router";

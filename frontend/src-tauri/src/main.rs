@@ -96,35 +96,12 @@ fn main() {
         })
         .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--hide-main-window"])))
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_window::init())
         .setup(|app| {
             APP_HANDLE.lock().unwrap().replace(app.handle());
             // app.get_window("main").unwrap().open_devtools();
-            // hide the popup window when it loses focus or is minimized or is closed
-            let window = app.get_window("popup").unwrap();
-            window.on_window_event(|event| {
-                let app = APP_HANDLE.lock().unwrap().as_ref().unwrap().clone();
-                match event {
-                    WindowEvent::CloseRequested { api, .. } => {
-                        // println!("close requested");
-                        exit_if_popup();
-                        let window = app.get_window("popup").unwrap();
-                        window.hide().unwrap();
-                        api.prevent_close();
-                    }
-                    WindowEvent::Resized(physical_size) => {
-                        // println!(
-                        //     "resized, w: {}, h: {}",
-                        //     physical_size.width, physical_size.height
-                        // );
-                        if physical_size.width == 0 && physical_size.height == 0 {
-                            exit_if_popup();
-                            let window = app.get_window("popup").unwrap();
-                            window.hide().unwrap();
-                        }
-                    }
-                    _ => {}
-                }
-            });
+            make_unclosable(app, "main");
+            make_unclosable(app, "popup");
             if ARGS.lock().unwrap().as_ref().unwrap().popup {
                 app.get_window("main").unwrap().hide().unwrap();
                 app.get_window("popup").unwrap().show().unwrap();
@@ -256,4 +233,33 @@ fn exit_if_popup() {
     if ARGS.lock().unwrap().as_ref().unwrap().popup {
         std::process::exit(0);
     }
+}
+
+/// hide the window when it is minimized or closed
+fn make_unclosable(app: &tauri::App, window_name: &'static str) {
+    let window = app.get_window(window_name).unwrap();
+            window.on_window_event(|event| {
+                let app = APP_HANDLE.lock().unwrap().as_ref().unwrap().clone();
+                match event {
+                    WindowEvent::CloseRequested { api, .. } => {
+                        // println!("close requested");
+                        exit_if_popup();
+                        let window = app.get_window(window_name).unwrap();
+                        window.hide().unwrap();
+                        api.prevent_close();
+                    }
+                    WindowEvent::Resized(physical_size) => {
+                        // println!(
+                        //     "resized, w: {}, h: {}",
+                        //     physical_size.width, physical_size.height
+                        // );
+                        if physical_size.width == 0 && physical_size.height == 0 {
+                            exit_if_popup();
+                            let window = app.get_window(window_name).unwrap();
+                            window.hide().unwrap();
+                        }
+                    }
+                    _ => {}
+                }
+            });
 }
