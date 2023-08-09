@@ -77,13 +77,13 @@
         {
           "domain": "tauri.localhost",
           "windows": ["main", "popup"],
-          "plugins": ["autostart", "window"]
+          "plugins": ["autostart", "window", "event"]
         },
         {
           "domain": "localhost",
           "scheme": "tauri",
           "windows": ["main", "popup"],
-          "plugins": ["autostart", "window"]
+          "plugins": ["autostart", "window", "event"]
         }
       ]
     }

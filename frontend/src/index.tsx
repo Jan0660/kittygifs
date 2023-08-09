@@ -7,6 +7,7 @@ import { AxiosError } from "axios";
 import "./skybord-components.css";
 import "./skybord-main.css";
 import { createEffect, createSignal } from "solid-js";
+import { EventCallback, emit, listen } from '@tauri-apps/api/event'
 
 interface Config {
     groupTextInput: boolean;
@@ -36,11 +37,19 @@ if (!item) {
 
 item.limit ??= 40;
 
-export const config = item;
+export let config = item;
 
 export const saveConfig = async () => {
     await localforage.setItem("kittygifs.config", config);
+    if (window.__TAURI_IPC__ != null) {
+        emit("configChanged", config);
+    }
 };
+
+listen("configChanged", (event) => {
+    // @ts-ignore
+    config = event.payload;
+});
 
 globalThis.config = config;
 globalThis.saveConfig = saveConfig;
