@@ -46,10 +46,13 @@ export const saveConfig = async () => {
     }
 };
 
-listen("configChanged", (event) => {
-    // @ts-ignore
-    config = event.payload;
-});
+
+if (window.__TAURI_IPC__ != null) {
+    listen("configChanged", (event) => {
+        // @ts-ignore
+        config = event.payload;
+    });
+}
 
 globalThis.config = config;
 globalThis.saveConfig = saveConfig;
