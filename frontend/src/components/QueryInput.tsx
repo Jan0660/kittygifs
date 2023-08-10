@@ -30,10 +30,12 @@ const QueryInput: Component<Props> = (props: Props) => {
         appWindow.listen("tauri://resize", event => {
             // @ts-ignore
             if (event.payload.height === 0 && event.payload.width === 0) {
+                props.setQuery("");
                 props.setGifs([]);
             }
         });
         appWindow.listen("tauri://close-requested", event => {
+            props.setQuery("");
             props.setGifs([]);
         })
     }
