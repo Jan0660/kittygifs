@@ -1,7 +1,7 @@
 # Privacy Policy
 This document applies to users of the kittygifs API(at https://gifs-api.jan0660.dev) and by extension the visitors of the kittygifs website(at https://gifs.jan0660.dev) and the desktop application as it is packaged by the kittygifs project. Self-hosted instances of kittygifs may have their own privacy policy.
 
-Last modified: 26th of July 2023
+Last modified: 10th of August 2023
 ## PRIVACY PLEDGE
 We are commited to carrying out responsible and appropriate use of data from our users. We will NOT:
 
@@ -56,3 +56,5 @@ We will try our best to moderate these resources, but in the case where it is no
 Please be careful and not have your IP address or anything else grabbed.
 ## VERCEL
 The website is hosted using [Vercel](https://vercel.com). [Their privacy policy](https://vercel.com/legal/privacy-policy) applies as well to you as the end user.
+## HCAPTCHA
+The website uses [hCaptcha](https://hcaptcha.com/privacy) to prevent spam and abuse. [Their privacy policy](https://hcaptcha.com/privacy) applies as well to you as the end user.
