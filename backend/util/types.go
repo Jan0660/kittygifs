@@ -68,12 +68,18 @@ type UserSession struct {
 }
 
 type Configuration struct {
-	MongoUrl                 string    `json:"mongoUrl"`
-	DatabaseName             string    `json:"databaseName"`
-	Address                  string    `json:"address"`
-	AllowSignup              bool      `json:"allowSignup"`
-	AccessControlAllowOrigin *[]string `json:"accessControlAllowOrigin"`
-	IssueDiscordWebhook      *string   `json:"issueDiscordWebhook"`
+	MongoUrl                 string                `json:"mongoUrl"`
+	DatabaseName             string                `json:"databaseName"`
+	Address                  string                `json:"address"`
+	AllowSignup              bool                  `json:"allowSignup"`
+	AccessControlAllowOrigin *[]string             `json:"accessControlAllowOrigin"`
+	IssueDiscordWebhook      *string               `json:"issueDiscordWebhook"`
+	Captcha                  *CaptchaConfiguration `json:"captcha"`
+}
+
+type CaptchaConfiguration struct {
+	SiteKey   string `json:"siteKey"`
+	SecretKey string `json:"secretKey"`
 }
 
 type UserInfo struct {

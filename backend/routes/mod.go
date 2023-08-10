@@ -5,12 +5,14 @@ import (
 	ratelimit "github.com/JGLTechnologies/gin-rate-limit"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
+	"github.com/ross714/hcaptcha"
 	"go.mongodb.org/mongo-driver/bson"
 	. "kittygifs/util"
 	"time"
 )
 
 var Config *Configuration
+var HCaptchaClient *hcaptcha.Client
 
 type Mounting struct {
 	Normal            *gin.RouterGroup
@@ -105,6 +107,15 @@ func RunGin(config *Configuration) error {
 	MountGifs(mounting)
 	MountUsers(mounting)
 	MountNotifications(mounting)
+
+	info := gin.H{}
+	if config.Captcha != nil {
+		HCaptchaClient = hcaptcha.New(config.Captcha.SecretKey, config.Captcha.SiteKey)
+		info["captcha"] = gin.H{"siteKey": config.Captcha.SiteKey}
+	}
+	mounting.Normal.GET("/", func(c *gin.Context) {
+		c.JSON(200, info)
+	})
 
 	return r.Run(config.Address)
 }

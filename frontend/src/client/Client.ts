@@ -93,11 +93,12 @@ export class KittyGifsClient {
     public async createUser(
         username: string,
         password: string,
+        captcha?: string,
         signal?: AbortSignal,
     ): Promise<UserSession> {
         const res = await this._axios.post(
             "/users",
-            { username: username, password: password },
+            { username: username, password: password, captcha: captcha },
             { signal },
         );
         return res.data;
@@ -189,6 +190,10 @@ export class KittyGifsClient {
     public async getNotificationByEventId(eventId: string): Promise<Notification> {
         return (await this._axios.get("/notifications/byEventId/" + eventId)).data;
     }
+
+    public async getInstanceInfo(): Promise<InstanceInfo> {
+        return (await this._axios.get("/")).data;
+    }
 }
 
 export type Gif = {
@@ -251,3 +256,9 @@ export function hasGroup(group: string, groups: string[] | null) {
     if (groups.indexOf("admin") != -1) return true;
     return groups.indexOf(group) != -1;
 }
+
+export type InstanceInfo = {
+    captcha?: {
+        siteKey: string;
+    }
+};

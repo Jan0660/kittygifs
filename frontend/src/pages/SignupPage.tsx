@@ -1,14 +1,19 @@
-import { Component, createSignal } from "solid-js";
+import { Component, Show, createSignal } from "solid-js";
 import { client, config, getErrorString, saveConfig } from "..";
 import { useNavigate } from "@solidjs/router";
+import { InstanceInfo } from "../client/Client";
+import HCaptcha from "solid-hcaptcha";
 
 const SignupPage: Component = () => {
-    const navigate = useNavigate();
     const [error, setError] = createSignal("");
     const [username, setUsername] = createSignal("");
     const [password, setPassword] = createSignal("");
     const [passwordConfirm, setPasswordConfirm] = createSignal("");
     const [consent, setConsent] = createSignal(false);
+    const [email, setEmail] = createSignal("");
+    const [instanceInfo, setInstanceInfo] = createSignal(null as InstanceInfo | null);
+    client.getInstanceInfo().then(setInstanceInfo);
+    const [captcha, setCaptcha] = createSignal(null as string | null);
     return (
         <>
             <div class="content-header">
@@ -16,6 +21,9 @@ const SignupPage: Component = () => {
             </div>
             <div class="content-content">
                 <div class="error">{error() == "" ? <></> : <p>{error()}</p>}</div>
+                <Show when={instanceInfo() == null}>
+                    <p>Checking signup requirements...</p>
+                </Show>
                 <h2>Username</h2>
                 <input
                     type="text"
@@ -54,9 +62,25 @@ const SignupPage: Component = () => {
                             setConsent(e.currentTarget.checked);
                         }}
                     />
-                    I consent to the <a class="link" href="/legal/terms">terms of service</a> and <a class="link" href="/legal/privacy">privacy policy</a>.
+                    I consent to the{" "}
+                    <a class="link" href="/legal/terms">
+                        terms of service
+                    </a>{" "}
+                    and{" "}
+                    <a class="link" href="/legal/privacy">
+                        privacy policy
+                    </a>
+                    .
                 </label>
                 <br />
+                <Show when={instanceInfo()?.captcha != null}>
+                    <HCaptcha
+                        sitekey={instanceInfo().captcha.siteKey}
+                        onVerify={token => {
+                            setCaptcha(token);
+                        }}
+                    />
+                </Show>
                 <button
                     class="button confirm"
                     onClick={async () => {
@@ -65,15 +89,15 @@ const SignupPage: Component = () => {
                                 setError("Passwords do not match!");
                                 return;
                             }
-                            const session = await client.createUser(username(), password());
+                            const session = await client.createUser(username(), password(), captcha());
                             config.token = session.token;
                             await saveConfig();
-                            navigate("/");
+                            window.location.href = "/";
                         } catch (e) {
                             setError(getErrorString(e));
                         }
                     }}
-                    disabled={!consent()}
+                    disabled={!(consent() && (captcha() != null || instanceInfo()?.captcha == null))}
                 >
                     Sign up
                 </button>

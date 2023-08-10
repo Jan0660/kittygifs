@@ -67,8 +67,9 @@ func MountUsers(mounting *Mounting) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		type Request struct {
-			Username string `json:"username"`
-			Password string `json:"password"`
+			Username string  `json:"username"`
+			Password string  `json:"password"`
+			Captcha  *string `json:"captcha"`
 		}
 		var req Request
 		err := c.BindJSON(&req)
@@ -95,6 +96,17 @@ func MountUsers(mounting *Mounting) {
 		if len(req.Password) < 8 {
 			c.JSON(400, ErrorStr("password too short(<8)"))
 			return
+		}
+		// validate captcha
+		if Config.Captcha != nil {
+			if req.Captcha == nil {
+				c.JSON(400, ErrorStr("captcha required"))
+				return
+			}
+			if !HCaptchaClient.Verify(*req.Captcha) {
+				c.JSON(400, ErrorStr("invalid captcha"))
+				return
+			}
 		}
 		// start creating account
 		hash, err := argon2id.CreateHash(req.Password, Argon2idParams)
