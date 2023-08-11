@@ -52,21 +52,34 @@ Special groups:
 
 ### Public
 
+#### GET /
+
+Gets instance information.
+
+Responses:
+
+- 200: [InstanceInfo](#instanceinfo)
+
 #### POST /users
 
 Creates a new user. This endpoint may be disabled in the backend's configuration.
 
 Request body:
 
-- username: string - must pass `^[a-z0-9_]{3,20}$` this regex
-- password: string - must be at least 8 characters long
+- `username`: string - must pass `^[a-z0-9_]{3,20}$` this regex
+- `password`: string - must be at least 8 characters long
+- `captcha`?: string - the captcha token, required if captcha is enabled
+- `email`?: string - the email address, required if SMTP is enabled
 
 Responses:
 
 - 403: signup disabled ([Error](#error))
 - 400: invalid username or password, or username is already used ([Error](#error))
 - 500: [Error](#error)
-- 200: [UserSession](#usersession)
+- 200
+  - `type`: string = "created"
+    - `session`: [UserSession](#usersession)
+  - `type`: string = "verificationSent"
 
 #### POST /users/sessions
 
@@ -79,9 +92,25 @@ Request body:
 
 Responses:
 
-- 401: invalid username or password ([Error](#error))
+- 401: invalid username or password, account not verified ([Error](#error))
 - 500: [Error](#error)
 - 200: [UserSession](#usersession)
+
+#### POST /users/resendVerificationEmail
+
+Resends the verification email for the specified user.
+
+Request body:
+
+- `email`: string
+- `captcha`?: string - the captcha token, required if captcha is enabled
+
+Responses:
+
+- 500: smtp not configured ([Error](#error))
+- 500: [Error](#error)
+- 400: invalid request, invalid captcha, email not found, account already verified ([Error](#error))
+- 200
 
 ### Sessioned
 
@@ -155,9 +184,9 @@ Query parameters:
 
 Request body:
 
-- tags: []string
-- note: string
-- group: string
+- `tags`: []string
+- `note`: string
+- `group`: string
 
 Responses:
 
@@ -183,8 +212,8 @@ Suggests an edit to a gif.
 
 Request body:
 
-- tags: []string
-- note: string
+- `tags`: []string
+- `note`: string
 
 Responses:
 
@@ -198,8 +227,8 @@ Resets your password.
 
 Request body:
 
-- oldPassword: string
-- newPassword: string
+- `oldPassword`: string
+- `newPassword`: string
 
 Responses:
 
@@ -213,8 +242,8 @@ For the admin to reset other users' passwords.
 
 Request body:
 
-- username: string
-- newPassword: string
+- `username`: string
+- `newPassword`: string
 
 Responses:
 
@@ -348,6 +377,20 @@ type UserInfo struct {
 type UserStats struct {
 	Uploads int64 `json:"uploads"`
 }
+```
+
+### InstanceInfo
+
+```ts
+export type InstanceInfo = {
+    allowSignup: boolean
+    captcha?: {
+        siteKey: string;
+    },
+    smtp?: {
+        fromAddress: string;
+    },
+};
 ```
 
 ### Notification
