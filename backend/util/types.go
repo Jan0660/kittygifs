@@ -103,3 +103,14 @@ type UserInfo struct {
 type UserStats struct {
 	Uploads int64 `json:"uploads"`
 }
+
+type MiscBase struct {
+	Type string `json:"type" bson:"type"`
+}
+
+type MiscEmailChange struct {
+	MiscBase `bson:",inline"`
+	Username string `json:"username" bson:"username"`
+	Email    string `json:"email" bson:"email"`
+	Token    string `json:"token" bson:"token"`
+}

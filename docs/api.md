@@ -112,6 +112,26 @@ Responses:
 - 400: invalid request, invalid captcha, email not found, account already verified ([Error](#error))
 - 200
 
+#### GET /users/verify/:token
+
+Verifies the specified user.
+
+Responses:
+
+- 500: [Error](#error)
+- 400: invalid token (string)
+- 200 - the user is now verified (string)
+
+#### GET /users/verifyEmailChange/:token
+
+Verifies the email change for the specified user.
+
+Responses:
+
+- 500: [Error](#error)
+- 400: invalid token (string)
+- 200 - the email is now changed (string)
+
 ### Sessioned
 
 #### GET /gifs/:id
@@ -219,6 +239,23 @@ Responses:
 
 - 500: [Error](#error)
 - 400: invalid request ([Error](#error))
+- 200
+
+#### POST /users/changeEmail
+
+Requests an email change.
+
+Request body:
+
+- `email`: string
+- `password`: string
+- `captcha`?: string - the captcha token, required if captcha is enabled
+
+Responses:
+
+- 500: smtp not configured ([Error](#error))
+- 500: [Error](#error)
+- 400: invalid request, invalid captcha ([Error](#error))
 - 200
 
 #### POST /users/resetPassword

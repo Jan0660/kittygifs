@@ -13,6 +13,7 @@ import (
 )
 
 var VerificationEmailTemplate *template.Template
+var EmailChangeEmailTemplate *template.Template
 
 func LoadEmailTemplates() {
 	Do := func(path string) *template.Template {
@@ -28,6 +29,7 @@ func LoadEmailTemplates() {
 	}
 
 	VerificationEmailTemplate = Do("./resources/verificationMail.template")
+	EmailChangeEmailTemplate = Do("./resources/emailChangeMail.template")
 }
 
 func ExecuteTemplate(t *template.Template, data interface{}) (string, error) {

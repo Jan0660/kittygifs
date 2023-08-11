@@ -204,6 +204,10 @@ export class KittyGifsClient {
     public async resendVerificationEmail(email: string, captcha?: string) {
         await this._axios.post("/users/resendVerificationEmail", { email, captcha });
     }
+
+    public async changeEmail(props: { email: string, password: string, captcha?: string }) {
+        await this._axios.post("/users/changeEmail", props);
+    }
 }
 
 export type Gif = {
