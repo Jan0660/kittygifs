@@ -144,7 +144,7 @@ func MountUsers(mounting *Mounting) {
 			Email:        req.Email,
 		}
 		if Config.Smtp != nil {
-			verification := GenerateRandomString(32)
+			verification := GenerateVerificationToken()
 			user.Verification = &verification
 		}
 		_, err = UsersCol.InsertOne(ctx, user)

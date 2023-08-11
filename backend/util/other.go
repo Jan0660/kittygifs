@@ -2,6 +2,8 @@ package util
 
 import (
 	"crypto/rand"
+	"encoding/base64"
+	"encoding/binary"
 	"errors"
 	"github.com/alexedwards/argon2id"
 	"github.com/oklog/ulid/v2"
@@ -9,6 +11,7 @@ import (
 	mathRand "math/rand"
 	"net/url"
 	"strings"
+	"time"
 )
 
 var Argon2idParams = &argon2id.Params{
@@ -37,15 +40,15 @@ func ValidateGif(gif Gif) error {
 		return errors.New("url is too long(>320)")
 	}
 	{
-		url, err := url.Parse(gif.Url)
+		gifUrl, err := url.Parse(gif.Url)
 		if err != nil {
 			return errors.New("failed to parse url: " + err.Error())
 		}
-		if url.Scheme != "https" && url.Scheme != "http" {
+		if gifUrl.Scheme != "https" && gifUrl.Scheme != "http" {
 			return errors.New("url is not http or https")
 		}
 		// verify domain
-		hostname := strings.ToLower(url.Hostname())
+		hostname := strings.ToLower(gifUrl.Hostname())
 		valid := false
 		for _, domain := range AllowedDomains {
 			if hostname == domain {
@@ -80,6 +83,35 @@ func ValidateTags(tags []string) error {
 		}
 	}
 	return nil
+}
+
+// GetBase64Timestamp gets a URL safe base64 encoded timestamp in UNIX seconds
+func GetBase64Timestamp() string {
+	bytes := make([]byte, 8)
+	binary.PutUvarint(bytes, uint64(time.Now().Unix()))
+	return base64.RawURLEncoding.EncodeToString(bytes)
+}
+
+// ParseBase64Timestamp parses a URL safe base64 encoded timestamp in UNIX seconds
+func ParseBase64Timestamp(timestamp string) (time.Time, error) {
+	bytes, err := base64.RawURLEncoding.DecodeString(timestamp)
+	if err != nil {
+		return time.Time{}, err
+	}
+	seconds, _ := binary.Uvarint(bytes)
+	return time.Unix(int64(seconds), 0), nil
+}
+
+func GenerateVerificationToken() string {
+	return GetBase64Timestamp() + "." + GenerateRandomString(24)
+}
+
+func GetVerificationTokenTimestamp(token string) (time.Time, error) {
+	parts := strings.Split(token, ".")
+	if len(parts) != 2 {
+		return time.Time{}, errors.New("invalid token format")
+	}
+	return ParseBase64Timestamp(parts[0])
 }
 
 // thanks https://gist.github.com/dopey/c69559607800d2f2f90b1b1ed4e550fb?permalink_comment_id=3527095#gistcomment-3527095
