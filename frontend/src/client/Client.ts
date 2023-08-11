@@ -94,11 +94,17 @@ export class KittyGifsClient {
         username: string,
         password: string,
         captcha?: string,
+        email?: string,
         signal?: AbortSignal,
-    ): Promise<UserSession> {
+    ): Promise<{
+        type: "created",
+        session: UserSession,
+    } | {
+        type: "verificationSent",
+    }> {
         const res = await this._axios.post(
             "/users",
-            { username: username, password: password, captcha: captcha },
+            { username: username, password: password, captcha: captcha, email: email },
             { signal },
         );
         return res.data;
@@ -194,6 +200,10 @@ export class KittyGifsClient {
     public async getInstanceInfo(): Promise<InstanceInfo> {
         return (await this._axios.get("/")).data;
     }
+
+    public async resendVerificationEmail(email: string, captcha?: string) {
+        await this._axios.post("/users/resendVerificationEmail", { email, captcha });
+    }
 }
 
 export type Gif = {
@@ -261,5 +271,8 @@ export type InstanceInfo = {
     allowSignup: boolean
     captcha?: {
         siteKey: string;
-    }
+    },
+    smtp?: {
+        fromAddress: string;
+    },
 };
