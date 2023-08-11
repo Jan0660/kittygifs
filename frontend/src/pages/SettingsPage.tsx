@@ -1,10 +1,12 @@
 import { type Component, Show, For, createSignal } from "solid-js";
 import "../index.css";
-import { config, saveConfig } from "..";
+import { client, config, getErrorString, saveConfig } from "..";
 import { invoke } from "@tauri-apps/api/tauri";
 import { GroupSelect } from "../components/GroupSelect";
 import { useNavigate } from "@solidjs/router";
 import { enable, isEnabled, disable } from "@tauri-apps/plugin-autostart";
+import HCaptcha from "solid-hcaptcha";
+import { InstanceInfo } from "../client/Client";
 
 const ModifierKeys = {
     Alt: 0x01,
@@ -69,6 +71,12 @@ const SettingsPage: Component = () => {
             setStartupEnabled(res);
         })
     }
+    const [changeEmail, setChangeEmail] = createSignal("");
+    const [changeEmailError, setChangeEmailError] = createSignal("");
+    const [changeEmailPassword, setChangeEmailPassword] = createSignal("");
+    const [changeEmailCaptcha, setChangeEmailCaptcha] = createSignal(null as string | null);
+    const [instanceInfo, setInstanceInfo] = createSignal(null as InstanceInfo | null);
+    client.getInstanceInfo().then(setInstanceInfo);
 
     return (
         <>
@@ -205,6 +213,69 @@ const SettingsPage: Component = () => {
                     </button>
                     * You currently have to restart the app for the shortcut to take effect.
                 </Show>
+                <Show when={config.token != null}>
+                    <h3>Account</h3>
+                    <h4>Change Email</h4>
+                    <div class="error">{changeEmailError() == "" ? <></> : <p>{changeEmailError()}</p>}</div>
+                    <input
+                        type="text"
+                        value={changeEmail()}
+                        onChange={e => {
+                            setChangeEmail(e.target.value);
+                        }
+                        }
+                        placeholder="New Email"
+                        class="input"
+                    />
+                    <br />
+                    <input
+                        type="password"
+                        value={changeEmailPassword()}
+                        onChange={e => {
+                            setChangeEmailPassword(e.target.value);
+                        }
+                        }
+                        placeholder="Password"
+                        class="input"
+                    />
+                    <br />
+                    <Show when={instanceInfo()?.captcha != null}>
+                        <HCaptcha
+                            sitekey={instanceInfo().captcha.siteKey}
+                            onVerify={token => {
+                                setChangeEmailCaptcha(token);
+                            }}
+                            onChallengeExpired={() => {
+                                setChangeEmailCaptcha(null);
+                            }}
+                        />
+                    </Show>
+                    <button
+                        class="button primary"
+                        onclick={async () => {
+                            setChangeEmailError("");
+                            try {
+                                await client.changeEmail({
+                                    email: changeEmail(),
+                                    password: changeEmailPassword(),
+                                    captcha: changeEmailCaptcha(),
+                                });
+                                setChangeEmailError("Email changed requested successfully. Please check your inbox and spam folder for a confirmation link.");
+                            } catch (e) {
+                                setChangeEmailError(getErrorString(e));
+                            }
+                        }
+                        }
+                        disabled={!(changeEmail() != "" && changeEmailPassword() != "" && (changeEmailCaptcha() != null || instanceInfo()?.captcha == null))}
+                    >Change Email</button>
+                    <br />
+                    <button
+                        class="button danger"
+                        onclick={() => {
+                            navigate("/settings/accountDeletion");
+                        }}
+                    >Request Account Deletion or Other GDPR Request</button>
+                </Show>
                 <h3>Pro Stuff 😎</h3>
                 <label>API URL</label> <br />
                 <input
@@ -229,14 +300,6 @@ const SettingsPage: Component = () => {
                     />
                     Use a text input for group selection instead of a dropdown
                 </label>
-                <br />
-                <br />
-                <button
-                    class="button danger"
-                    onclick={() => {
-                        navigate("/settings/accountDeletion");
-                    }}
-                >Request Account Deletion or Other GDPR Request</button>
             </div>
         </>
     );

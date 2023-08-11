@@ -1,7 +1,7 @@
 # Privacy Policy
 This document applies to users of the kittygifs API(at https://gifs-api.jan0660.dev) and by extension the visitors of the kittygifs website(at https://gifs.jan0660.dev) and the desktop application as it is packaged by the kittygifs project. Self-hosted instances of kittygifs may have their own privacy policy.
 
-Last modified: 10th of August 2023
+Last modified: 11th of August 2023
 ## PRIVACY PLEDGE
 We are commited to carrying out responsible and appropriate use of data from our users. We will NOT:
 
@@ -33,7 +33,10 @@ You have the right, at any time, to ask us to:
 
 You can do this by:
 
-- Sending us a request via the website on the appropriate page, accessible via the button on the bottom of the settings page.
+- Sending us a request via the website on the appropriate page, accessible via the button on the bottom of the Account section on the settings page.
+- Sending us an email from the email address assigned to your account to `jan0660(at)tutanota.com`.
+  If asking to delete your account, please include details like if you are willing to let us keep your contributions to the website in an anonymized form, or if you want them to be deleted as well.
+
 ## CHANGES TO OUR PRIVACY POLICY
 We may update our Privacy Policy in the future if needed.
 

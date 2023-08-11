@@ -67,7 +67,7 @@ func MountUsers(mounting *Mounting) {
 			c.JSON(403, ErrorStr("signup is disabled by the server admin"))
 			return
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 16*time.Second)
 		defer cancel()
 		type Request struct {
 			Username string  `json:"username"`
@@ -102,35 +102,12 @@ func MountUsers(mounting *Mounting) {
 			return
 		}
 		// validate email
-		if Config.Smtp != nil {
-			if req.Email == nil {
-				c.JSON(400, ErrorStr("email required"))
-				return
-			}
-			if !govalidator.IsEmail(*req.Email) {
-				c.JSON(400, ErrorStr("invalid email"))
-				return
-			}
-			count, err = UsersCol.CountDocuments(ctx, bson.M{"email": *req.Email})
-			if err != nil {
-				c.JSON(500, Error(err))
-				return
-			}
-			if count > 0 {
-				c.JSON(400, ErrorStr("email already exists"))
-				return
-			}
+		if Config.Smtp != nil && validateEmail(c, ctx, req.Email) != true {
+			return
 		}
 		// validate captcha
-		if Config.Captcha != nil {
-			if req.Captcha == nil {
-				c.JSON(400, ErrorStr("captcha required"))
-				return
-			}
-			if !HCaptchaClient.Verify(*req.Captcha) {
-				c.JSON(400, ErrorStr("invalid captcha"))
-				return
-			}
+		if verifyCaptcha(c, req.Captcha) != true {
+			return
 		}
 		// start creating account
 		hash, err := argon2id.CreateHash(req.Password, Argon2idParams)
@@ -357,15 +334,8 @@ func MountUsers(mounting *Mounting) {
 			return
 		}
 		// validate captcha
-		if Config.Captcha != nil {
-			if req.Captcha == nil {
-				c.JSON(400, ErrorStr("captcha required"))
-				return
-			}
-			if !HCaptchaClient.Verify(*req.Captcha) {
-				c.JSON(400, ErrorStr("invalid captcha"))
-				return
-			}
+		if verifyCaptcha(c, req.Captcha) != true {
+			return
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
@@ -408,6 +378,83 @@ func MountUsers(mounting *Mounting) {
 		}
 		c.String(200, "Account verified, you can now log in")
 	})
+	mounting.Normal.GET("/users/verifyEmailChange/:token", func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		var entry MiscEmailChange
+		err := MiscCol.FindOne(ctx, bson.M{"type": "emailChange", "token": c.Param("token")}).Decode(&entry)
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			c.String(400, "Email change token is invalid, already used or expired")
+			return
+		} else if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		var user User
+		err = UsersCol.FindOne(ctx, bson.M{"_id": entry.Username}).Decode(&user)
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		user.Email = &entry.Email
+		_, err = UsersCol.ReplaceOne(ctx, bson.M{"_id": user.Username}, user)
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		err = MiscCol.FindOneAndDelete(ctx, bson.M{"type": "emailChange", "token": c.Param("token")}).Err()
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		c.String(200, "Email changed")
+	})
+	mounting.Authed.POST("/users/changeEmail", mounting.PasswordRateLimit, func(c *gin.Context) {
+		if Config.Smtp == nil {
+			c.JSON(500, ErrorStr("smtp not configured"))
+			return
+		}
+		type Request struct {
+			Password string  `json:"password"`
+			Email    string  `json:"email"`
+			Captcha  *string `json:"captcha"`
+		}
+		var req Request
+		err := c.BindJSON(&req)
+		if err != nil {
+			c.JSON(400, Error(err))
+			return
+		}
+		// validate captcha
+		if verifyCaptcha(c, req.Captcha) != true {
+			return
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		if validateEmail(c, ctx, &req.Email) != true {
+			return
+		}
+		user := GetUser(c)
+		if CheckPassword(c, req.Password, user.PasswordHash) != true {
+			return
+		}
+		token := GenerateVerificationToken()
+		_, err = MiscCol.InsertOne(ctx, bson.M{
+			"type":     "emailChange",
+			"username": user.Username,
+			"email":    req.Email,
+			"token":    token,
+		})
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		err = sendEmailChangeEmail(c, *user, req.Email, token)
+		if err != nil {
+			return
+		}
+		c.Status(200)
+	})
 }
 
 func createSession(ctx context.Context, username string) (*UserSession, error) {
@@ -446,4 +493,58 @@ func sendVerificationEmail(c *gin.Context, user User) error {
 		return err
 	}
 	return nil
+}
+
+func sendEmailChangeEmail(c *gin.Context, user User, email string, token string) error {
+	content, err := ExecuteTemplate(EmailChangeEmailTemplate, map[string]interface{}{
+		"User":   user,
+		"ApiUrl": Config.ApiUrl,
+		"Token":  token,
+	})
+	if err != nil {
+		c.JSON(500, Error(err))
+		return err
+	}
+	err = SendEmail(Config.Smtp, email, "Email Change Verification", content)
+	if err != nil {
+		c.JSON(500, ErrorStr("failed to send verification email"))
+		return err
+	}
+	return nil
+}
+
+// verifyCaptcha verifies the captcha and returns true if it's valid, otherwise it writes the error to the response and returns false
+func verifyCaptcha(c *gin.Context, captchaToken *string) bool {
+	if Config.Captcha != nil {
+		if captchaToken == nil {
+			c.JSON(400, ErrorStr("captcha required"))
+			return false
+		}
+		if !HCaptchaClient.Verify(*captchaToken) {
+			c.JSON(400, ErrorStr("invalid captcha"))
+			return false
+		}
+	}
+	return true
+}
+
+func validateEmail(c *gin.Context, ctx context.Context, email *string) bool {
+	if email == nil {
+		c.JSON(400, ErrorStr("email required"))
+		return false
+	}
+	if !govalidator.IsEmail(*email) {
+		c.JSON(400, ErrorStr("invalid email"))
+		return false
+	}
+	count, err := UsersCol.CountDocuments(ctx, bson.M{"email": *email})
+	if err != nil {
+		c.JSON(500, Error(err))
+		return false
+	}
+	if count > 0 {
+		c.JSON(400, ErrorStr("email already exists"))
+		return false
+	}
+	return true
 }
