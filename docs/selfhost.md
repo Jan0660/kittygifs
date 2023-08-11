@@ -71,7 +71,7 @@ Site key and secret key for hCaptcha.
 
 ### `smtp`
 
-SMTP server to use for sending emails. Required `apiUrl` to be set.
+SMTP server to use for sending emails. Requires `apiUrl` to be set.
 
 ```json
 {
