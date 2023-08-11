@@ -87,8 +87,8 @@ Creates a new session for the specified user.
 
 Request body:
 
-- username: string
-- password: string
+- `username`: string
+- `password`: string
 
 Responses:
 
@@ -130,9 +130,9 @@ Searches for gifs.
 
 Query parameters:
 
-- q: string - the search query, must not be longer than 256 characters, [see searching](#searching)
-- max: int32 - the maximum number of gifs to return
-- skip: int64 - the number of gifs to skip
+- `q`: string - the search query, must not be longer than 256 characters, [see searching](#searching)
+- `max`: int32 - the maximum number of gifs to return
+- `skip`: int64 - the number of gifs to skip
 
 Responses:
 
@@ -148,7 +148,7 @@ If `username` is `self`, the information about the authenticated user is returne
 
 Query parameters:
 
-- stats: bool? - if true, the user's stats are included in the response
+- `stats`: bool? - if true, the user's stats are included in the response
 
 Responses:
 
