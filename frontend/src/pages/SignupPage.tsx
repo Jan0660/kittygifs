@@ -93,6 +93,9 @@ const SignupPage: Component = () => {
                         onVerify={token => {
                             setCaptcha(token);
                         }}
+                        onChallengeExpired={() => {
+                            setCaptcha(null);
+                        }}
                     />
                 </Show>
                 <button
