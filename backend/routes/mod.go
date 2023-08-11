@@ -108,7 +108,9 @@ func RunGin(config *Configuration) error {
 	MountUsers(mounting)
 	MountNotifications(mounting)
 
-	info := gin.H{}
+	info := gin.H{
+		"allowSignup": config.AllowSignup,
+	}
 	if config.Captcha != nil {
 		HCaptchaClient = hcaptcha.New(config.Captcha.SecretKey, config.Captcha.SiteKey)
 		info["captcha"] = gin.H{"siteKey": config.Captcha.SiteKey}

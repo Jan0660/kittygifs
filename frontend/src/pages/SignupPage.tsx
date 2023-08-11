@@ -20,10 +20,14 @@ const SignupPage: Component = () => {
                 <h1>Signup</h1>
             </div>
             <div class="content-content">
-                <div class="error">{error() == "" ? <></> : <p>{error()}</p>}</div>
-                <Show when={instanceInfo() == null}>
+                <Show when={instanceInfo() === null}>
                     <p>Checking signup requirements...</p>
                 </Show>
+                <Show when={instanceInfo() !== null && !instanceInfo()?.allowSignup}>
+                    <p>Signup is disabled on this instance.</p>
+                </Show>
+                <Show when={instanceInfo() !== null && instanceInfo()?.allowSignup}>
+                <div class="error">{error() == "" ? <></> : <p>{error()}</p>}</div>
                 <h2>Username</h2>
                 <input
                     type="text"
@@ -101,6 +105,7 @@ const SignupPage: Component = () => {
                 >
                     Sign up
                 </button>
+                </Show>
             </div>
         </>
     );

@@ -258,6 +258,7 @@ export function hasGroup(group: string, groups: string[] | null) {
 }
 
 export type InstanceInfo = {
+    allowSignup: boolean
     captcha?: {
         siteKey: string;
     }
