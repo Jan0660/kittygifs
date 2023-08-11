@@ -22,6 +22,8 @@ type User struct {
 	Username     string    `json:"username" bson:"_id"`
 	PasswordHash string    `json:"passwordHash" bson:"passwordHash"`
 	Groups       *[]string `json:"groups,omitempty" bson:"groups,omitempty"`
+	Email        *string   `json:"email,omitempty" bson:"email,omitempty"`
+	Verification *string   `json:"verification,omitempty" bson:"verification,omitempty"`
 }
 
 // HasGroups Returns true if user has all the specified groups or is admin, otherwise returns false
@@ -75,11 +77,21 @@ type Configuration struct {
 	AccessControlAllowOrigin *[]string             `json:"accessControlAllowOrigin"`
 	IssueDiscordWebhook      *string               `json:"issueDiscordWebhook"`
 	Captcha                  *CaptchaConfiguration `json:"captcha"`
+	Smtp                     *SmtpConfiguration    `json:"smtp"`
+	ApiUrl                   string                `json:"apiUrl"`
 }
 
 type CaptchaConfiguration struct {
 	SiteKey   string `json:"siteKey"`
 	SecretKey string `json:"secretKey"`
+}
+
+type SmtpConfiguration struct {
+	ServerAddress string `json:"serverAddress"`
+	FromAddress   string `json:"fromAddress"`
+	FromName      string `json:"fromName"`
+	Username      string `json:"username"`
+	Password      string `json:"password"`
 }
 
 type UserInfo struct {

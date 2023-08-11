@@ -22,7 +22,11 @@ func main() {
 		if config.AccessControlAllowOrigin == nil {
 			config.AccessControlAllowOrigin = &[]string{"*"} // default to allow all origins
 		}
+		if config.ApiUrl == "" {
+			log.Fatalln("apiUrl must be set in config.json")
+		}
 	}
+	LoadEmailTemplates()
 	InitializeMongoDB(&config)
 	err := routes.RunGin(&config)
 	if err != nil {

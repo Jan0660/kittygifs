@@ -115,6 +115,11 @@ func RunGin(config *Configuration) error {
 		HCaptchaClient = hcaptcha.New(config.Captcha.SecretKey, config.Captcha.SiteKey)
 		info["captcha"] = gin.H{"siteKey": config.Captcha.SiteKey}
 	}
+	if config.Smtp != nil {
+		info["smtp"] = gin.H{
+			"fromAddress": config.Smtp.FromAddress,
+		}
+	}
 	mounting.Normal.GET("/", func(c *gin.Context) {
 		c.JSON(200, info)
 	})
