@@ -22,8 +22,8 @@ func main() {
 		if config.AccessControlAllowOrigin == nil {
 			config.AccessControlAllowOrigin = &[]string{"*"} // default to allow all origins
 		}
-		if config.ApiUrl == "" {
-			log.Fatalln("apiUrl must be set in config.json")
+		if config.ApiUrl == "" && config.Smtp != nil {
+			log.Fatalln("apiUrl must be set in config.json when smtp is enabled")
 		}
 	}
 	LoadEmailTemplates()

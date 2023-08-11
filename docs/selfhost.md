@@ -13,7 +13,7 @@
      "address": ":8234",
      "apiUrl": "https://gifs-api.jan0660.dev",
      "allowSignup": true,
-     "accessControlAllowOrigin": ["*"],
+     "accessControlAllowOrigin": ["*"]
    }
    ```
 
@@ -36,7 +36,7 @@ Required. Address to listen on.
 
 ### `apiUrl`
 
-Required. URL of the API, used in the verification email. Must not have a trailing slash.
+Required by `smtp`. URL of the API, used in the verification email. Must not have a trailing slash.
 
 ### `allowSignup`
 
@@ -71,7 +71,7 @@ Site key and secret key for hCaptcha.
 
 ### `smtp`
 
-SMTP server to use for sending emails.
+SMTP server to use for sending emails. Required `apiUrl` to be set.
 
 ```json
 {
