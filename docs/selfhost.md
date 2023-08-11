@@ -11,6 +11,7 @@
      "mongoUrl": "",
      "databaseName": "kittygifs",
      "address": ":8234",
+     "apiUrl": "https://gifs-api.jan0660.dev",
      "allowSignup": true,
      "accessControlAllowOrigin": ["*"],
    }
@@ -22,16 +23,20 @@
 
 ### `mongoUrl`
 
-Connection string to your MongoDB instance.
+Required. Connection string to your MongoDB instance.
 See [MongoDB docs](https://docs.mongodb.com/manual/reference/connection-string/) for more info.
 
 ### `databaseName`
 
-Name of the database to use, will be created if it doesn't exist.
+Required. Name of the database to use, will be created if it doesn't exist.
 
 ### `address`
 
-Address to listen on.
+Required. Address to listen on.
+
+### `apiUrl`
+
+Required. URL of the API, used in the verification email. Must not have a trailing slash.
 
 ### `allowSignup`
 
@@ -49,3 +54,34 @@ Remember to include `https://tauri.localhost` and `tauri://localhost` if you wan
 
 Discord webhook URL too send notifications of GDPR requests to.
 If not set, no notifications will be sent.
+
+### `captcha`
+
+Site key and secret key for hCaptcha.
+
+```json
+{
+  // ...
+  "captcha": {
+    "siteKey": "",
+    "secretKey": ""
+  }
+}
+```
+
+### `smtp`
+
+SMTP server to use for sending emails.
+
+```json
+{
+  // ...
+  "smtp": {
+    "serverAddress": "mailserver:465",
+    "fromAddress": "noreply@jan0660.dev",
+    "fromName": "kittygifs",
+    "username": "noreply@jan0660.dev",
+    "password": ""
+  }
+}
+```
