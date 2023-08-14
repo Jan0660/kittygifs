@@ -66,7 +66,8 @@ Creates a new user. This endpoint may be disabled in the backend's configuration
 
 Request body:
 
-- `username`: string - must pass `^[a-z0-9_]{3,20}$` this regex
+- `username`: string - must pass this regex `^[a-z0-9_]{3,20}$`
+  (lowercase, numbers and underscore, 3 to 20 characters)
 - `password`: string - must be at least 8 characters long
 - `captcha`?: string - the captcha token, required if captcha is enabled
 - `email`?: string - the email address, required if SMTP is enabled

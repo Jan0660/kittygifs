@@ -35,7 +35,7 @@ You can do this by:
 
 - Sending us a request via the website on the appropriate page, accessible via the button on the bottom of the Account section on the settings page.
 - Sending us an email from the email address assigned to your account to `jan0660(at)tutanota.com`.
-  If asking to delete your account, please include details like if you are willing to let us keep your contributions to the website in an anonymized form, or if you want them to be deleted as well.
+  If asking to delete your account, please include details of whether you are willing to let us keep your contributions to the website in an anonymized form, or if you want them to be deleted as well.
 
 ## CHANGES TO OUR PRIVACY POLICY
 We may update our Privacy Policy in the future if needed.
