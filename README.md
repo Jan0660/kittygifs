@@ -28,7 +28,9 @@ Then follow instructions in Usage below.
 
 ### Other
 
-Get the newest version from [the releases page](https://github.com/Jan0660/kittygifs/releases).
+You can get it from the [Microsoft Store](https://apps.microsoft.com/store/detail/9NP2F5MF41J1).
+
+<!-- Get the newest version from [the releases page](https://github.com/Jan0660/kittygifs/releases). -->
 
 ## Usage
 
