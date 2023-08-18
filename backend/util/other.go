@@ -77,9 +77,15 @@ func ValidateGif(gif Gif) error {
 
 // ValidateTags Returns nil if tags are valid, otherwise returns an error
 func ValidateTags(tags []string) error {
-	for _, tag := range tags {
+	for index, tag := range tags {
 		if !TagValidation.MatchString(tag) {
 			return errors.New("Invalid tag: " + tag)
+		}
+		// check for duplicates
+		for index2, tag2 := range tags {
+			if index != index2 && tag == tag2 {
+				return errors.New("Duplicate tag: " + tag)
+			}
 		}
 	}
 	return nil
