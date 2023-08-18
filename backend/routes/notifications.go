@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	. "kittygifs/util"
 	notifications "kittygifs/util/notifications"
+	"slices"
 	"time"
 )
 
@@ -49,23 +50,14 @@ func MountNotifications(mounting *Mounting) {
 			return
 		}
 		var filter bson.M
-		// todo(refactor): once Go 1.21 is released, use slices.Contains and no goto
-		for _, notificationType := range notifications.NotificationTypesDeletable {
-			if notification.Data["type"] == notificationType {
-				goto isDeletable
-			}
+		notificationType := notification.Data["type"].(string)
+		if !slices.Contains(notifications.NotificationTypesDeletable, notificationType) {
+			c.JSON(403, ErrorStr("this notification is not deletable"))
+			return
 		}
-		c.JSON(403, ErrorStr("this notification is not deletable"))
-		return
-	isDeletable:
-		// todo(refactor): once Go 1.21 is released, use slices.Contains
-		for _, notificationType := range notifications.NotificationTypesDeleteByEvent {
-			if notification.Data["type"] == notificationType {
-				filter = bson.M{"eventId": notification.EventId}
-				break
-			}
-		}
-		if filter == nil {
+		if slices.Contains(notifications.NotificationTypesDeleteByEvent, notificationType) {
+			filter = bson.M{"eventId": notification.EventId}
+		} else {
 			filter = bson.M{"_id": notification.Id}
 		}
 		_, err = NotificationsCol.DeleteMany(ctx, filter)

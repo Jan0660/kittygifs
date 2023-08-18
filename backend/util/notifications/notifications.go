@@ -3,6 +3,7 @@ package notifications
 import (
 	"go.mongodb.org/mongo-driver/bson"
 	. "kittygifs/util"
+	"slices"
 )
 
 func MustDeleteNotificationsByEventId(eventId string) {
@@ -28,7 +29,9 @@ func NotifyGroup(groupName, eventId, notificationType string, data map[string]in
 		return err
 	}
 	for _, user := range users {
-		// todo: once Go 1.21 is released, use slices.Contains and don't notify otherUsers if they are in the group, too
+		if slices.Contains(otherUsers, user.Username) {
+			continue
+		}
 		err = NotifyUser(user.Username, eventId, notificationType, data)
 		if err != nil {
 			return err
