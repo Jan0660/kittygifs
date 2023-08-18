@@ -65,6 +65,7 @@ const NotificationsPage: Component = () => {
                                                     setNotifications(notifications());
                                                 }}
                                                 style="cursor: pointer"
+                                                class="link"
                                             >
                                                 X
                                             </a>{" "}
