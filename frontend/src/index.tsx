@@ -6,38 +6,43 @@ import localforage from "localforage";
 import { AxiosError } from "axios";
 import "./skybord-components.css";
 import "./skybord-main.css";
-import { createEffect, createSignal } from "solid-js";
-import { EventCallback, emit, listen } from '@tauri-apps/api/event'
+import { createSignal } from "solid-js";
+import { emit, listen } from '@tauri-apps/api/event'
 
 interface Config {
-    groupTextInput: boolean;
     token?: string;
+    apiUrl: string;
+    enableSync?: boolean;
+}
+
+export interface Settings {
+    enableSyncByDefault: boolean;
+    groupTextInput: boolean;
     searchHighlight: boolean;
     searchHighlightInPopup: boolean;
-    apiUrl: string;
     defaultGroup?: string;
     queryPrepend: string;
     limit: number;
+    timestamp: number;
 }
 
-let item = (await localforage.getItem("kittygifs.config")) as Config;
+export interface SettingsSync {
+    /** Username, not present if not synced from server */
+    _id?: string;
+    data: Settings;
+    checkedTimestamp?: number;
+}
 
-if (!item) {
-    item = {
-        groupTextInput: false,
-        searchHighlight: false,
-        searchHighlightInPopup: false,
+let configItem = (await localforage.getItem("kittygifs.config")) as Config;
+
+if (!configItem) {
+    configItem = {
         apiUrl: import.meta.env.VITE_API_URL,
-        defaultGroup: null,
-        queryPrepend: "",
-        limit: 40,
     };
-    await localforage.setItem("kittygifs.config", item);
+    // await localforage.setItem("kittygifs.config", item);
 }
 
-item.limit ??= 40;
-
-export let config = item;
+export let config = configItem;
 
 export const saveConfig = async () => {
     await localforage.setItem("kittygifs.config", config);
@@ -46,18 +51,86 @@ export const saveConfig = async () => {
     }
 };
 
+globalThis.config = config;
+globalThis.saveConfig = saveConfig;
+
+let settingsItem = (await localforage.getItem("kittygifs.settings")) as SettingsSync;
+
+if (!settingsItem) {
+    settingsItem = {
+        data: {
+            enableSyncByDefault: true,
+            groupTextInput: false,
+            searchHighlight: false,
+            searchHighlightInPopup: false,
+            defaultGroup: null,
+            queryPrepend: "",
+            limit: 40,
+            timestamp: 0,
+        },
+    };
+    // await localforage.setItem("kittygifs.settings", item);
+}
+
+export let settings = settingsItem;
+
+let syncSettings: null | (() => void) = null;
+
+export const saveSettings = async (doNotSync?: boolean) => {
+    await localforage.setItem("kittygifs.settings", settings);
+    if (window.__TAURI_IPC__ != null) {
+        emit("settingsChanged", settings);
+    }
+    if (config.token != null && config.enableSync && !doNotSync) {
+        settings.data.timestamp = Math.floor(Date.now() / 1000);
+        settings.checkedTimestamp = Date.now();
+        // sync the change 1s after the last change
+        let ss = () => {
+            client.setSyncSettings(settings.data).then(() => {
+                syncSettings = null;
+            });
+        };
+        syncSettings = ss;
+        setTimeout(() => {
+            if (syncSettings === ss) {
+                ss();
+            }
+        }, 1000);
+    }
+}
+
+globalThis.settings = settings;
+globalThis.saveSettings = saveSettings;
 
 if (window.__TAURI_IPC__ != null) {
     listen("configChanged", (event) => {
         // @ts-ignore
         config = event.payload;
     });
+    listen("settingsChanged", (event) => {
+        // @ts-ignore
+        settings = event.payload;
+    });
 }
 
-globalThis.config = config;
-globalThis.saveConfig = saveConfig;
+export let client = new KittyGifsClient(config.apiUrl, config.token);
 
-export const client = new KittyGifsClient(config.apiUrl, config.token);
+export const initClient = () => {
+    client = new KittyGifsClient(config.apiUrl, config.token);
+};
+
+// if sync enabled, and token present, and settings not checked in the last 10m, check for new settings
+if (config.enableSync && config.token != null && (settings.checkedTimestamp ?? 0) < Date.now() - 10 * 60 * 1000) {
+    client.getSyncSettings().then(async settingsSynced => {
+        if (settingsSynced.data.timestamp > settings.data.timestamp) {
+            settings = settingsSynced;
+            settings.checkedTimestamp = Date.now();
+            await saveSettings(true);
+        } else {
+            client.setSyncSettings(settings.data);
+        }
+    });
+}
 
 export type UserInfoStored = {
     lastFetch: number;

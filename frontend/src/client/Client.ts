@@ -1,12 +1,13 @@
 import { Axios } from "axios";
+import { Settings, SettingsSync } from "..";
 
 export class KittyGifsClient {
     private _axios: Axios;
 
-    constructor(baseUrl: string, password: string | null = null) {
+    constructor(baseUrl: string, token: string | null = null) {
         this._axios = new Axios({
             baseURL: baseUrl,
-            headers: password != null ? { "x-session-token": password } : {},
+            headers: token != null ? { "x-session-token": token } : {},
             validateStatus: status => status >= 200 && status < 300,
             transformRequest: (data, headers) => {
                 if (data == null) return null;
@@ -207,6 +208,14 @@ export class KittyGifsClient {
 
     public async changeEmail(props: { email: string, password: string, captcha?: string }) {
         await this._axios.post("/users/changeEmail", props);
+    }
+
+    public async getSyncSettings(): Promise<SettingsSync> {
+        return (await this._axios.get("/sync/settings")).data;
+    }
+
+    public async setSyncSettings(settings: Settings): Promise<void> {
+        await this._axios.post("/sync/settings", settings);
     }
 }
 

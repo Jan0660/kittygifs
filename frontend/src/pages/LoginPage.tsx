@@ -1,5 +1,5 @@
 import { Component, createSignal } from "solid-js";
-import { client, config, getErrorString, saveConfig } from "..";
+import { client, config, getErrorString, saveConfig, settings, initClient } from "..";
 import { useNavigate } from "@solidjs/router";
 
 const LoginPage: Component = () => {
@@ -43,6 +43,16 @@ const LoginPage: Component = () => {
                             const token = await client.createSession(username(), password());
                             config.token = token;
                             await saveConfig();
+                            initClient();
+                            try{
+                                const syncSettings = await client.getSyncSettings();
+                                if (syncSettings.data.enableSyncByDefault) {
+                                    config.enableSync = true;
+                                    await saveConfig();
+                                }
+                            } catch (e) {
+                                // ignore
+                            }
                             // not using navigate because it doesn't reload the page
                             window.location.href = "/";
                         } catch (e) {
