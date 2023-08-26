@@ -453,6 +453,16 @@ export type InstanceInfo = {
 };
 ```
 
+### SyncSettings
+
+```ts
+export type SyncSettings = {
+    /** username */
+    _id: string;
+    data: any;
+};
+```
+
 ### Notification
 
 ```go
