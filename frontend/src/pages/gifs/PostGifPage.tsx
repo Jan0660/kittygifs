@@ -1,6 +1,6 @@
 import { Component, For, createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import { client, config, getErrorString } from "../..";
+import { client, config, getErrorString, settings } from "../..";
 import { GroupSelect } from "../../components/GroupSelect";
 
 const PostGifPage: Component = () => {
@@ -9,7 +9,7 @@ const PostGifPage: Component = () => {
     const [url, setUrl] = createSignal("");
     const [tags, setTags] = createSignal([] as string[]);
     const [note, setNote] = createSignal("");
-    const [group, setGroup] = createSignal(config.defaultGroup ?? "none");
+    const [group, setGroup] = createSignal(settings.data.defaultGroup ?? "none");
     return (
         <>
             <div class="content-header">

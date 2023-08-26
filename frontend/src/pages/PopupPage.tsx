@@ -5,7 +5,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { GifPreviewSingle } from "../components/GifPreviewSingle";
 import QueryInput from "../components/QueryInput";
 import { SearchHighlight } from "../components/SearchHighlight";
-import { config } from "..";
+import { config, settings } from "..";
 import { A } from "@solidjs/router";
 
 const PopupPage: Component = () => {
@@ -56,8 +56,8 @@ const PopupPage: Component = () => {
                     <For each={gifs()}>
                         {(gif, i) => (
                             <A href='#' style="width: 100%; height: auto;" onClick={() => (selected(gif))} class="gif-link">
-                                <GifPreviewSingle gif={gif} tryForceCache height={config.searchHighlightInPopup ? null : "100%"} />
-                                <Show when={config.searchHighlightInPopup}>
+                                <GifPreviewSingle gif={gif} tryForceCache height={settings.data.searchHighlightInPopup ? null : "100%"} />
+                                <Show when={settings.data.searchHighlightInPopup}>
                                     <SearchHighlight gif={gif} query={query()}></SearchHighlight>
                                 </Show>
                             </A>

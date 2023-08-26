@@ -19,6 +19,7 @@ const LogoutPage: Component = () => {
                     onClick={async () => {
                         try {
                             config.token = null;
+                            config.enableSync = null;
                             await saveConfig();
                             await deleteUserInfo();
                             await deleteNotificationStore();

@@ -3,7 +3,7 @@ import { Gif } from "../client/Client";
 import "../index.css";
 import QueryInput from "../components/QueryInput";
 import { GifPreviewSingle } from "../components/GifPreviewSingle";
-import { client, config } from "..";
+import { client, config, settings } from "..";
 import { SearchHighlight } from "../components/SearchHighlight";
 import { A, useSearchParams } from "@solidjs/router";
 
@@ -32,7 +32,7 @@ const IndexPage: Component = () => {
                                 class="gif-link"
                             >
                                 <GifPreviewSingle gif={gif} tryForceCache />
-                                <Show when={config.searchHighlight}>
+                                <Show when={settings.data.searchHighlight}>
                                     <SearchHighlight gif={gif} query={query()}></SearchHighlight>
                                 </Show>
                             </A>
@@ -44,7 +44,7 @@ const IndexPage: Component = () => {
                     onClick={async () => {
                         setGifs(
                             gifs().concat(
-                                await client.searchGifs(query(), null, { skip: gifs().length, max: config.limit }),
+                                await client.searchGifs(query(), null, { skip: gifs().length, max: settings.data.limit }),
                             ),
                         );
                     }}

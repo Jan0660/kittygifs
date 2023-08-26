@@ -1,6 +1,6 @@
 import { type Component, Show, For, createSignal } from "solid-js";
 import "../index.css";
-import { client, config, getErrorString, saveConfig } from "..";
+import { client, config, getErrorString, saveConfig, saveSettings, settings } from "..";
 import { invoke } from "@tauri-apps/api/tauri";
 import { GroupSelect } from "../components/GroupSelect";
 import { useNavigate } from "@solidjs/router";
@@ -88,10 +88,10 @@ const SettingsPage: Component = () => {
                 <label>
                     <input
                         type="checkbox"
-                        checked={config.searchHighlight}
+                        checked={settings.data.searchHighlight}
                         onChange={() => {
-                            config.searchHighlight = !config.searchHighlight;
-                            saveConfig();
+                            settings.data.searchHighlight = !settings.data.searchHighlight;
+                            saveSettings();
                         }}
                     />{" "}
                     Show Search Highlight
@@ -100,11 +100,11 @@ const SettingsPage: Component = () => {
                 <label>Query Prepend - Prepended to every search behind the scenes.</label> <br />
                 <input
                     type="text"
-                    value={config.queryPrepend ?? ""}
+                    value={settings.data.queryPrepend ?? ""}
                     onChange={e => {
                         e.target.value = e.target.value.toLocaleLowerCase().trimStart();
-                        config.queryPrepend = e.target.value;
-                        saveConfig();
+                        settings.data.queryPrepend = e.target.value;
+                        saveSettings();
                     }}
                     class="input"
                 />
@@ -112,29 +112,29 @@ const SettingsPage: Component = () => {
                 <label>Default Group for Posting</label> <br />
                 <input
                     type="text"
-                    value={config.defaultGroup ?? ""}
+                    value={settings.data.defaultGroup ?? ""}
                     onChange={e => {
                         e.target.value = e.target.value.toLocaleLowerCase().trim();
-                        config.defaultGroup = e.target.value == "" ? null : e.target.value;
-                        saveConfig();
+                        settings.data.defaultGroup = e.target.value == "" ? null : e.target.value;
+                        saveSettings();
                     }}
                     class="input"
                 />
                 <br />
                 <label>Gifs Limit</label><br/>
-                <input class="input" type="number" value={config.limit} onChange={(e) => {
-                    config.limit = parseInt(e.target.value);
-                    saveConfig();
+                <input class="input" type="number" value={settings.data.limit} onChange={(e) => {
+                    settings.data.limit = parseInt(e.target.value);
+                    saveSettings();
                 }}/>
                 <Show when={runningTauri && desktopConfig() != null}>
                     <h3>Desktop Settings</h3>
                     <label>
                         <input
                             type="checkbox"
-                            checked={config.searchHighlightInPopup}
+                            checked={settings.data.searchHighlightInPopup}
                             onChange={() => {
-                                config.searchHighlightInPopup = !config.searchHighlightInPopup;
-                                saveConfig();
+                                settings.data.searchHighlightInPopup = !settings.data.searchHighlightInPopup;
+                                saveSettings();
                             }}
                         />{" "}
                         Show Search Highlight in Popup
@@ -275,6 +275,30 @@ const SettingsPage: Component = () => {
                             navigate("/settings/accountDeletion");
                         }}
                     >Request Account Deletion or Other GDPR Request</button>
+                    <h3>Setting Sync</h3>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={config.enableSync}
+                            onChange={() => {
+                                config.enableSync = !config.enableSync;
+                                saveConfig();
+                            }}
+                        />{" "}
+                        Enable Settings Sync (locally)
+                    </label>
+                    <br />
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={settings.data.enableSyncByDefault}
+                            onChange={() => {
+                                settings.data.enableSyncByDefault = !settings.data.enableSyncByDefault;
+                                saveSettings();
+                            }}
+                        />{" "}
+                        Enable Settings Sync by Default on New Logins
+                    </label>
                 </Show>
                 <h3>Pro Stuff 😎</h3>
                 <label>API URL</label> <br />
@@ -292,10 +316,10 @@ const SettingsPage: Component = () => {
                 <label>
                     <input
                         type="checkbox"
-                        checked={config.groupTextInput}
+                        checked={settings.data.groupTextInput}
                         onChange={e => {
-                            config.groupTextInput = e.target.checked;
-                            saveConfig();
+                            settings.data.groupTextInput = e.target.checked;
+                            saveSettings();
                         }}
                     />
                     Use a text input for group selection instead of a dropdown

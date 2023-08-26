@@ -1,5 +1,5 @@
 import { Accessor, For, Setter, Show } from "solid-js";
-import { config, userInfo } from "..";
+import { config, settings, userInfo } from "..";
 
 export const GroupSelect = ({
     groupAccessor,
@@ -12,7 +12,7 @@ export const GroupSelect = ({
         <>
             <label>
                 Group:{" "}
-                <Show when={!config.groupTextInput && userInfo?.info?.groups}>
+                <Show when={!settings.data.groupTextInput && userInfo?.info?.groups}>
                     <select
                         value={groupAccessor()}
                         class="input"
@@ -34,7 +34,7 @@ export const GroupSelect = ({
                         </For>
                     </select>
                 </Show>
-                <Show when={config.groupTextInput}>
+                <Show when={settings.data.groupTextInput}>
                     <input
                         type="text"
                         placeholder="Group"

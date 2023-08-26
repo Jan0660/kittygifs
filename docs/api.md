@@ -345,6 +345,28 @@ Responses:
 - 500: [Error](#error)
 - 200: [Notification](#notification)
 
+#### GET /sync/settings
+
+Gets the authenticated user's sync settings, used by the frontend.
+
+Responses:
+
+- 500: [Error](#error)
+- 404: no settings saved
+- 200: [SyncSettings](#syncsettings)
+
+#### POST /sync/settings
+
+Saves the authenticated user's sync settings, used by the frontend.
+
+Request body: an object to be saved in the `data` field of the sync settings. Maximum body length is 4kB.
+
+Responses:
+
+- 500: [Error](#error)
+- 400: invalid body, empty body, body > 4kB ([Error](#error))
+- 200
+
 ## Objects
 
 The following type definitions are from the Go backend.

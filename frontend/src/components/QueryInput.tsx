@@ -1,5 +1,5 @@
 import { Accessor, Component, Setter, onMount } from "solid-js";
-import { client, config } from "../index";
+import { client, config, settings } from "../index";
 import { appWindow } from '@tauri-apps/plugin-window';
 import { Gif } from "../client/Client";
 
@@ -15,8 +15,8 @@ const QueryInput: Component<Props> = (props: Props) => {
     if (!(runningTauri && appWindow.isVisible())) {
         onMount(() => {
             abortLast = new AbortController();
-            client.searchGifs(config.queryPrepend + " " + props.query(), abortLast.signal, {
-                max: config.limit,
+            client.searchGifs(settings.data.queryPrepend + " " + props.query(), abortLast.signal, {
+                max: settings.data.limit,
             }).then(res => {
                 props.setGifs(res);
             }).catch(e => {
@@ -57,11 +57,11 @@ const QueryInput: Component<Props> = (props: Props) => {
                     e.currentTarget.value = e.currentTarget.value.toLocaleLowerCase().trimStart();
                     props.setQuery(e.currentTarget.value);
                     let query = e.currentTarget.value;
-                    if (config.queryPrepend) {
-                        query = config.queryPrepend + " " + query;
+                    if (settings.data.queryPrepend) {
+                        query = settings.data.queryPrepend + " " + query;
                     }
                     client.searchGifs(query, abortLast.signal, {
-                        max: config.limit,
+                        max: settings.data.limit,
                     }).then(res => {
                         console.log(res);
                         props.setGifs(res);
