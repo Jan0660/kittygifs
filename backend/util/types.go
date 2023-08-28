@@ -114,3 +114,12 @@ type MiscEmailChange struct {
 	Email    string `json:"email" bson:"email"`
 	Token    string `json:"token" bson:"token"`
 }
+
+type Tag struct {
+	Name        string  `json:"name" bson:"_id"`
+	Count       int32   `json:"count" bson:"count"`
+	Description *string `json:"description,omitempty" bson:"description,omitempty"`
+	// Color if present is a hex color 6 character string
+	Color        *string   `json:"color,omitempty" bson:"color,omitempty"`
+	Implications *[]string `json:"implications,omitempty" bson:"implications,omitempty"`
+}
