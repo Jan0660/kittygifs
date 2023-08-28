@@ -108,6 +108,7 @@ func RunGin(config *Configuration) error {
 	MountUsers(mounting)
 	MountNotifications(mounting)
 	MountSync(mounting)
+	MountTags(mounting)
 
 	info := gin.H{
 		"allowSignup": config.AllowSignup,

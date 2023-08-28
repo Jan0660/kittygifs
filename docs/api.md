@@ -45,6 +45,7 @@ Special groups:
 - `admin` - can do anything, treated as having every group (except for `$ig` in search)
 - `perm:edit_all_gifs` - permission to edit all gifs
 - `perm:delete_all_gifs` - permission to delete all gifs
+- `perm:edit_tags` - permission to edit all tags
 - `gifEditSuggestions` - receives notifications about gif edit suggestions,
   still needs `perm:edit_all_gifs` to accept them
 

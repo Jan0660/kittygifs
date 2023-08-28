@@ -91,6 +91,23 @@ func ValidateTags(tags []string) error {
 	return nil
 }
 
+// ValidateTag Validates a tag object.
+// Does not verify the name.
+func ValidateTag(tag Tag) error {
+	if tag.Description != nil {
+		if *tag.Description == "" {
+			return errors.New("description is empty, should be null instead")
+		}
+		if len(*tag.Description) > 128 {
+			return errors.New("description is too long(>128)")
+		}
+	}
+	if tag.Color != nil && !ColorValidation.MatchString(*tag.Color) {
+		return errors.New("invalid color")
+	}
+	return nil
+}
+
 // GetBase64Timestamp gets a URL safe base64 encoded timestamp in UNIX seconds
 func GetBase64Timestamp() string {
 	bytes := make([]byte, 8)
