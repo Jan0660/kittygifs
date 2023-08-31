@@ -2,6 +2,7 @@ import { Component, For, createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { client, config, getErrorString, settings } from "../..";
 import { GroupSelect } from "../../components/GroupSelect";
+import { TagSpan } from "../../components/TagSpan";
 
 const PostGifPage: Component = () => {
     const navigate = useNavigate();
@@ -28,13 +29,7 @@ const PostGifPage: Component = () => {
                 />
                 <br />
                 <For each={tags()}>
-                    {tag => {
-                        return (
-                            <span class="tag">
-                                {tag}
-                            </span>
-                        )
-                    }}
+                    {tag => <TagSpan tagName={tag} />}
                 </For><br />
                 <input
                     type="text"

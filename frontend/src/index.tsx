@@ -1,12 +1,12 @@
 import { render } from "solid-js/web";
 import { Router } from "@solidjs/router";
 import App from "./App";
-import { KittyGifsClient, UserInfo } from "./client/Client";
+import { KittyGifsClient, Tag, TagCategory, UserInfo } from "./client/Client";
 import localforage from "localforage";
 import { AxiosError } from "axios";
 import "./skybord-components.css";
 import "./skybord-main.css";
-import { createSignal } from "solid-js";
+import { Accessor, createSignal } from "solid-js";
 import { emit, listen } from '@tauri-apps/api/event'
 
 interface Config {
@@ -132,60 +132,119 @@ if (config.enableSync && config.token != null && (settings.checkedTimestamp ?? 0
     });
 }
 
-export type UserInfoStored = {
-    lastFetch: number;
-    info: UserInfo;
-};
+// export type UserInfoStored = {
+//     lastFetch: number;
+//     info: UserInfo;
+// };
 
-let userInfoStored = (await localforage.getItem("kittygifs.userInfo")) as UserInfoStored | null;
+// let userInfoStored = (await localforage.getItem("kittygifs.userInfo")) as UserInfoStored | null;
 
-export let userInfo: UserInfoStored | null = userInfoStored;
+// export let userInfo: UserInfoStored | null = userInfoStored;
 
-// if user info stored is older than 20m, fetch new user info
-if ((!userInfo || userInfo.lastFetch < Date.now() - 20 * 60 * 1000) && config.token != null) {
-    client.getUserInfo("self").then(async info => {
-        userInfo = await localforage.setItem("kittygifs.userInfo", {
-            lastFetch: Date.now(),
-            info: info,
-        });
-    });
+// // if user info stored is older than 20m, fetch new user info
+// if ((!userInfo || userInfo.lastFetch < Date.now() - 20 * 60 * 1000) && config.token != null) {
+//     client.getUserInfo("self").then(async info => {
+//         userInfo = await localforage.setItem("kittygifs.userInfo", {
+//             lastFetch: Date.now(),
+//             info: info,
+//         });
+//     });
+// }
+
+// export const deleteUserInfo = async () => {
+//     await localforage.removeItem("kittygifs.userInfo");
+// }
+
+// globalThis.userInfoStored = userInfoStored;
+// globalThis.deleteUserInfo = deleteUserInfo;
+
+class StoredStore<T> {
+    public store: T | null = null;
+    public lastFetch = 0;
 }
 
-export const deleteUserInfo = async () => {
-    await localforage.removeItem("kittygifs.userInfo");
+class Store<T> extends StoredStore<T> {
+    private storeKey: string;
+    public cacheDuration: number;
+    public getStore: Accessor<T>;
+    public setStore: (store: T) => void;
+    private fetchFunc: () => Promise<T | null>;
+    constructor(storeKey: string, cacheDuration: number, fetchFunc: () => Promise<T>) {
+        super();
+        this.storeKey = storeKey;
+        this.cacheDuration = cacheDuration;
+        [this.getStore, this.setStore] = createSignal(this.store);
+        this.fetchFunc = fetchFunc;
+    }
+    async load(check = true) {
+        const stored = (await localforage.getItem(this.storeKey)) as StoredStore<T> | null;
+        if (stored != null) {
+            this.store = stored.store;
+            this.setStore(stored.store);
+            this.lastFetch = stored.lastFetch;
+        }
+        if (check) {
+            this.get();
+        }
+    }
+    async get(force = false): Promise<T> {
+        if (this.store == null || this.lastFetch < Date.now() - this.cacheDuration || force) {
+            this.store = await this.fetchFunc();
+            this.setStore(this.store);
+            this.lastFetch = Date.now();
+        }
+        return this.store;
+    }
+    async getSave(force = true): Promise<T> {
+        const store = await this.get(force);
+        await this.save();
+        return store;
+    }
+    set(store: T) {
+        this.store = store;
+        this.setStore(store);
+        this.lastFetch = Date.now();
+    }
+    async save() {
+        await localforage.setItem(this.storeKey, {store: this.store, lastFetch: this.lastFetch});
+    }
+    async setSave(store: T) {
+        this.set(store);
+        await this.save();
+    }
+    async clear() {
+        this.store = null;
+        this.setStore(null);
+        this.lastFetch = 0;
+        await localforage.removeItem(this.storeKey);
+    }
 }
 
-globalThis.userInfoStored = userInfoStored;
-globalThis.deleteUserInfo = deleteUserInfo;
+export const notificationStore = new Store<number>("kittygifs.notificationsCount", 5 * 60 * 1000, async () => {
+    if (config.token == null) {
+        return 0;
+    }
+    return await client.getNotificationsCount();
+});
+await notificationStore.load();
 
-export type NotificationStore = {
-    lastFetch: number;
-    count: number;
-};
+export const userInfo = new Store<UserInfo>("kittygifs.userInfo", 20 * 60 * 1000, async () => {
+    if (config.token == null) {
+        return null;
+    }
+    return await client.getUserInfo("self");
+});
+await userInfo.load();
 
-let notificationStoreInner = (await localforage.getItem("kittygifs.notificationStore")) as NotificationStore | null;
-const [getNotificationStore, setNotificationStore] = createSignal(notificationStoreInner);
+export const tagsStore = new Store<Tag[]>("kittygifs.tags", 20 * 60 * 1000, async () => {
+    return await client.tags.getAll();
+});
+await tagsStore.load();
 
-if ((!notificationStoreInner || notificationStoreInner.lastFetch < Date.now() - 5 * 60 * 1000) && config.token != null) {
-    client.getNotificationsCount().then(count => {
-        setNotificationCount(count);
-    });
-}
-
-export const notificationStore = getNotificationStore;
-
-export const deleteNotificationStore = async () => {
-    await localforage.removeItem("kittygifs.notificationStore");
-};
-
-export const setNotificationCount = async (count: number) => {
-    const store = {
-        lastFetch: Date.now(),
-        count,
-    };
-    localforage.setItem("kittygifs.notificationStore", store);
-    setNotificationStore(store);
-};
+export const tagCategories = new Store<TagCategory[]>("kittygifs.tagCategories", 20 * 60 * 1000, async () => {
+    return await client.tags.categories.getAll();
+});
+await tagCategories.load();
 
 export function getErrorString(e: Error): string {
     if (e instanceof AxiosError) {

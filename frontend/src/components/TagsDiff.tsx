@@ -1,4 +1,5 @@
 import { Accessor, For, JSX, createEffect, createSignal } from "solid-js";
+import { TagSpan } from "./TagSpan";
 
 export const TagsDiff = ({
     oldTags,
@@ -31,21 +32,20 @@ export const TagsDiff = ({
         <div style={"overflow-wrap: anywhere"}>
             <For each={diff()}>
                 {tag => {
-                    let style: JSX.CSSProperties = {};
+                    let style: string;
                     if (tag.startsWith("-")) {
-                        style = {
-                            "background-color": "red",
-                        };
+                        style = "background-color: red;";
                     } else if (tag.startsWith("+")) {
-                        style = {
-                            "background-color": "green",
-                        };
+                        style = "background-color: green;";
                     }
                     return (
-                        <span class="tag" style={style}>
-                            {tag}
-                        </span>
-                    )
+                        <TagSpan
+                            tagName={tag[0] === "+" || tag[0] === "-" ? tag.substring(1) : tag}
+                            tagNameShow={tag}
+                            noStyle
+                            styleAppend={style}
+                        />
+                    );
                 }}
             </For>
         </div>

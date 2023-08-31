@@ -5,6 +5,7 @@ import { GifViewData } from "../../App";
 import { client, config, getErrorString, userInfo } from "../..";
 import { decodeTime } from "ulid";
 import { hasGroup } from "../../client/Client";
+import { TagSpan } from "../../components/TagSpan";
 
 const GifPage: Component = () => {
     const gif = useRouteData<typeof GifViewData>();
@@ -23,13 +24,7 @@ const GifPage: Component = () => {
                         </div>
                         <p>Tags:
                             <For each={gif().tags}>
-                                {tag => {
-                                    return (
-                                        <span class="tag">
-                                            {tag}
-                                        </span>
-                                    )
-                                }}
+                                {tag => <TagSpan tagName={tag} />}
                             </For>
                         </p>
                         <div style="word-wrap: break-word">
@@ -66,10 +61,10 @@ const GifPage: Component = () => {
                             </div>
                             <span>
                                 <A class="button" href={`/gifs/${gif().id}/edit/suggest`}>Suggest Edit</A>
-                                <Show when={hasGroup("perm:edit_all_gifs", userInfo.info.groups) || userInfo.info.username == gif().uploader}>
+                                <Show when={hasGroup("perm:edit_all_gifs", userInfo.getStore().groups) || userInfo.getStore().username == gif().uploader}>
                                     <A class="button" href={`/gifs/${gif().id}/edit`}>Edit</A>
                                 </Show>
-                                <Show when={hasGroup("perm:delete_all_gifs", userInfo.info.groups) || userInfo.info.username == gif().uploader}>
+                                <Show when={hasGroup("perm:delete_all_gifs", userInfo.getStore().groups) || userInfo.getStore().username == gif().uploader}>
                                     <Show
                                         when={deleteAreYouSure()}
                                         fallback={<button class="button danger" onClick={() => setDeleteAreYouSure(true)}>Delete</button>}

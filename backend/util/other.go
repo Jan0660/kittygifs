@@ -1,12 +1,14 @@
 package util
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/binary"
 	"errors"
 	"github.com/alexedwards/argon2id"
 	"github.com/oklog/ulid/v2"
+	"go.mongodb.org/mongo-driver/bson"
 	"math/big"
 	mathRand "math/rand"
 	"net/url"
@@ -79,12 +81,12 @@ func ValidateGif(gif Gif) error {
 func ValidateTags(tags []string) error {
 	for index, tag := range tags {
 		if !TagValidation.MatchString(tag) {
-			return errors.New("Invalid tag: " + tag)
+			return errors.New("invalid tag: " + tag)
 		}
 		// check for duplicates
 		for index2, tag2 := range tags {
 			if index != index2 && tag == tag2 {
-				return errors.New("Duplicate tag: " + tag)
+				return errors.New("duplicate tag: " + tag)
 			}
 		}
 	}
@@ -93,7 +95,8 @@ func ValidateTags(tags []string) error {
 
 // ValidateTag Validates a tag object.
 // Does not verify the name.
-func ValidateTag(tag Tag) error {
+// If ctx is not nil, it will check if the category exists.
+func ValidateTag(tag Tag, ctx context.Context) error {
 	if tag.Description != nil {
 		if *tag.Description == "" {
 			return errors.New("description is empty, should be null instead")
@@ -102,7 +105,43 @@ func ValidateTag(tag Tag) error {
 			return errors.New("description is too long(>128)")
 		}
 	}
-	if tag.Color != nil && !ColorValidation.MatchString(*tag.Color) {
+	if tag.Category != nil {
+		if *tag.Category == "" {
+			return errors.New("category is empty string, should be null instead")
+		}
+		if len(*tag.Category) > 32 {
+			return errors.New("category is too long(>32)")
+		}
+		if ctx != nil {
+			count, err := TagCategoriesCol.CountDocuments(ctx, bson.M{"_id": *tag.Category})
+			if err != nil {
+				return err
+			}
+			if count == 0 {
+				return errors.New("category does not exist")
+			}
+		}
+	}
+	return nil
+}
+
+func ValidateTagCategory(category TagCategory) error {
+	if category.Name == "" {
+		return errors.New("name is empty")
+	}
+	if len(category.Name) > 32 {
+		return errors.New("name is too long(>32)")
+	}
+	if category.Name == "none" {
+		return errors.New("name is reserved")
+	}
+	if !TagCategoryValidation.MatchString(category.Name) {
+		return errors.New("invalid name")
+	}
+	if category.Description != nil && len(*category.Description) > 128 {
+		return errors.New("description is too long(>128)")
+	}
+	if category.Color != nil && !ColorValidation.MatchString(*category.Color) {
 		return errors.New("invalid color")
 	}
 	return nil

@@ -12,7 +12,7 @@ export const GroupSelect = ({
         <>
             <label>
                 Group:{" "}
-                <Show when={!settings.data.groupTextInput && userInfo?.info?.groups}>
+                <Show when={!settings.data.groupTextInput && userInfo.getStore()?.groups}>
                     <select
                         value={groupAccessor()}
                         class="input"
@@ -20,7 +20,7 @@ export const GroupSelect = ({
                     >
                         <For
                             each={
-                                userInfo.info.groups?.concat("private", "none") ?? [
+                                userInfo.getStore().groups?.concat("private", "none") ?? [
                                     "private",
                                     "none",
                                 ]

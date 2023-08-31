@@ -38,6 +38,7 @@
         "solid-hcaptcha": "^0.2.6",
         "solid-js": "1.7.7",
         "solid-markdown": "^1.2.2",
+        "solid-simple-table": "^2.0.0",
         "ua-parser-js": "^1.0.35",
         "ulid": "^2.3.0"
     }

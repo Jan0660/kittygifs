@@ -21,7 +21,7 @@ const EditGifPage: Component = () => {
         if (gif()) {
             setTags(gif().tags)
             setNote(gif().note)
-            setGroup(gif().group == `@${userInfo?.info?.username}` ? "private" : gif().group ?? "none")
+            setGroup(gif().group == `@${userInfo.getStore()?.username}` ? "private" : gif().group ?? "none")
         }
     })
     if (gifEditSuggestion) {
