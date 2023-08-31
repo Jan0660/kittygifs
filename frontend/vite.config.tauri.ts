@@ -5,6 +5,7 @@ import { tauri } from 'vite-plugin-tauri'
 // https://vitejs.dev/config/
 export default defineConfig(
   mergeConfig(
+    // @ts-ignore
     baseViteConfig,
     defineConfig({
       plugins: [tauri()],

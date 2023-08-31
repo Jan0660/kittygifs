@@ -58,6 +58,10 @@ jobs:
               working-directory: ./frontend
               run: pnpm install
 
+            - name: Check for TypeScript errors
+              working-directory: ./frontend
+              run: pnpm tsc --noEmit
+
             - name: Build 🔧
               working-directory: ./frontend
               run: pnpm build:tauri

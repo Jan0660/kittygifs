@@ -44,6 +44,7 @@ export const GifPreviewSingle: Component<Props> = (props: Props) => {
                 playsinline
                 src={previewUrl}
                 class="gifPreview"
+                // @ts-ignore
                 style={style}
                 onclick={onClick}
                 {...extraProps}
@@ -54,6 +55,7 @@ export const GifPreviewSingle: Component<Props> = (props: Props) => {
             <img
                 src={previewUrl}
                 class="gifPreview"
+                // @ts-ignore
                 style={style}
                 onclick={onClick}
                 {...extraProps}
