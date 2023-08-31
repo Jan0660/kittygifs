@@ -5,6 +5,7 @@ import "regexp"
 var (
 	UsernameValidation       = regexp.MustCompile("^[a-z0-9_]{3,20}$")
 	TagValidation            = regexp.MustCompile("^[a-z0-9_]{2,20}$")
+	TagCategoryValidation    = regexp.MustCompile("^[a-z0-9_]{2,20}$")
 	ColorValidation          = regexp.MustCompile("(?i)^[0-9a-f]{6}$")
 	IsTenorUrl               = regexp.MustCompile("(?i)^https://tenor.com/view/(?:.*-)?(?P<id>\\d+)$")
 	TenorPreviewGifUrl       = regexp.MustCompile("(?i)\"mediumgif\":{\"url\":(\"https:\\\\u002F\\\\u002Fmedia.tenor.com\\\\u002F.+?\\\\u002F.+?\\.gif\")")

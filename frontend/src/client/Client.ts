@@ -2,7 +2,9 @@ import { Axios } from "axios";
 import { Settings, SettingsSync } from "..";
 
 export class KittyGifsClient {
-    private _axios: Axios;
+    /** Use if you know what you're doing <3 */
+    public _axios: Axios;
+    public tags: KittyGifsClientTags;
 
     constructor(baseUrl: string, token: string | null = null) {
         this._axios = new Axios({
@@ -19,6 +21,7 @@ export class KittyGifsClient {
                 return JSON.parse(data);
             },
         });
+        this.tags = new KittyGifsClientTags(this);
     }
 
     public async searchGifs(query: string, signal?: AbortSignal, props?: {
@@ -219,6 +222,66 @@ export class KittyGifsClient {
     }
 }
 
+class KittyGifsClientTags {
+    public client: KittyGifsClient;
+    public categories: KittyGifsClientTagsCategories;
+
+    constructor(client: KittyGifsClient) {
+        this.client = client;
+        this.categories = new KittyGifsClientTagsCategories(client);
+    }
+
+    public async getAll(): Promise<Tag[]> {
+        return (await this.client._axios.get("/tags")).data;
+    }
+
+    public async get(name: string): Promise<Tag> {
+        return (await this.client._axios.get("/tags/" + encodeURIComponent(name))).data;
+    }
+
+    /** Forces an update of tag use counts. User must have `admin` group. */
+    public async update() : Promise<void> {
+        await this.client._axios.post("/tags/update");
+    }
+
+    /** Updates a tag. If a field in `props` is undefined, it will still be set to null by the backend. */
+    public async patch(name: string, props: {
+        category?: string;
+        description?: string;
+        implications?: string[];
+    }): Promise<void> {
+        await this.client._axios.patch("/tags/" + encodeURIComponent(name), props);
+    }
+}
+
+class KittyGifsClientTagsCategories {
+    public client: KittyGifsClient;
+
+    constructor(client: KittyGifsClient) {
+        this.client = client;
+    }
+
+    public async getAll(): Promise<TagCategory[]> {
+        return (await this.client._axios.get("/tags/categories")).data;
+    }
+
+    public async post(category: TagCategory): Promise<void> {
+        await this.client._axios.post("/tags/categories", category);
+    }
+
+    public async patch(name: string, props: {
+        name?: string;
+        description?: string;
+        color?: string;
+    }): Promise<void> {
+        await this.client._axios.patch("/tags/categories/" + encodeURIComponent(name), props);
+    }
+
+    public async delete(name: string): Promise<void> {
+        await this.client._axios.delete("/tags/categories/" + encodeURIComponent(name));
+    }
+}
+
 export type Gif = {
     id: string;
     url: string;
@@ -289,3 +352,18 @@ export type InstanceInfo = {
         fromAddress: string;
     },
 };
+
+export type Tag = {
+    name: string;
+    count: number;
+    description?: string;
+    implications?: string[];
+    category?: string;
+}
+
+export type TagCategory = {
+    name: string;
+    description?: string;
+    /** 6-char hex color string, e.g. `BEEFEE` */
+    color?: string;
+}

@@ -21,6 +21,9 @@ const App: Component = () => {
                             kitties!!
                         </A>
                     </span>
+                    <A href="/tags" class="button">
+                        Tags TODO MAKE THIS NOT LOOK BAD IN THE NAVBAR
+                    </A>
                     <ul class="navbar-links">
                         <li>
                             <Show when={config.token == null}>
@@ -33,9 +36,9 @@ const App: Component = () => {
                                 </A>
                             </Show>
                             <Show when={config.token != null}>
-                                <Show when={notificationStore()?.count}>
+                                <Show when={notificationStore.getStore()}>
                                     <A href="/notifications" class="button">
-                                        Notifications ({notificationStore().count})
+                                        Notifications ({notificationStore.getStore()})
                                     </A>
                                 </Show>
                                 <A href="/gifs/post" class="button">
@@ -141,6 +144,14 @@ const App: Component = () => {
                             />
                         </Route>
                         <Route path="/notifications" component={lazy(() => import("./pages/NotificationsPage"))} />
+                        <Route path="/tags">
+                            <Route path="/" component={lazy(() => import("./pages/tags/TagsPage"))} />
+                            <Route path="/tag/:tag" component={lazy(() => import("./pages/tags/TagPage"))} />
+                            <Route path="/categories">
+                                <Route path="/" component={lazy(() => import("./pages/tags/TagCategoriesPage"))} />
+                                <Route path="/category/:category" component={lazy(() => import("./pages/tags/TagCategoryPage"))} />
+                            </Route>
+                        </Route>
                     </Routes>
                     <div class="is-center">
                         <span>

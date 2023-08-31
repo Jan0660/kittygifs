@@ -18,6 +18,7 @@ var (
 	MiscCol          *mongo.Collection
 	SyncSettingsCol  *mongo.Collection
 	TagsCol          *mongo.Collection
+	TagCategoriesCol *mongo.Collection
 )
 
 // InitializeMongoDB initializes the MongoDB client and collections
@@ -44,6 +45,7 @@ func InitializeMongoDB(config *Configuration) {
 		_ = db.CreateCollection(ctx, "misc")
 		_ = db.CreateCollection(ctx, "sync_settings")
 		_ = db.CreateCollection(ctx, "tags")
+		_ = db.CreateCollection(ctx, "tag_categories")
 	}
 	GifsCol = db.Collection("gifs")
 	UsersCol = db.Collection("users")
@@ -53,4 +55,5 @@ func InitializeMongoDB(config *Configuration) {
 	MiscCol = db.Collection("misc")
 	SyncSettingsCol = db.Collection("sync_settings")
 	TagsCol = db.Collection("tags")
+	TagCategoriesCol = db.Collection("tag_categories")
 }
