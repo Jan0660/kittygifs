@@ -40,12 +40,12 @@ const LoginPage: Component = () => {
                     class="button confirm"
                     onClick={async () => {
                         try {
-                            const token = await client.createSession(username(), password());
+                            const token = await client.users.sessions.post(username(), password());
                             config.token = token;
                             await saveConfig();
                             initClient();
                             try{
-                                const syncSettings = await client.getSyncSettings();
+                                const syncSettings = await client.sync.getSettings();
                                 if (syncSettings.data.enableSyncByDefault) {
                                     config.enableSync = true;
                                     await saveConfig();

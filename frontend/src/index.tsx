@@ -86,7 +86,7 @@ export const saveSettings = async (doNotSync?: boolean) => {
         settings.checkedTimestamp = Date.now();
         // sync the change 1s after the last change
         let ss = () => {
-            client.setSyncSettings(settings.data).then(() => {
+            client.sync.setSettings(settings.data).then(() => {
                 syncSettings = null;
             });
         };
@@ -121,42 +121,16 @@ export const initClient = () => {
 
 // if sync enabled, and token present, and settings not checked in the last 10m, check for new settings
 if (config.enableSync && config.token != null && (settings.checkedTimestamp ?? 0) < Date.now() - 10 * 60 * 1000) {
-    client.getSyncSettings().then(async settingsSynced => {
+    client.sync.getSettings().then(async settingsSynced => {
         if (settingsSynced.data.timestamp > settings.data.timestamp) {
             settings = settingsSynced;
             settings.checkedTimestamp = Date.now();
             await saveSettings(true);
         } else {
-            client.setSyncSettings(settings.data);
+            client.sync.setSettings(settings.data);
         }
     });
 }
-
-// export type UserInfoStored = {
-//     lastFetch: number;
-//     info: UserInfo;
-// };
-
-// let userInfoStored = (await localforage.getItem("kittygifs.userInfo")) as UserInfoStored | null;
-
-// export let userInfo: UserInfoStored | null = userInfoStored;
-
-// // if user info stored is older than 20m, fetch new user info
-// if ((!userInfo || userInfo.lastFetch < Date.now() - 20 * 60 * 1000) && config.token != null) {
-//     client.getUserInfo("self").then(async info => {
-//         userInfo = await localforage.setItem("kittygifs.userInfo", {
-//             lastFetch: Date.now(),
-//             info: info,
-//         });
-//     });
-// }
-
-// export const deleteUserInfo = async () => {
-//     await localforage.removeItem("kittygifs.userInfo");
-// }
-
-// globalThis.userInfoStored = userInfoStored;
-// globalThis.deleteUserInfo = deleteUserInfo;
 
 class StoredStore<T> {
     public store: T | null = null;
@@ -224,7 +198,7 @@ export const notificationStore = new Store<number>("kittygifs.notificationsCount
     if (config.token == null) {
         return 0;
     }
-    return await client.getNotificationsCount();
+    return await client.notifications.getCount();
 });
 await notificationStore.load();
 
@@ -232,7 +206,7 @@ export const userInfo = new Store<UserInfo>("kittygifs.userInfo", 20 * 60 * 1000
     if (config.token == null) {
         return null;
     }
-    return await client.getUserInfo("self");
+    return await client.users.getUserInfo("self");
 });
 await userInfo.load();
 

@@ -25,7 +25,7 @@ const EditGifPage: Component = () => {
         }
     })
     if (gifEditSuggestion) {
-        client.getNotificationByEventId(gifEditSuggestion).then((notif) => {
+        client.notifications.getByEventId(gifEditSuggestion).then((notif) => {
             if (notif.data.type == "gifEditSuggestion") {
                 setTags(notif.data.tags)
                 setNote(notif.data.note)
@@ -74,7 +74,7 @@ const EditGifPage: Component = () => {
                         onClick={async () => {
                             setError("");
                             try {
-                                await client.patchGif(gif().id, {
+                                await client.gifs.patch(gif().id, {
                                     tags: tags(),
                                     note: note(),
                                     group: group() == "none" ? "" : group(),

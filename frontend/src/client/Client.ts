@@ -5,6 +5,10 @@ export class KittyGifsClient {
     /** Use if you know what you're doing <3 */
     public _axios: Axios;
     public tags: KittyGifsClientTags;
+    public users: KittyGifsClientUsers;
+    public notifications: KittyGifsClientNotifications;
+    public sync: KittyGifsClientSync;
+    public gifs: KittyGifsClientGifs;
 
     constructor(baseUrl: string, token: string | null = null) {
         this._axios = new Axios({
@@ -22,79 +26,28 @@ export class KittyGifsClient {
             },
         });
         this.tags = new KittyGifsClientTags(this);
+        this.users = new KittyGifsClientUsers(this);
+        this.notifications = new KittyGifsClientNotifications(this);
+        this.sync = new KittyGifsClientSync(this);
+        this.gifs = new KittyGifsClientGifs(this);
     }
 
-    public async searchGifs(query: string, signal?: AbortSignal, props?: {
-        skip?: number;
-        max?: number;
-    }): Promise<Gif[]> {
-        let url = "/gifs/search?q=" + encodeURIComponent(query);
-        if (props?.skip != null) {
-            url += "&skip=" + props.skip;
-        }
-        if (props?.max != null) {
-            url += "&max=" + props.max;
-        }
-        let res = await this._axios.get(url, {
-            signal,
-        });
-        return res.data;
+    public async getInstanceInfo(): Promise<InstanceInfo> {
+        return (await this._axios.get("/")).data;
+    }
+}
+
+class KittyGifsClientUsers {
+    public client: KittyGifsClient;
+    public sessions: KittyGifsClientUsersSessions;
+
+    constructor(client: KittyGifsClient) {
+        this.client = client;
+        this.sessions = new KittyGifsClientUsersSessions(client);
     }
 
-    public async getGif(id: string, signal?: AbortSignal): Promise<Gif> {
-        let res = await this._axios.get("/gifs/" + encodeURIComponent(id), { signal });
-        return res.data;
-    }
-
-    public async patchGif(
-        id: string,
-        props: {
-            tags: string[];
-            note: string;
-            group: string | null;
-        }, gifEditSuggestion?: string,
-        signal?: AbortSignal,
-    ): Promise<void> {
-        if (props.group == "") {
-            props.group = null;
-        }
-        let url = "/gifs/" + encodeURIComponent(id);
-        if (gifEditSuggestion != null) {
-            url += "?gifEditSuggestion=" + encodeURIComponent(gifEditSuggestion);
-        }
-        await this._axios.patch(url, props, {
-            signal: signal,
-        });
-    }
-
-    public async postGifEditSuggestion(id: string, props: {
-        tags: string[];
-        note: string;
-    }): Promise<void> {
-        await this._axios.post("/gifs/" + encodeURIComponent(id) + "/edit/suggestions", props);
-    }
-
-    public async postGif(
-        props: {
-            url: string;
-            tags: string[];
-            note: string;
-            group: string | null;
-        },
-        signal?: AbortSignal,
-    ): Promise<Gif> {
-        const res = await this._axios.post("/gifs", props, { signal: signal });
-        return res.data;
-    }
-
-    public async deleteGif(id: string, signal?: AbortSignal): Promise<Gif> {
-        const res = await this._axios.delete("/gifs/" + encodeURIComponent(id), {
-            signal,
-        });
-        return res.data;
-    }
-
-    public async createUser(
+    /** Creates a new user. */
+    public async post(
         username: string,
         password: string,
         captcha?: string,
@@ -106,7 +59,7 @@ export class KittyGifsClient {
     } | {
         type: "verificationSent",
     }> {
-        const res = await this._axios.post(
+        const res = await this.client._axios.post(
             "/users",
             { username: username, password: password, captcha: captcha, email: email },
             { signal },
@@ -114,38 +67,12 @@ export class KittyGifsClient {
         return res.data;
     }
 
-    public async createSession(
-        username: string,
-        password: string,
-        signal?: AbortSignal,
-    ): Promise<string> {
-        const res = await this._axios.post(
-            "/users/sessions",
-            { username: username, password: password },
-            { signal },
-        );
-        return res.data.token;
-    }
-
-    public async deleteSession(
-        token: string,
-        signal?: AbortSignal,
-    ): Promise<void> {
-        await this._axios.delete("/users/sessions/" + encodeURIComponent(token), { signal },);
-    }
-
-    public async deleteAllOtherSessions(
-        signal?: AbortSignal
-    ): Promise<void> {
-        await this._axios.delete("/users/sessions", { signal })
-    }
-
     public async resetPassword(
         oldPassword: string,
         newPassword: string,
         signal?: AbortSignal,
     ): Promise<void> {
-        const res = await this._axios.post(
+        const res = await this.client._axios.post(
             "/users/resetPassword",
             { oldPassword, newPassword },
             { signal },
@@ -171,7 +98,7 @@ export class KittyGifsClient {
         if (props?.stats) {
             url += "?stats=true";
         }
-        const res = await this._axios.get(url, { signal });
+        const res = await this.client._axios.get(url, { signal });
         return res.data;
     }
 
@@ -182,43 +109,94 @@ export class KittyGifsClient {
             keepPosts: boolean,
             note: string,
         }): Promise<void> {
-        await this._axios.post("/users/gdprRequest", props);
-    }
-
-    public async getNotifications(): Promise<Notification[]> {
-        return (await this._axios.get("/notifications")).data;
-    }
-
-    public async getNotificationsCount(): Promise<number> {
-        return (await this._axios.get("/notifications/count")).data.count;
-    }
-
-    public async deleteNotification(id: string): Promise<void> {
-        await this._axios.delete("/notifications/" + id);
-    }
-
-    public async getNotificationByEventId(eventId: string): Promise<Notification> {
-        return (await this._axios.get("/notifications/byEventId/" + eventId)).data;
-    }
-
-    public async getInstanceInfo(): Promise<InstanceInfo> {
-        return (await this._axios.get("/")).data;
-    }
-
-    public async resendVerificationEmail(email: string, captcha?: string) {
-        await this._axios.post("/users/resendVerificationEmail", { email, captcha });
+        await this.client._axios.post("/users/gdprRequest", props);
     }
 
     public async changeEmail(props: { email: string, password: string, captcha?: string }) {
-        await this._axios.post("/users/changeEmail", props);
+        await this.client._axios.post("/users/changeEmail", props);
     }
 
-    public async getSyncSettings(): Promise<SettingsSync> {
-        return (await this._axios.get("/sync/settings")).data;
+    public async resendVerificationEmail(email: string, captcha?: string) {
+        await this.client._axios.post("/users/resendVerificationEmail", { email, captcha });
+    }
+}
+
+class KittyGifsClientUsersSessions {
+    public client: KittyGifsClient;
+
+    constructor(client: KittyGifsClient) {
+        this.client = client;
     }
 
-    public async setSyncSettings(settings: Settings): Promise<void> {
-        await this._axios.post("/sync/settings", settings);
+    /** Creates a new session. */
+    public async post(
+        username: string,
+        password: string,
+        signal?: AbortSignal,
+    ): Promise<string> {
+        const res = await this.client._axios.post(
+            "/users/sessions",
+            { username: username, password: password },
+            { signal },
+        );
+        return res.data.token;
+    }
+
+    public async delete(
+        token: string,
+        signal?: AbortSignal,
+    ): Promise<void> {
+        await this.client._axios.delete("/users/sessions/" + encodeURIComponent(token), { signal },);
+    }
+
+    /** Deletes all sessions except the current one. */
+    public async deleteAllOtherSessions(
+        signal?: AbortSignal
+    ): Promise<void> {
+        await this.client._axios.delete("/users/sessions", { signal })
+    }
+}
+
+class KittyGifsClientNotifications {
+    public client: KittyGifsClient;
+
+    constructor(client: KittyGifsClient) {
+        this.client = client;
+    }
+
+    /** Gets all notifications. */
+    public async get(): Promise<Notification[]> {
+        return (await this.client._axios.get("/notifications")).data;
+    }
+
+    /** Gets the number of notifications. */
+    public async getCount(): Promise<number> {
+        return (await this.client._axios.get("/notifications/count")).data.count;
+    }
+
+    /** Deletes a notification. */
+    public async delete(id: string): Promise<void> {
+        await this.client._axios.delete("/notifications/" + id);
+    }
+
+    public async getByEventId(eventId: string): Promise<Notification> {
+        return (await this.client._axios.get("/notifications/byEventId/" + eventId)).data;
+    }
+}
+
+class KittyGifsClientSync {
+    public client: KittyGifsClient;
+
+    constructor(client: KittyGifsClient) {
+        this.client = client;
+    }
+
+    public async getSettings(): Promise<SettingsSync> {
+        return (await this.client._axios.get("/sync/settings")).data;
+    }
+
+    public async setSettings(settings: Settings): Promise<void> {
+        await this.client._axios.post("/sync/settings", settings);
     }
 }
 
@@ -280,6 +258,85 @@ class KittyGifsClientTagsCategories {
     public async delete(name: string): Promise<void> {
         await this.client._axios.delete("/tags/categories/" + encodeURIComponent(name));
     }
+}
+
+class KittyGifsClientGifs {
+    public client: KittyGifsClient;
+
+    constructor(client: KittyGifsClient) {
+        this.client = client;
+    }
+
+    public async search(query: string, signal?: AbortSignal, props?: {
+        skip?: number;
+        max?: number;
+    }): Promise<Gif[]> {
+        let url = "/gifs/search?q=" + encodeURIComponent(query);
+        if (props?.skip != null) {
+            url += "&skip=" + props.skip;
+        }
+        if (props?.max != null) {
+            url += "&max=" + props.max;
+        }
+        let res = await this.client._axios.get(url, {
+            signal,
+        });
+        return res.data;
+    }
+
+    public async get(id: string, signal?: AbortSignal): Promise<Gif> {
+        let res = await this.client._axios.get("/gifs/" + encodeURIComponent(id), { signal });
+        return res.data;
+    }
+
+    public async patch(
+        id: string,
+        props: {
+            tags: string[];
+            note: string;
+            group: string | null;
+        }, gifEditSuggestion?: string,
+        signal?: AbortSignal,
+    ): Promise<void> {
+        if (props.group == "") {
+            props.group = null;
+        }
+        let url = "/gifs/" + encodeURIComponent(id);
+        if (gifEditSuggestion != null) {
+            url += "?gifEditSuggestion=" + encodeURIComponent(gifEditSuggestion);
+        }
+        await this.client._axios.patch(url, props, {
+            signal: signal,
+        });
+    }
+
+    public async postEditSuggestion(id: string, props: {
+        tags: string[];
+        note: string;
+    }): Promise<void> {
+        await this.client._axios.post("/gifs/" + encodeURIComponent(id) + "/edit/suggestions", props);
+    }
+
+    public async post(
+        props: {
+            url: string;
+            tags: string[];
+            note: string;
+            group: string | null;
+        },
+        signal?: AbortSignal,
+    ): Promise<Gif> {
+        const res = await this.client._axios.post("/gifs", props, { signal: signal });
+        return res.data;
+    }
+
+    public async delete(id: string, signal?: AbortSignal): Promise<Gif> {
+        const res = await this.client._axios.delete("/gifs/" + encodeURIComponent(id), {
+            signal,
+        });
+        return res.data;
+    }
+
 }
 
 export type Gif = {

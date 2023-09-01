@@ -106,7 +106,7 @@ const SignupPage: Component = () => {
                                 setError("Passwords do not match!");
                                 return;
                             }
-                            const result = await client.createUser(username(), password(), captcha(), email());
+                            const result = await client.users.post(username(), password(), captcha(), email());
                             if (result.type == "created") {
                                 config.token = result.session.token;
                                 await saveConfig();
@@ -131,7 +131,7 @@ const SignupPage: Component = () => {
                         class="button confirm"
                         onClick={async () => {
                             try {
-                                await client.resendVerificationEmail(email(), captcha());
+                                await client.users.resendVerificationEmail(email(), captcha());
                                 setError("Verification email sent! Check your inbox, and your spam folder.");
                             } catch (e) {
                                 setError(getErrorString(e));

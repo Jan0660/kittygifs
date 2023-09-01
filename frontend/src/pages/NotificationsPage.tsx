@@ -33,7 +33,7 @@ const NotificationsPage: Component = () => {
     const [notifications, setNotifications] = createSignal(null as Notification[] | null, {
         equals: false,
     });
-    client.getNotifications().then(async notifs => {
+    client.notifications.get().then(async notifs => {
         console.log(notifs);
         setNotifications(notifs);
         await notificationStore.setSave(notifs.length);
@@ -60,7 +60,7 @@ const NotificationsPage: Component = () => {
                                         <Show when={isDeletableNotification(notif)}>
                                             <a
                                                 onclick={async () => {
-                                                    await client.deleteNotification(notif.id);
+                                                    await client.notifications.delete(notif.id);
                                                     notifications().splice(index(), 1);
                                                     setNotifications(notifications());
                                                 }}

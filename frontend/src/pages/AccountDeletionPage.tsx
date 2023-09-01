@@ -56,7 +56,7 @@ const AccountDeletionPage: Component = () => {
                     class="button danger"
                     onclick={async () => {
                         try {
-                            await client.createGDPRRequest({
+                            await client.users.createGDPRRequest({
                                 password: password(),
                                 keepPosts: keepPosts(),
                                 isDeletion: isDeletion(),
