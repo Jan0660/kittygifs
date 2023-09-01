@@ -2,6 +2,7 @@ import { lazy, type Component, createResource, ErrorBoundary, Show, For } from "
 import { Route, Routes } from "@solidjs/router";
 import { client, getErrorString, config, notificationStore } from ".";
 import { A } from "@solidjs/router";
+import { Toaster } from "solid-toast";
 
 export function GifViewData({ params }) {
     const fetchGif = async () => {
@@ -14,6 +15,9 @@ export function GifViewData({ params }) {
 const App: Component = () => {
     return (
         <>
+            <Toaster position="top-center" containerStyle={{"top": "75px"}} toastOptions={{
+                duration: 12000,
+            }} />
             <div class="navbar">
                 <div class="navbar-content">
                     <span class="site-name">

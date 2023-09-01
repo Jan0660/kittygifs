@@ -38,6 +38,9 @@ dependencies:
   solid-simple-table:
     specifier: ^2.0.0
     version: 2.0.0(@babel/core@7.22.8)
+  solid-toast:
+    specifier: ^0.5.0
+    version: 0.5.0(solid-js@1.7.7)
   ua-parser-js:
     specifier: ^1.0.35
     version: 1.0.35
@@ -2589,6 +2592,14 @@ packages:
       solid-js: 1.6.16
     transitivePeerDependencies:
       - '@babel/core'
+    dev: false
+
+  /solid-toast@0.5.0(solid-js@1.7.7):
+    resolution: {integrity: sha512-t770JakjyS2P9b8Qa1zMLOD51KYKWXbTAyJePVUoYex5c5FH5S/HtUBUbZAWFcqRCKmAE8KhyIiCvDZA8bOnxQ==}
+    peerDependencies:
+      solid-js: ^1.5.4
+    dependencies:
+      solid-js: 1.7.7
     dev: false
 
   /source-map-js@1.0.2:

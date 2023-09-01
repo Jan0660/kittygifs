@@ -8,6 +8,7 @@ import "./skybord-components.css";
 import "./skybord-main.css";
 import { Accessor, createSignal } from "solid-js";
 import { emit, listen } from '@tauri-apps/api/event'
+import toast from "solid-toast";
 
 interface Config {
     token?: string;
@@ -230,6 +231,14 @@ export function getErrorString(e: Error): string {
             : e.message;
     }
     return e.toString();
+}
+
+export function toastSave(promise: Promise<any>) {
+    toast.promise(promise, {
+        loading: "Saving...",
+        success: "Saved!",
+        error: (e: Error) => "Failed to save: " + getErrorString(e),
+    })
 }
 
 render(

@@ -1,7 +1,7 @@
 import { createSignal, type Component, Show, For } from "solid-js";
 import { Tag, hasGroup } from "../../client/Client";
 import "../../index.css";
-import { client, tagCategories, userInfo } from "../..";
+import { client, tagCategories, toastSave, userInfo } from "../..";
 import { useParams, useSearchParams } from "@solidjs/router";
 
 const TagPage: Component = () => {
@@ -65,9 +65,8 @@ const TagPage: Component = () => {
                     <br />
                     <Show when={canEdit}>
                         <button
-                            onClick={async () => {
-                                await client.tags.patch(tagName, tag());
-                                // todo: somehow let user know it worked, redirect to tags page?
+                            onClick={() => {
+                                toastSave(client.tags.patch(tagName, tag()));
                             }}
                             class="button primary"
                         >
