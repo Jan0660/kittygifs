@@ -255,7 +255,7 @@ const SettingsPage: Component = () => {
                         onclick={async () => {
                             setChangeEmailError("");
                             try {
-                                await client.changeEmail({
+                                await client.users.changeEmail({
                                     email: changeEmail(),
                                     password: changeEmailPassword(),
                                     captcha: changeEmailCaptcha(),

@@ -5,7 +5,7 @@ import { A } from "@solidjs/router";
 
 export function GifViewData({ params }) {
     const fetchGif = async () => {
-        return await client.getGif(params.id);
+        return await client.gifs.get(params.id);
     };
     const [gif] = createResource(() => params.id, fetchGif);
     return gif;

@@ -23,7 +23,7 @@ const LogoutPage: Component = () => {
                             await saveConfig();
                             await userInfo.clear();
                             await notificationStore.clear();
-                            await client.deleteSession(config.token);
+                            await client.users.sessions.delete(config.token);
                             // not using navigate because it doesn't reload the page
                             window.location.href = "/";
                         } catch (e) {

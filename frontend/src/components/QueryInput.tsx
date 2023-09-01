@@ -15,7 +15,7 @@ const QueryInput: Component<Props> = (props: Props) => {
     if (!(runningTauri && appWindow.isVisible())) {
         onMount(() => {
             abortLast = new AbortController();
-            client.searchGifs(settings.data.queryPrepend + " " + props.query(), abortLast.signal, {
+            client.gifs.search(settings.data.queryPrepend + " " + props.query(), abortLast.signal, {
                 max: settings.data.limit,
             }).then(res => {
                 props.setGifs(res);
@@ -60,7 +60,7 @@ const QueryInput: Component<Props> = (props: Props) => {
                     if (settings.data.queryPrepend) {
                         query = settings.data.queryPrepend + " " + query;
                     }
-                    client.searchGifs(query, abortLast.signal, {
+                    client.gifs.search(query, abortLast.signal, {
                         max: settings.data.limit,
                     }).then(res => {
                         console.log(res);

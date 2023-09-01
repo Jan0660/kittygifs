@@ -54,7 +54,7 @@ const TagEditSuggestPage: Component = () => {
                         onClick={async () => {
                             setError("");
                             try {
-                                await client.postGifEditSuggestion(gif().id, {
+                                await client.gifs.postEditSuggestion(gif().id, {
                                     tags: tags(),
                                     note: note(),
                                 });

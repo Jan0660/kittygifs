@@ -19,7 +19,7 @@ const ResetPasswordPage: Component = () => {
                         Resetting your password does <b>not</b> sign out your other sessions. To do so, click on the following button:
                         <button onClick={async () => {
                             try {
-                                await client.deleteAllOtherSessions();
+                                await client.users.sessions.deleteAllOtherSessions();
                             } catch (e) {
                                 setError(getErrorString(e));
                             }
@@ -51,7 +51,7 @@ const ResetPasswordPage: Component = () => {
                     class="button"
                     onClick={async () => {
                         try {
-                            await client.resetPassword(oldPassword(), newPassword());
+                            await client.users.resetPassword(oldPassword(), newPassword());
                         } catch (e) {
                             setError(getErrorString(e));
                         }

@@ -51,7 +51,7 @@ const PostGifPage: Component = () => {
                 <button
                     onClick={async () => {
                         try {
-                            const gif = await client.postGif({
+                            const gif = await client.gifs.post({
                                 url: url(),
                                 tags: tags(),
                                 note: note(),

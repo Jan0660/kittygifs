@@ -73,7 +73,7 @@ const GifPage: Component = () => {
                                             class="button confirm"
                                             onClick={async () => {
                                                 try {
-                                                    await client.deleteGif(gif().id);
+                                                    await client.gifs.delete(gif().id);
                                                     navigate("/");
                                                 } catch (e) {
                                                     alert(getErrorString(e));
