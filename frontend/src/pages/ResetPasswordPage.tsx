@@ -1,5 +1,6 @@
 import { Component, createSignal } from "solid-js";
 import { client, config, getErrorString, saveConfig } from "..";
+import toast from "solid-toast";
 
 const ResetPasswordPage: Component = () => {
     const [error, setError] = createSignal("");
@@ -18,11 +19,11 @@ const ResetPasswordPage: Component = () => {
                     <p>
                         Resetting your password does <b>not</b> sign out your other sessions. To do so, click on the following button:
                         <button onClick={async () => {
-                            try {
-                                await client.users.sessions.deleteAllOtherSessions();
-                            } catch (e) {
-                                setError(getErrorString(e));
-                            }
+                            toast.promise(client.users.sessions.deleteAllOtherSessions(), {
+                                loading: "Signing out other sessions...",
+                                success: "Signed out other sessions",
+                                error: (e: Error) => getErrorString(e),
+                            });
                         }}
                             class="button danger">Sign out all my other sessions</button>
                     </p>
@@ -50,11 +51,11 @@ const ResetPasswordPage: Component = () => {
                 <button
                     class="button"
                     onClick={async () => {
-                        try {
-                            await client.users.resetPassword(oldPassword(), newPassword());
-                        } catch (e) {
-                            setError(getErrorString(e));
-                        }
+                        toast.promise(client.users.resetPassword(oldPassword(), newPassword()), {
+                            loading: "Resetting password...",
+                            success: "Password reset",
+                            error: (e: Error) => getErrorString(e),
+                        });
                     }}
                 >
                     Reset Password

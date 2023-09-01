@@ -1,8 +1,9 @@
 import { createSignal, type Component, Show, For } from "solid-js";
 import { Tag, TagCategory, hasGroup } from "../../client/Client";
 import "../../index.css";
-import { client, tagCategories, userInfo } from "../..";
+import { client, getErrorString, tagCategories, toastSave, userInfo } from "../..";
 import { useParams, useSearchParams } from "@solidjs/router";
+import toast from "solid-toast";
 
 const TagPage: Component = () => {
     const params = useParams();
@@ -81,9 +82,8 @@ const TagPage: Component = () => {
                     <br />
                     <Show when={canEdit}>
                         <button
-                            onClick={async () => {
-                                await client.tags.categories.patch(categoryName, category());
-                                // todo: somehow let user know it worked, redirect to categories page?
+                            onClick={() => {
+                                toastSave(client.tags.categories.patch(categoryName, category()));
                             }}
                             class="button primary"
                         >
