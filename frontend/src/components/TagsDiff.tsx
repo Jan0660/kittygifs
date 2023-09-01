@@ -34,9 +34,9 @@ export const TagsDiff = ({
                 {tag => {
                     let style: string;
                     if (tag.startsWith("-")) {
-                        style = "background-color: red;";
+                        style = "color: white; background-color: red;";
                     } else if (tag.startsWith("+")) {
-                        style = "background-color: green;";
+                        style = "color: white; background-color: green;";
                     }
                     return (
                         <TagSpan
