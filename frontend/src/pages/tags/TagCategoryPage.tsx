@@ -52,6 +52,7 @@ const TagPage: Component = () => {
                     <textarea
                         value={category().description ?? ""}
                         class="input"
+                        style="width: 50%; height: 6em;"
                         disabled={!canEdit}
                         onInput={e => {
                             setCategory({

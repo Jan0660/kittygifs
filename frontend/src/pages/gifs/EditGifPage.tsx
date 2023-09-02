@@ -51,6 +51,7 @@ const EditGifPage: Component = () => {
                         type="text"
                         value={tags().join(" ")}
                         class="input"
+                        style="width: 50%;"
                         onInput={e => {
                             setTags(e.currentTarget.value.split(" "));
                         }}
@@ -63,6 +64,7 @@ const EditGifPage: Component = () => {
                     <textarea
                         value={note()}
                         class="input"
+                        style="width: 50%; height: 6em;"
                         onInput={e => {
                             setNote(e.currentTarget.value);
                         }}

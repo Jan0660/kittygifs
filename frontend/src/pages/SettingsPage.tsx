@@ -1,4 +1,4 @@
-import { type Component, Show, For, createSignal } from "solid-js";
+import { type Component, Show, For, createSignal, createEffect } from "solid-js";
 import "../index.css";
 import { client, config, getErrorString, saveConfig, saveSettings, settings } from "..";
 import { invoke } from "@tauri-apps/api/tauri";
@@ -71,6 +71,11 @@ const SettingsPage: Component = () => {
             setStartupEnabled(res);
         })
     }
+    const [defaultGroup, setDefaultGroup] = createSignal(settings.data.defaultGroup ?? "none");
+    createEffect(() => {
+        settings.data.defaultGroup = defaultGroup() == "none" ? null : defaultGroup();
+        saveSettings();
+    });
     const [changeEmail, setChangeEmail] = createSignal("");
     const [changeEmailError, setChangeEmailError] = createSignal("");
     const [changeEmailPassword, setChangeEmailPassword] = createSignal("");
@@ -110,7 +115,7 @@ const SettingsPage: Component = () => {
                 />
                 <br />
                 <label>Default Group for Posting</label> <br />
-                <input
+                {/* <input
                     type="text"
                     value={settings.data.defaultGroup ?? ""}
                     onChange={e => {
@@ -119,7 +124,8 @@ const SettingsPage: Component = () => {
                         saveSettings();
                     }}
                     class="input"
-                />
+                /> */}
+                <GroupSelect groupAccessor={defaultGroup} groupSetter={setDefaultGroup} />
                 <br />
                 <label>Gifs Limit</label><br/>
                 <input class="input" type="number" value={settings.data.limit} onChange={(e) => {
@@ -311,6 +317,7 @@ const SettingsPage: Component = () => {
                     }}
                     placeholder="http(s)://host:port"
                     class="input"
+                    style="width: 50%;"
                 />
                 <br />
                 <label>

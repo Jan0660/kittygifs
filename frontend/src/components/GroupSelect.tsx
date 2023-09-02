@@ -38,7 +38,7 @@ export const GroupSelect = ({
                     <input
                         type="text"
                         placeholder="Group"
-                        value={groupAccessor()}
+                        value={groupAccessor() == "none" ? "" : groupAccessor()}
                         class="input"
                         onInput={e => groupSetter(e.currentTarget.value)}
                     />
