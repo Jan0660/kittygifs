@@ -25,6 +25,7 @@ const PostGifPage: Component = () => {
                     placeholder="URL"
                     value={url()}
                     class="input"
+                    style="width: 50%;"
                     onInput={e => setUrl(e.currentTarget.value)}
                 />
                 <br />
@@ -36,6 +37,7 @@ const PostGifPage: Component = () => {
                     placeholder="Tags"
                     value={tags().join(" ")}
                     class="input"
+                    style="width: 50%;"
                     onInput={e => setTags(e.currentTarget.value.split(" "))}
                 />
                 <br />
@@ -43,6 +45,7 @@ const PostGifPage: Component = () => {
                     placeholder="Note"
                     value={note()}
                     class="input"
+                    style="width: 50%; height: 6em;"
                     onInput={e => setNote(e.currentTarget.value)}
                 />
                 <br />

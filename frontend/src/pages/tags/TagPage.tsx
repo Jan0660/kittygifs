@@ -33,6 +33,7 @@ const TagPage: Component = () => {
                     <textarea
                         value={tag().description ?? ""}
                         class="input"
+                        style="width: 50%; height: 6em;"
                         disabled={!canEdit}
                         onInput={e => {
                             setTag({ ...tag(), description: e.currentTarget.value == "" ? null : e.currentTarget.value });
