@@ -241,6 +241,21 @@ export function toastSave(promise: Promise<any>) {
     })
 }
 
+export function applyTagImplications(tags: string[]): string[] {
+    const newTags = [...tags];
+    for (const tag of tags) {
+        const tagObj = tagsStore.getStore().find(t => t.name == tag);
+        if (tagObj?.implications != null) {
+            for (const implication of tagObj.implications) {
+                if (!newTags.includes(implication)) {
+                    newTags.push(implication);
+                }
+            }
+        }
+    }
+    return newTags;
+};
+
 render(
     () => (
         <Router>
