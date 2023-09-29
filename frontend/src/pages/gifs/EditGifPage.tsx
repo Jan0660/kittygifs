@@ -1,7 +1,7 @@
 import { Component, Show, createEffect, createSignal } from "solid-js";
 import { useNavigate, useRouteData, useSearchParams } from "@solidjs/router";
 import { GifViewData } from "../../App";
-import { client, getErrorString, userInfo } from "../..";
+import { applyTagImplications, client, getErrorString, tagsStore, userInfo } from "../..";
 import { GifPreviewSingle } from "../../components/GifPreviewSingle";
 import { GroupSelect } from "../../components/GroupSelect";
 import { TagsDiff } from "../../components/TagsDiff";
@@ -32,6 +32,8 @@ const EditGifPage: Component = () => {
             }
         })
     }
+
+    tagsStore.getSave();
 
     return (
         <>
@@ -77,7 +79,7 @@ const EditGifPage: Component = () => {
                             setError("");
                             try {
                                 await client.gifs.patch(gif().id, {
-                                    tags: tags(),
+                                    tags: applyTagImplications(tags()),
                                     note: note(),
                                     group: group() == "none" ? "" : group(),
                                 }, gifEditSuggestion);

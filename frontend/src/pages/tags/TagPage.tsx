@@ -6,15 +6,18 @@ import { useParams, useSearchParams } from "@solidjs/router";
 
 const TagPage: Component = () => {
     const params = useParams();
-    console.log(params)
+    console.log(params);
     const tagName = params["tag"] ?? "";
     const [invalid, setInvalid] = createSignal(false);
     const [tag, setTag] = createSignal(null as Tag | null);
-    client.tags.get(tagName).then((tag) => {
-        setTag(tag);
-    }).catch((err) => {
-        setInvalid(true);
-    });
+    client.tags
+        .get(tagName)
+        .then(tag => {
+            setTag(tag);
+        })
+        .catch(err => {
+            setInvalid(true);
+        });
     const canEdit = hasGroup("perm:edit_tags", userInfo.getStore()?.groups);
 
     return (
@@ -23,37 +26,53 @@ const TagPage: Component = () => {
                 <h1>Tag: {tagName}</h1>
             </div>
             <div class="content-content">
-                <Show when={tag() != null} fallback={<>
-                    <Show when={invalid()} fallback={<h2>Loading...</h2>}>
-                        <h2>Invalid tag.</h2>
-                    </Show>
-                </>}>
+                <Show
+                    when={tag() != null}
+                    fallback={
+                        <>
+                            <Show when={invalid()} fallback={<h2>Loading...</h2>}>
+                                <h2>Invalid tag.</h2>
+                            </Show>
+                        </>
+                    }
+                >
                     <p>Count: {tag().count}</p>
-                    <label>Description</label><br />
+                    <label>Description</label>
+                    <br />
                     <textarea
                         value={tag().description ?? ""}
                         class="input"
                         style="width: 50%; height: 6em;"
                         disabled={!canEdit}
                         onInput={e => {
-                            setTag({ ...tag(), description: e.currentTarget.value == "" ? null : e.currentTarget.value });
+                            setTag({
+                                ...tag(),
+                                description:
+                                    e.currentTarget.value == "" ? null : e.currentTarget.value,
+                            });
                         }}
                     />
                     <br />
-                    <label>Category</label><br />
+                    <label>Category</label>
+                    <br />
                     <select
                         value={tag().category ?? "none"}
                         class="input"
                         onChange={e => {
-                            setTag({ ...tag(), category: e.currentTarget.value == "none" ? null : e.currentTarget.value });
+                            setTag({
+                                ...tag(),
+                                category:
+                                    e.currentTarget.value == "none" ? null : e.currentTarget.value,
+                            });
                         }}
                         disabled={!canEdit}
                     >
                         <For
                             each={
-                                tagCategories.getStore()?.map(category => category.name)?.concat("none") ?? [
-                                    "none",
-                                ]
+                                tagCategories
+                                    .getStore()
+                                    ?.map(category => category.name)
+                                    ?.concat("none") ?? ["none"]
                             }
                         >
                             {(category, i) => (
@@ -63,6 +82,25 @@ const TagPage: Component = () => {
                             )}
                         </For>
                     </select>
+                    <br />
+                    <label>Implications</label>
+                    <br />
+                    <input
+                        type="text"
+                        class="input"
+                        disabled={!canEdit}
+                        value={tag().implications?.join(" ") ?? ""}
+                        placeholder="Implications (space separated list)"
+                        onInput={e => {
+                            setTag({
+                                ...tag(),
+                                implications:
+                                    e.currentTarget.value == ""
+                                        ? null
+                                        : e.currentTarget.value.split(" "),
+                            });
+                        }}
+                    />
                     <br />
                     <Show when={canEdit}>
                         <button

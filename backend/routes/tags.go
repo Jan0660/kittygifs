@@ -40,7 +40,6 @@ func MountTags(mounting *Mounting) {
 		}
 		c.JSON(200, tag)
 	})
-	// todo: make run periodically
 	mounting.Authed.GET("/tags/update", func(c *gin.Context) {
 		if !GetUser(c).HasGroup("admin") {
 			c.Status(403)
@@ -54,6 +53,54 @@ func MountTags(mounting *Mounting) {
 			return
 		}
 		c.JSON(200, res)
+	})
+	mounting.Authed.GET("/tags/forceImplicationsUpdate", func(c *gin.Context) {
+		if !GetUser(c).HasGroup("admin") {
+			c.Status(403)
+			return
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer cancel()
+		// get tags that have implications
+		cur, err := TagsCol.Find(ctx, bson.M{"implications": bson.M{"$exists": true}})
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		for cur.Next(ctx) {
+			var tag Tag
+			err = cur.Decode(&tag)
+			if err != nil {
+				c.JSON(500, Error(err))
+				return
+			}
+
+			_, err := GifsCol.UpdateMany(ctx, bson.M{
+				"$and": bson.A{
+					bson.M{
+						"tags": tag.Name,
+					},
+					bson.M{
+						"tags": bson.M{
+							"$not": bson.M{
+								"$all": tag.Implications,
+							},
+						},
+					},
+				},
+			}, bson.M{
+				"$addToSet": bson.M{
+					"tags": bson.M{
+						"$each": tag.Implications,
+					},
+				},
+			})
+			if err != nil {
+				c.JSON(500, Error(err))
+				return
+			}
+		}
+		c.Status(200)
 	})
 	mounting.Authed.PATCH("/tags/:tag", func(c *gin.Context) {
 		if !GetUser(c).HasGroup("perm:edit_tags") {

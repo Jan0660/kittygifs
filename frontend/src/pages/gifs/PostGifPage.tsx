@@ -1,6 +1,6 @@
 import { Component, For, createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import { client, config, getErrorString, settings } from "../..";
+import { applyTagImplications, client, config, getErrorString, settings, tagsStore } from "../..";
 import { GroupSelect } from "../../components/GroupSelect";
 import { TagSpan } from "../../components/TagSpan";
 
@@ -11,6 +11,7 @@ const PostGifPage: Component = () => {
     const [tags, setTags] = createSignal([] as string[]);
     const [note, setNote] = createSignal("");
     const [group, setGroup] = createSignal(settings.data.defaultGroup ?? "none");
+    tagsStore.getSave();
     return (
         <>
             <div class="content-header">
@@ -56,7 +57,7 @@ const PostGifPage: Component = () => {
                         try {
                             const gif = await client.gifs.post({
                                 url: url(),
-                                tags: tags(),
+                                tags: applyTagImplications(tags()),
                                 note: note(),
                                 group: group() == "none" ? "" : group(),
                             });
