@@ -235,6 +235,11 @@ class KittyGifsClientTags {
     public async delete(name: string) {
         await this.client._axios.delete("/tags/" + encodeURIComponent(name));
     }
+
+    /** Renames a tag an all its usages */
+    public async rename(name: string, newName: string) {
+        await this.client._axios.post("/tags/" + encodeURIComponent(name) + "/rename?new=" + encodeURIComponent(newName));
+    }
 }
 
 class KittyGifsClientTagsCategories {
