@@ -159,7 +159,7 @@ class Store<T> extends StoredStore<T> {
             this.lastFetch = stored.lastFetch;
         }
         if (check) {
-            this.get();
+            this.getSave();
         }
     }
     async get(force = false): Promise<T> {

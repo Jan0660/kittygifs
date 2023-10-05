@@ -135,6 +135,70 @@ func MountTags(mounting *Mounting) {
 		}
 		c.Status(200)
 	})
+	mounting.Authed.POST("/tags/:tag/rename", func(c *gin.Context) {
+		if !GetUser(c).HasGroup("perm:delete_tags") {
+			c.Status(403)
+			return
+		}
+		newName := c.Query("new")
+		if newName == "" {
+			c.JSON(400, ErrorStr("new name is empty"))
+			return
+		}
+		if !TagValidation.MatchString(newName) {
+			c.JSON(400, ErrorStr("invalid new name"))
+			return
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		//err := TagsCol.FindOneAndUpdate(ctx, bson.M{"_id": c.Param("tag")}, bson.M{"$set": bson.M{"_id": newName}}).Err()
+		//if err != nil {
+		//	c.JSON(500, Error(err))
+		//	return
+		//}
+		var tag Tag
+		err := TagsCol.FindOne(ctx, bson.M{"_id": c.Param("tag")}).Decode(&tag)
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		newExists := false
+		{
+			count, err := TagsCol.CountDocuments(ctx, bson.M{"_id": newName})
+			if err != nil {
+				c.JSON(500, Error(err))
+				return
+			}
+			if count > 0 {
+				newExists = true
+			}
+		}
+		tag.Name = newName
+		_, err = TagsCol.DeleteOne(ctx, bson.M{"_id": c.Param("tag")})
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		if !newExists {
+			_, err = TagsCol.InsertOne(ctx, tag)
+			if err != nil {
+				c.JSON(500, Error(err))
+				return
+			}
+		}
+		// rename all usages
+		_, err = GifsCol.UpdateMany(ctx, bson.M{"tags": c.Param("tag")}, bson.M{"$addToSet": bson.M{"tags": newName}})
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		_, err = GifsCol.UpdateMany(ctx, bson.M{"tags": c.Param("tag")}, bson.M{"$pull": bson.M{"tags": c.Param("tag")}})
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		c.Status(200)
+	})
 	mounting.Authed.DELETE("/tags/:tag", func(c *gin.Context) {
 		if !GetUser(c).HasGroup("perm:delete_tags") {
 			c.Status(403)

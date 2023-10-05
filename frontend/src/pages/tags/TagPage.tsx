@@ -2,9 +2,10 @@ import { createSignal, type Component, Show, For } from "solid-js";
 import { Tag, hasGroup } from "../../client/Client";
 import "../../index.css";
 import { client, tagCategories, toastSave, userInfo } from "../..";
-import { useParams, useSearchParams } from "@solidjs/router";
+import { useNavigate, useParams, useSearchParams } from "@solidjs/router";
 
 const TagPage: Component = () => {
+    const navigate = useNavigate();
     const params = useParams();
     console.log(params);
     const tagName = params["tag"] ?? "";
@@ -22,6 +23,7 @@ const TagPage: Component = () => {
     const canDelete = hasGroup("perm:delete_tags", userInfo.getStore()?.groups);
 
     const [deleteSure, setDeleteSure] = createSignal(false);
+    const [renamed, setRenamed] = createSignal("");
 
     return (
         <>
@@ -116,15 +118,20 @@ const TagPage: Component = () => {
                         </button>
                     </Show>
                     <Show when={canDelete}>
-                        <Show when={!deleteSure()} fallback={<button
-                                onClick={async () => {
-                                    await client.tags.delete(tagName);
-                                    window.location.href = "/tags";
-                                }}
-                                class="button danger"
-                            >
-                                Are you sure?
-                            </button>}>
+                        <Show
+                            when={!deleteSure()}
+                            fallback={
+                                <button
+                                    onClick={async () => {
+                                        await client.tags.delete(tagName);
+                                        window.location.href = "/tags";
+                                    }}
+                                    class="button danger"
+                                >
+                                    Are you sure?
+                                </button>
+                            }
+                        >
                             <button
                                 onClick={() => {
                                     setDeleteSure(true);
@@ -134,6 +141,29 @@ const TagPage: Component = () => {
                                 Delete with all usages
                             </button>
                         </Show>
+                    </Show>
+                    <Show when={canEdit}>
+                        <h2>Rename Tag</h2>
+                        <p>This also allows you to merge this tag into another.</p>
+                        <input
+                            type="text"
+                            class="input"
+                            value={renamed()}
+                            onInput={e => {
+                                setRenamed(e.currentTarget.value);
+                            }}
+                        />
+                        <br />
+                        <button
+                            onClick={async () => {
+                                await client.tags.rename(tagName, renamed());
+                                // navigate(`/tags/tag/${renamed()}`);
+                                window.location.href = `/tags/tag/${renamed()}`;
+                            }}
+                            class="button primary"
+                        >
+                            Rename
+                        </button>
                     </Show>
                 </Show>
             </div>
