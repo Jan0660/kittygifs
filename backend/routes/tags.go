@@ -135,6 +135,26 @@ func MountTags(mounting *Mounting) {
 		}
 		c.Status(200)
 	})
+	mounting.Authed.DELETE("/tags/:tag", func(c *gin.Context) {
+		if !GetUser(c).HasGroup("perm:delete_tags") {
+			c.Status(403)
+			return
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		_, err := TagsCol.DeleteOne(ctx, bson.M{"_id": c.Param("tag")})
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		// delete all usages
+		_, err = GifsCol.UpdateMany(ctx, bson.M{"tags": c.Param("tag")}, bson.M{"$pull": bson.M{"tags": c.Param("tag")}})
+		if err != nil {
+			c.JSON(500, Error(err))
+			return
+		}
+		c.Status(200)
+	})
 
 	// tag categories
 	mounting.Normal.GET("/tags/categories", func(c *gin.Context) {

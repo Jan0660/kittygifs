@@ -19,6 +19,9 @@ const TagPage: Component = () => {
             setInvalid(true);
         });
     const canEdit = hasGroup("perm:edit_tags", userInfo.getStore()?.groups);
+    const canDelete = hasGroup("perm:delete_tags", userInfo.getStore()?.groups);
+
+    const [deleteSure, setDeleteSure] = createSignal(false);
 
     return (
         <>
@@ -111,6 +114,26 @@ const TagPage: Component = () => {
                         >
                             Save
                         </button>
+                    </Show>
+                    <Show when={canDelete}>
+                        <Show when={!deleteSure()} fallback={<button
+                                onClick={async () => {
+                                    await client.tags.delete(tagName);
+                                    window.location.href = "/tags";
+                                }}
+                                class="button danger"
+                            >
+                                Are you sure?
+                            </button>}>
+                            <button
+                                onClick={() => {
+                                    setDeleteSure(true);
+                                }}
+                                class="button danger"
+                            >
+                                Delete with all usages
+                            </button>
+                        </Show>
                     </Show>
                 </Show>
             </div>

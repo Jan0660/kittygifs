@@ -230,6 +230,11 @@ class KittyGifsClientTags {
     }): Promise<void> {
         await this.client._axios.patch("/tags/" + encodeURIComponent(name), props);
     }
+
+    /** Deletes a tag and all its usages. */
+    public async delete(name: string) {
+        await this.client._axios.delete("/tags/" + encodeURIComponent(name));
+    }
 }
 
 class KittyGifsClientTagsCategories {
