@@ -287,7 +287,7 @@ func MountTags(mounting *Mounting) {
 			c.JSON(500, Error(err))
 			return
 		}
-		if update.Name != category.Name {
+		if update.Name != category.Name && update.Name != "" {
 			// change all the usages of the old name to the new name
 			_, err = TagsCol.UpdateMany(ctx, bson.M{"category": c.Param("category")}, bson.M{"$set": bson.M{"category": update.Name}})
 			if err != nil {
