@@ -1,0 +1,48 @@
+version: "3.10"
+
+services:
+  mongodb:
+    # image: mongo
+    image: public.ecr.aws/alanedwardes/mongodb-without-avx:6.0.6
+    entrypoint: mongod --bind_ip 0.0.0.0
+    restart: unless-stopped
+    networks:
+      - db
+    volumes:
+      - ./data/mongodb:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=kittygifs
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    networks:
+      - db
+      - backend
+    volumes:
+      - ./backend/config.json:/app/config.json
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    networks:
+      - frontend
+  caddy:
+    image: caddy
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - backend
+      - frontend
+    ports:
+      - 8026:8026
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data/caddy-data:/data
+      - ./data/caddy-config:/config
+
+
+networks:
+  db:
+  backend:
+  frontend:
