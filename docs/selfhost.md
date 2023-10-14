@@ -1,10 +1,21 @@
 # Selfhosting
 
-1. Install Go 1.20 or higher
-2. Clone this repo
-3. `cd backend/`
-4. `go build -ldflags "-s -w"` (the flags remove debug info and reduce binary size)
-5. Create your `config.json`, fill in the `mongoUrl`. See [Config](#config) for more info.
+## Docker
+
+1. Create your `backend/config.json` as described in [Backend](#backend). The `mongoUrl` should be `mongodb://mongodb` and keep the `address` and `databaseName` same as in the example.
+2. `cp .env.example .env` and change `HOSTNAME` to the URL you will access kittygifs at.
+3. `cp frontend/.env.production frontend/.env.production.local` and change `VITE_API_URL` to what you changed `HOSTNAME` to above and add `/api` to it.
+   The frontend image needs to be rebuilt if this file is changed.
+4. `docker-compose build`
+5. `docker-compose up -d`
+6. TODO MAKING AN ADMIN USER
+
+## Backend
+
+1. Install Go 1.21 or higher
+2. `cd backend/`
+3. `go build -ldflags "-s -w"` (the flags remove debug info and reduce binary size)
+4. Create your `config.json`, fill in the `mongoUrl`. See [Config](#config) for more info.
 
    ```json
    {
@@ -17,7 +28,15 @@
    }
    ```
 
-6. Run the binary
+5. Run the binary
+
+## Frontend
+
+1. [Get pnpm](https://pnpm.io/installation) and at least Node.js v16.
+2. `cd frontend/`
+3. Edit `.env.production` to suit your needs.
+4. `pnpm build`
+5. The built site is now in `./dist`
 
 ## Config
 

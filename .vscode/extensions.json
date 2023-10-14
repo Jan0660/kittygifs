@@ -1,5 +1,7 @@
 {
-    "recommendations": [
-        "esbenp.prettier-vscode"
-    ]
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "golang.go",
+    "rust-lang.rust-analyzer"
+  ]
 }
