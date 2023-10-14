@@ -275,6 +275,10 @@ func MountTags(mounting *Mounting) {
 			c.JSON(400, Error(err))
 			return
 		}
+		if err = ValidateTagCategory(update); err != nil {
+			c.JSON(400, Error(err))
+			return
+		}
 		var category TagCategory
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
