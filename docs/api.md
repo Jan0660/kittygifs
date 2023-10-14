@@ -134,6 +134,33 @@ Responses:
 - 400: invalid token (string)
 - 200 - the email is now changed (string)
 
+#### GET /tags
+
+Gets all tags.
+
+Responses:
+
+- 500: [Error](#error)
+- 200: array of [Tag](#tag)
+
+#### GET /tags/:tag
+
+Gets the specified tag.
+
+Responses:
+
+- 500: [Error](#error)
+- 200: [Tag](#tag)
+
+#### GET /tags/categories
+
+Gets all tag categories.
+
+Responses:
+
+- 500: [Error](#error)
+- 200: array of [TagCategory](#tagcategory)
+
 ### Sessioned
 
 #### GET /gifs/:id
@@ -277,7 +304,7 @@ Responses:
 
 #### POST /users/resetPasswordAdmin
 
-For the admin to reset other users' passwords.
+Requires `admin` group on the authenticated user. Resets another user's password.
 
 Request body:
 
@@ -366,6 +393,110 @@ Responses:
 
 - 500: [Error](#error)
 - 400: invalid body, empty body, body > 4kB ([Error](#error))
+- 200
+
+#### GET /tags/update
+
+Requires `admin` group on the authenticated user.
+This manually updates the tag usage counts.
+This is normally done periodically internally by the backend.
+
+Responses:
+
+- 500: [Error](#error)
+- 200: an object where the keys are the tag names and the values are the new counts(int32)
+
+#### GET /tags/forceImplicationsUpdate
+
+Requires `admin` group on the authenticated user.
+This manually forces tag implications on already existing gifs.
+Normally a tag implication is applied when a gif is uploaded,
+but this endpoint can be used to apply them to already existing gifs.
+
+Responses:
+
+- 500: [Error](#error)
+- 200
+
+#### PATCH /tags/:tag
+
+Requires `perm:edit_tags` group on the authenticated user.
+All fields in the body are applied, even if they are not present,
+so to not change a field, it must contain the current value.
+
+Request body:
+
+- `description`: string
+- `category`: string
+- `implications`: []string
+
+Responses:
+
+- 500: [Error](#error)
+- 400: failed tag validation ([Error](#error))
+- 200
+
+#### POST /tags/:tag/rename
+
+Requires `perm:delete_tags` group on the authenticated user.
+Renames the specified tag, this applies the name change to all gifs with the tag.
+This can also be used to merge a tag into another existing tag.
+
+Query parameters:
+
+- `new`: string
+
+Responses:
+
+- 500: [Error](#error)
+- 400: failed new tag name validation, or it's empty ([Error](#error))
+- 200
+
+#### DELETE /tags/:tag
+
+Requires `perm:delete_tags` group on the authenticated user.
+Deletes the specified tag and removes it from all gifs.
+
+Responses:
+
+- 500: [Error](#error)
+- 200
+
+#### POST /tags/categories
+
+Requires `perm:edit_tags` group on the authenticated user.
+Creates a new tag category.
+
+Request body: [TagCategory](#tagcategory)
+
+Responses:
+
+- 500: [Error](#error)
+- 400: failed validation ([Error](#error))
+- 200
+
+#### PATCH /tags/categories/:category
+
+Requires `perm:edit_tags` group on the authenticated user.
+All fields in the body are applied, even if they are not present,
+so to not change a field, it must contain the current value.
+
+Request body: [TagCategory](#tagcategory)
+
+Responses:
+
+- 500: [Error](#error)
+- 400: failed validation or invalid body ([Error](#error))
+- 200
+
+#### DELETE /tags/categories/:category
+
+Requires `perm:edit_tags` group on the authenticated user.
+Deletes the specified tag category.
+
+Responses:
+
+- 500: [Error](#error)
 - 200
 
 ## Objects
@@ -462,6 +593,29 @@ export type SyncSettings = {
     _id: string;
     data: any;
 };
+```
+
+### Tag
+
+```go
+type Tag struct {
+	Name         string    `json:"name" bson:"_id"`
+	Count        int32     `json:"count" bson:"count"`
+	Description  *string   `json:"description,omitempty" bson:"description,omitempty"`
+	Category     *string   `json:"category,omitempty" bson:"category,omitempty"`
+	Implications *[]string `json:"implications,omitempty" bson:"implications,omitempty"`
+}
+```
+
+### TagCategory
+
+```go
+type TagCategory struct {
+	Name        string  `json:"name" bson:"_id"`
+	Description *string `json:"description,omitempty" bson:"description,omitempty"`
+	// Color if present is a hex color 6 character string
+	Color *string `json:"color,omitempty" bson:"color,omitempty"`
+}
 ```
 
 ### Notification
