@@ -1,0 +1,9 @@
+{$HOSTNAME} {
+	route /api* {
+		uri strip_prefix /api
+		reverse_proxy http://backend:8234
+	}
+
+	
+    reverse_proxy http://frontend:5000
+}
