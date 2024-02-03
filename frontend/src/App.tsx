@@ -25,9 +25,6 @@ const App: Component = () => {
                             kitties!!
                         </A>
                     </span>
-                    <A href="/tags" class="button">
-                        Tags TODO MAKE THIS NOT LOOK BAD IN THE NAVBAR
-                    </A>
                     <ul class="navbar-links">
                         <li>
                             <Show when={config.token == null}>
@@ -57,6 +54,9 @@ const App: Component = () => {
                             </Show>
                             <A href="/settings" class="button">
                                 Settings
+                            </A>
+                            <A href="/tags" class="button">
+                                Tags
                             </A>
                             <Show when={config.token != null}>
                                 <br />
