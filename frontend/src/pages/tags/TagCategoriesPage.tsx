@@ -1,8 +1,8 @@
 import { createSignal, type Component, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import { Tag } from "../../client/Client";
+import { hasGroup } from "../../client/Client";
 import "../../index.css";
-import { client, tagCategories, tagsStore, userInfo } from "../..";
+import { client, tagCategories, userInfo } from "../..";
 import { SimpleTable } from "solid-simple-table";
 import "solid-simple-table/dist/SimpleTable.css";
 
@@ -73,7 +73,7 @@ const TagCategoriesPage: Component = () => {
                         getRowID={(row: any) => "tagsTable." + (row as Row).name}
                     />
                 </Show>
-                <Show when={userInfo.getStore()?.groups.includes("perm:edit_tags")}>
+                <Show when={hasGroup("perm:edit_tags", userInfo.getStore()?.groups)}>
                     <h2>New Category</h2>
                     <label>Name: </label>
                     <input type="text" class="input" value={newCategoryName()} onChange={e => {
