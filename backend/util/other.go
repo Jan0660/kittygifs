@@ -28,8 +28,7 @@ var AllowedDomains = []string{
 	"tenor.com",
 	"media.tenor.com",
 	"i.imgur.com",
-	"media.discordapp.net",
-	"cdn.discordapp.com",
+	"f.jan0660.dev",
 	"autumn.revolt.chat",
 }
 
