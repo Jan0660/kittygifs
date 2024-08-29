@@ -256,6 +256,23 @@ export function applyTagImplications(tags: string[]): string[] {
     return newTags;
 };
 
+export async function loginWithToken(token: string) {
+    config.token = token;
+    await saveConfig();
+    initClient();
+    try{
+        const syncSettings = await client.sync.getSettings();
+        if (syncSettings.data.enableSyncByDefault) {
+            config.enableSync = true;
+            await saveConfig();
+        }
+    } catch (e) {
+        // ignore
+    }
+    // not using navigate because it doesn't reload the page
+    window.location.href = "/";
+}
+
 render(
     () => (
         <Router>

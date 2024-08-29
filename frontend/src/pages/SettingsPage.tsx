@@ -1,6 +1,6 @@
 import { type Component, Show, For, createSignal, createEffect } from "solid-js";
 import "../index.css";
-import { client, config, getErrorString, saveConfig, saveSettings, settings } from "..";
+import { client, config, getErrorString, saveConfig, saveSettings, settings, userInfo } from "..";
 import { invoke } from "@tauri-apps/api/tauri";
 import { GroupSelect } from "../components/GroupSelect";
 import { useNavigate } from "@solidjs/router";
@@ -221,6 +221,9 @@ const SettingsPage: Component = () => {
                 </Show>
                 <Show when={config.token != null}>
                     <h3>Account</h3>
+                    <Show when={userInfo.getStore()?.username}>
+                        <p>Logged in as {userInfo.getStore()?.username}</p>
+                    </Show>
                     <h4>Change Email</h4>
                     <div class="error">{changeEmailError() == "" ? <></> : <p>{changeEmailError()}</p>}</div>
                     <input

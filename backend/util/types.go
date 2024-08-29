@@ -20,6 +20,7 @@ type Size struct {
 
 type User struct {
 	Username     string    `json:"username" bson:"_id"`
+	LogtoId      *string   `json:"logtoId,omitempty" bson:"logtoId,omitempty"`
 	PasswordHash string    `json:"passwordHash" bson:"passwordHash"`
 	Groups       *[]string `json:"groups,omitempty" bson:"groups,omitempty"`
 	Email        *string   `json:"email,omitempty" bson:"email,omitempty"`
@@ -79,6 +80,7 @@ type Configuration struct {
 	Captcha                  *CaptchaConfiguration `json:"captcha"`
 	Smtp                     *SmtpConfiguration    `json:"smtp"`
 	ApiUrl                   string                `json:"apiUrl"`
+	Logto                    *LogtoConfiguration   `json:"logto"`
 }
 
 type CaptchaConfiguration struct {
@@ -92,6 +94,12 @@ type SmtpConfiguration struct {
 	FromName      string `json:"fromName"`
 	Username      string `json:"username"`
 	Password      string `json:"password"`
+}
+
+type LogtoConfiguration struct {
+	Endpoint  string `json:"endpoint"`
+	AppId     string `json:"appId"`
+	AppSecret string `json:"appSecret"`
 }
 
 type UserInfo struct {
