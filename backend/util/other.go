@@ -146,6 +146,22 @@ func ValidateTagCategory(category TagCategory) error {
 	return nil
 }
 
+func ValidateUsername(username string, ctx context.Context) error {
+
+	if !UsernameValidation.MatchString(username) {
+		return errors.New("invalid username")
+	}
+	// check if username exists
+	count, err := UsersCol.CountDocuments(ctx, bson.M{"_id": username})
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return errors.New("username already exists")
+	}
+	return nil
+}
+
 // GetBase64Timestamp gets a URL safe base64 encoded timestamp in UNIX seconds
 func GetBase64Timestamp() string {
 	bytes := make([]byte, 8)

@@ -130,6 +130,10 @@ const App: Component = () => {
                             component={lazy(() => import("./pages/ResetPasswordPage"))}
                         />
                         <Route
+                            path="/logto"
+                            component={lazy(() => import("./pages/LogtoPage"))}
+                        />
+                        <Route
                             path="/settings"
                             component={lazy(() => import("./pages/SettingsPage"))}
                         />

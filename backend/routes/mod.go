@@ -17,7 +17,9 @@ var HCaptchaClient *hcaptcha.Client
 type Mounting struct {
 	Normal            *gin.RouterGroup
 	Sessioned         *gin.RouterGroup
+	SessionedHandler  gin.HandlerFunc
 	Authed            *gin.RouterGroup
+	AuthedHandler     gin.HandlerFunc
 	PasswordRateLimit gin.HandlerFunc
 }
 
@@ -66,7 +68,7 @@ func RunGin(config *Configuration) error {
 			return c.ClientIP()
 		},
 	})
-	sessioned := r.Group("/", func(c *gin.Context) {
+	sessionedHandler := func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		sessionToken := c.GetHeader("x-session-token")
@@ -89,19 +91,23 @@ func RunGin(config *Configuration) error {
 		c.Set("username", session.Username)
 		c.Set("user", &user)
 		c.Next()
-	})
-	authed := sessioned.Group("/", func(c *gin.Context) {
+	}
+	sessioned := r.Group("/", sessionedHandler)
+	authedHandler := func(c *gin.Context) {
 		if _, exists := c.Get("user"); !exists {
 			c.Status(401)
 			c.Abort()
 			return
 		}
 		c.Next()
-	})
+	}
+	authed := sessioned.Group("/", authedHandler)
 	mounting := &Mounting{
 		Normal:            r.Group("/"),
 		Sessioned:         sessioned,
+		SessionedHandler:  sessionedHandler,
 		Authed:            authed,
+		AuthedHandler:     authedHandler,
 		PasswordRateLimit: passwordRL,
 	}
 	MountGifs(mounting)
@@ -109,6 +115,7 @@ func RunGin(config *Configuration) error {
 	MountNotifications(mounting)
 	MountSync(mounting)
 	MountTags(mounting)
+	MountLogto(mounting)
 
 	info := gin.H{
 		"allowSignup": config.AllowSignup,

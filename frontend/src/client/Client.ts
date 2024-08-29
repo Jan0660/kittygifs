@@ -9,6 +9,7 @@ export class KittyGifsClient {
     public notifications: KittyGifsClientNotifications;
     public sync: KittyGifsClientSync;
     public gifs: KittyGifsClientGifs;
+    public logto: KittyGifsClientLogto;
 
     constructor(baseUrl: string, token: string | null = null) {
         this._axios = new Axios({
@@ -30,6 +31,7 @@ export class KittyGifsClient {
         this.notifications = new KittyGifsClientNotifications(this);
         this.sync = new KittyGifsClientSync(this);
         this.gifs = new KittyGifsClientGifs(this);
+        this.logto = new KittyGifsClientLogto(this);
     }
 
     public async getInstanceInfo(): Promise<InstanceInfo> {
@@ -347,6 +349,26 @@ class KittyGifsClientGifs {
         return res.data;
     }
 
+}
+
+class KittyGifsClientLogto {
+    public client: KittyGifsClient;
+
+    constructor(client: KittyGifsClient) {
+        this.client = client;
+    }
+
+    public async registerAccount(props: { logtoFirstId: string, username: string }): Promise<UserSession> {
+        return (await this.client._axios.post("/logto/registerAccount", props)).data;
+    }
+
+    public async getSessionToken(token: string): Promise<string> {
+        return (await this.client._axios.get("/logto/sessionToken?token=" + encodeURIComponent(token))).data.token;
+    }
+
+    public async link(logtoFirstId: string) {
+        await this.client._axios.post("/logto/link", { logtoFirstId });
+    }
 }
 
 export type Gif = {

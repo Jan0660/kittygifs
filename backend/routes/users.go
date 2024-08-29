@@ -81,19 +81,9 @@ func MountUsers(mounting *Mounting) {
 			c.JSON(400, Error(err))
 			return
 		}
-		// validate username
-		if !UsernameValidation.MatchString(req.Username) {
-			c.JSON(400, ErrorStr("invalid username"))
-			return
-		}
-		// check if username exists
-		count, err := UsersCol.CountDocuments(ctx, bson.M{"_id": req.Username})
+		err = ValidateUsername(req.Username, ctx)
 		if err != nil {
-			c.JSON(500, Error(err))
-			return
-		}
-		if count > 0 {
-			c.JSON(400, ErrorStr("username already exists"))
+			c.JSON(400, Error(err))
 			return
 		}
 		// validate password
