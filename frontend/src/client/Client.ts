@@ -440,6 +440,10 @@ export type InstanceInfo = {
     smtp?: {
         fromAddress: string;
     },
+    logto?: {
+        endpoint: string;
+        appId: string;
+    },
 };
 
 export type Tag = {

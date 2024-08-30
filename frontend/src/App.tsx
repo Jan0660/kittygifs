@@ -1,6 +1,6 @@
 import { lazy, type Component, createResource, ErrorBoundary, Show, For } from "solid-js";
 import { Route, Routes } from "@solidjs/router";
-import { client, getErrorString, config, notificationStore } from ".";
+import { client, getErrorString, config, notificationStore, instanceInfo } from ".";
 import { A } from "@solidjs/router";
 import { Toaster } from "solid-toast";
 
@@ -15,7 +15,7 @@ export function GifViewData({ params }) {
 const App: Component = () => {
     return (
         <>
-            <Toaster position="top-center" containerStyle={{"top": "75px"}} toastOptions={{
+            <Toaster position="top-center" containerStyle={{ "top": "75px" }} toastOptions={{
                 duration: 12000,
             }} />
             <div class="navbar">
@@ -28,13 +28,22 @@ const App: Component = () => {
                     <ul class="navbar-links">
                         <li>
                             <Show when={config.token == null}>
-                                <A href="/login" class="button">
-                                    Login
-                                </A>{" "}
-                                or{" "}
-                                <A href="/signup" class="button">
-                                    Signup
-                                </A>
+                                <Show when={instanceInfo.getStore().logto} fallback={
+                                    <>
+                                        <A href="/login" class="button">
+                                            Login
+                                        </A>{" "}
+                                        <Show when={instanceInfo.getStore().allowSignup}>
+                                            or{" "}
+                                            <A href="/signup" class="button">
+                                                Signup
+                                            </A>
+                                        </Show>
+                                    </>}>
+                                    <A href="/logto" class="button">
+                                        {instanceInfo.getStore().allowSignup ? "Login/Signup" : "Login"}
+                                    </A>
+                                </Show>
                             </Show>
                             <Show when={config.token != null}>
                                 <Show when={notificationStore.getStore()}>

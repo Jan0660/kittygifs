@@ -96,6 +96,10 @@ func MountLogto(mounting *Mounting) {
 			ctx.Redirect(http.StatusTemporaryRedirect, returnUri+"?token="+token)
 			return
 		}
+		if !Config.AllowSignup {
+			ctx.Redirect(http.StatusTemporaryRedirect, returnUri+"?signupDisabled=true")
+			return
+		}
 
 		logtoFirstId := generateRandomString(16)
 		logtoFirsts[logtoFirstId] = userInfo.Sub
@@ -142,6 +146,10 @@ func MountLogto(mounting *Mounting) {
 		ctx.Status(200)
 	})
 	logto.POST("/registerAccount", func(ctx *gin.Context) {
+		if !Config.AllowSignup {
+			ctx.JSON(403, ErrorStr("signup is disabled by the server admin"))
+			return
+		}
 		type Request struct {
 			LogtoFirstId string `json:"logtoFirstId"`
 			Username     string `json:"username"`
@@ -229,7 +237,6 @@ func SignIn(logtoClient *client.LogtoClient, logtoConfig *client.LogtoConfig, st
 	codeVerifier := core.GenerateCodeVerifier()
 	codeChallenge := core.GenerateCodeChallenge(codeVerifier)
 	state := generateRandomString(12) + "|" + returnUri
-	//state := generateRandomString(12) + url.QueryEscape("|"+returnUri)
 
 	signInUri, generateSignInUriErr := core.GenerateSignInUri(&core.SignInUriGenerationOptions{
 		AuthorizationEndpoint: oidcConfig.AuthorizationEndpoint,

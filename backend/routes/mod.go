@@ -129,6 +129,12 @@ func RunGin(config *Configuration) error {
 			"fromAddress": config.Smtp.FromAddress,
 		}
 	}
+	if config.Logto != nil {
+		info["logto"] = gin.H{
+			"endpoint": config.Logto.Endpoint,
+			"appId":    config.Logto.AppId,
+		}
+	}
 	mounting.Normal.GET("/", func(c *gin.Context) {
 		c.JSON(200, info)
 	})
