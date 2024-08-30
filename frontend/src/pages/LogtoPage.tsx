@@ -1,5 +1,5 @@
-import { Component, createSignal, Show } from "solid-js";
-import { client, config, userInfo, getErrorString, notificationStore, saveConfig, loginWithToken } from "..";
+import { Component, createMemo, createSignal, Show } from "solid-js";
+import { client, config, userInfo, getErrorString, notificationStore, saveConfig, loginWithToken, instanceInfo } from "..";
 import { useNavigate, useSearchParams } from "@solidjs/router";
 import localforage from "localforage";
 
@@ -16,6 +16,7 @@ const LogtoPage: Component = () => {
         linking = true;
         client.logto.link(searchParams["logtoFirstId"]).then(() => document.location.href = "/");
     }
+    const loginOrSignup = createMemo(() => instanceInfo.getStore().allowSignup ? "Login/Signup" : "Login")
     return (
         <>
             <div class="content-header">
@@ -26,15 +27,18 @@ const LogtoPage: Component = () => {
                     {error() == "" ? <></> : <p>{error()}</p>}
                 </div>
                 <br />
-                <Show when={!searchParams["token"] && !searchParams["logtoFirstId"]}>
+                <Show when={!searchParams["token"] && !searchParams["logtoFirstId"] && !searchParams["signupDisabled"]}>
                     <button
                         class="button confirm"
                         onClick={async () => {
                             window.location.href = config.apiUrl + "/logto/sign-in?return=" + encodeURIComponent(window.location.href);
                         }}
                     >
-                        {config.token ? "Link this account with Logto" : "Login/Signup"}
+                        {config.token ? "Link this account with Logto" : loginOrSignup()}
                     </button>
+                </Show>
+                <Show when={!searchParams["token"] && !searchParams["logtoFirstId"] && searchParams["signupDisabled"]}>
+                    <p>Signing up is disabled by the kittygifs instance admin.</p>
                 </Show>
                 <Show when={searchParams["token"] && !searchParams["logtoFirstId"]}>
                     <p>Please wait...</p>

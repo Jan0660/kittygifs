@@ -1,5 +1,5 @@
 import { Component, Show, createSignal } from "solid-js";
-import { client, config, getErrorString, saveConfig } from "..";
+import { client, config, getErrorString, instanceInfo, saveConfig } from "..";
 import { InstanceInfo } from "../client/Client";
 import HCaptcha from "solid-hcaptcha";
 
@@ -10,8 +10,7 @@ const SignupPage: Component = () => {
     const [passwordConfirm, setPasswordConfirm] = createSignal("");
     const [consent, setConsent] = createSignal(false);
     const [email, setEmail] = createSignal(null as string | null);
-    const [instanceInfo, setInstanceInfo] = createSignal(null as InstanceInfo | null);
-    client.getInstanceInfo().then(setInstanceInfo);
+    instanceInfo.getSave(true);
     const [captcha, setCaptcha] = createSignal(null as string | null);
     return (
         <>
@@ -19,15 +18,15 @@ const SignupPage: Component = () => {
                 <h1>Signup</h1>
             </div>
             <div class="content-content">
-                <Show when={instanceInfo() === null}>
+                <Show when={instanceInfo.getStore() === null}>
                     <p>Checking signup requirements...</p>
                 </Show>
-                <Show when={instanceInfo() !== null && !instanceInfo()?.allowSignup}>
+                <Show when={instanceInfo.getStore() !== null && !instanceInfo.getStore()?.allowSignup}>
                     <p>Signup is disabled on this instance.</p>
                 </Show>
-                <Show when={instanceInfo() !== null && instanceInfo()?.allowSignup}>
+                <Show when={instanceInfo.getStore() !== null && instanceInfo.getStore()?.allowSignup}>
                 <div class="error">{error() == "" ? <></> : <p>{error()}</p>}</div>
-                <Show when={instanceInfo()?.smtp != null}>
+                <Show when={instanceInfo.getStore()?.smtp != null}>
                     <h2>Email</h2>
                     <input
                         type="email"
@@ -87,9 +86,9 @@ const SignupPage: Component = () => {
                     .
                 </label>
                 <br />
-                <Show when={instanceInfo()?.captcha != null}>
+                <Show when={instanceInfo.getStore()?.captcha != null}>
                     <HCaptcha
-                        sitekey={instanceInfo().captcha.siteKey}
+                        sitekey={instanceInfo.getStore().captcha.siteKey}
                         onVerify={token => {
                             setCaptcha(token);
                         }}
@@ -118,11 +117,11 @@ const SignupPage: Component = () => {
                             setError(getErrorString(e));
                         }
                     }}
-                    disabled={!(consent() && (captcha() != null || instanceInfo()?.captcha == null))}
+                    disabled={!(consent() && (captcha() != null || instanceInfo.getStore()?.captcha == null))}
                 >
                     Sign up
                 </button>
-                <Show when={instanceInfo()?.smtp != null}>
+                <Show when={instanceInfo.getStore()?.smtp != null}>
                     <p>
                         If you didn't receive a verification email, fill out the email field, finish the captcha and{" "}
                         use the button below to resend the verification email.
@@ -137,7 +136,7 @@ const SignupPage: Component = () => {
                                 setError(getErrorString(e));
                             }
                         }}
-                        disabled={!(consent() && (captcha() != null || instanceInfo()?.captcha == null))}
+                        disabled={!(consent() && (captcha() != null || instanceInfo.getStore()?.captcha == null))}
                     >
                         Resend verification email
                     </button>

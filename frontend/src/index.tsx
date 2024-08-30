@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { Router } from "@solidjs/router";
 import App from "./App";
-import { KittyGifsClient, Tag, TagCategory, UserInfo } from "./client/Client";
+import { InstanceInfo, KittyGifsClient, Tag, TagCategory, UserInfo } from "./client/Client";
 import localforage from "localforage";
 import { AxiosError } from "axios";
 import "./skybord-components.css";
@@ -220,6 +220,12 @@ export const tagCategories = new Store<TagCategory[]>("kittygifs.tagCategories",
     return await client.tags.categories.getAll();
 });
 await tagCategories.load();
+
+export const instanceInfo = new Store<InstanceInfo>("kittygifs.instanceInfo", 30 * 60 * 1000, async () => {
+    return await client.getInstanceInfo();
+});
+instanceInfo.set({allowSignup: false});
+await instanceInfo.load();
 
 export function getErrorString(e: Error): string {
     if (e instanceof AxiosError) {
