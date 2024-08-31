@@ -443,6 +443,7 @@ export type InstanceInfo = {
     logto?: {
         endpoint: string;
         appId: string;
+        allowLegacySignup: boolean;
     },
 };
 

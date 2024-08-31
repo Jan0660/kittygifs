@@ -2,6 +2,7 @@ import { Component, Show, createSignal } from "solid-js";
 import { client, config, getErrorString, instanceInfo, saveConfig } from "..";
 import { InstanceInfo } from "../client/Client";
 import HCaptcha from "solid-hcaptcha";
+import { A } from "@solidjs/router";
 
 const SignupPage: Component = () => {
     const [error, setError] = createSignal("");
@@ -22,7 +23,10 @@ const SignupPage: Component = () => {
                     <p>Checking signup requirements...</p>
                 </Show>
                 <Show when={instanceInfo.getStore() !== null && !instanceInfo.getStore()?.allowSignup}>
-                    <p>Signup is disabled on this instance.</p>
+                    <p>Signup is disabled by the site's administrator.</p>
+                </Show>
+                <Show when={instanceInfo.getStore() !== null && instanceInfo.getStore()?.allowSignup && !instanceInfo.getStore().logto?.allowLegacySignup}>
+                    <p>Signup using username and password is disabled by the site's administrator. <A href="/logto" class="link">Sign up using Logto instead.</A></p>
                 </Show>
                 <Show when={instanceInfo.getStore() !== null && instanceInfo.getStore()?.allowSignup}>
                 <div class="error">{error() == "" ? <></> : <p>{error()}</p>}</div>

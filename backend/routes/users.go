@@ -66,6 +66,9 @@ func MountUsers(mounting *Mounting) {
 		if !Config.AllowSignup {
 			c.JSON(403, ErrorStr("signup is disabled by the server admin"))
 			return
+		} else if Config.Logto != nil && Config.Logto.AllowLegacySignup == false {
+			c.JSON(403, ErrorStr("signup is enabled but legacy signup is not, you must use sign up using logto"))
+			return
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), 16*time.Second)
 		defer cancel()

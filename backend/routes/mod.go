@@ -131,8 +131,9 @@ func RunGin(config *Configuration) error {
 	}
 	if config.Logto != nil {
 		info["logto"] = gin.H{
-			"endpoint": config.Logto.Endpoint,
-			"appId":    config.Logto.AppId,
+			"endpoint":          config.Logto.Endpoint,
+			"appId":             config.Logto.AppId,
+			"allowLegacySignup": config.Logto.AllowLegacySignup,
 		}
 	}
 	mounting.Normal.GET("/", func(c *gin.Context) {
