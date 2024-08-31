@@ -78,7 +78,6 @@ type Configuration struct {
 	AccessControlAllowOrigin *[]string             `json:"accessControlAllowOrigin"`
 	IssueDiscordWebhook      *string               `json:"issueDiscordWebhook"`
 	Captcha                  *CaptchaConfiguration `json:"captcha"`
-	Smtp                     *SmtpConfiguration    `json:"smtp"`
 	ApiUrl                   string                `json:"apiUrl"`
 	Logto                    *LogtoConfiguration   `json:"logto"`
 }
@@ -86,14 +85,6 @@ type Configuration struct {
 type CaptchaConfiguration struct {
 	SiteKey   string `json:"siteKey"`
 	SecretKey string `json:"secretKey"`
-}
-
-type SmtpConfiguration struct {
-	ServerAddress string `json:"serverAddress"`
-	FromAddress   string `json:"fromAddress"`
-	FromName      string `json:"fromName"`
-	Username      string `json:"username"`
-	Password      string `json:"password"`
 }
 
 type LogtoConfiguration struct {

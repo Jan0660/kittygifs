@@ -71,7 +71,6 @@ Request body:
   (lowercase, numbers and underscore, 3 to 20 characters)
 - `password`: string - must be at least 8 characters long
 - `captcha`?: string - the captcha token, required if captcha is enabled
-- `email`?: string - the email address, required if SMTP is enabled
 
 Responses:
 
@@ -97,42 +96,6 @@ Responses:
 - 401: invalid username or password, account not verified ([Error](#error))
 - 500: [Error](#error)
 - 200: [UserSession](#usersession)
-
-#### POST /users/resendVerificationEmail
-
-Resends the verification email for the specified user.
-
-Request body:
-
-- `email`: string
-- `captcha`?: string - the captcha token, required if captcha is enabled
-
-Responses:
-
-- 500: smtp not configured ([Error](#error))
-- 500: [Error](#error)
-- 400: invalid request, invalid captcha, email not found, account already verified ([Error](#error))
-- 200
-
-#### GET /users/verify/:token
-
-Verifies the specified user.
-
-Responses:
-
-- 500: [Error](#error)
-- 400: invalid token (string)
-- 200 - the user is now verified (string)
-
-#### GET /users/verifyEmailChange/:token
-
-Verifies the email change for the specified user.
-
-Responses:
-
-- 500: [Error](#error)
-- 400: invalid token (string)
-- 200 - the email is now changed (string)
 
 #### GET /tags
 
@@ -268,23 +231,6 @@ Responses:
 
 - 500: [Error](#error)
 - 400: invalid request ([Error](#error))
-- 200
-
-#### POST /users/changeEmail
-
-Requests an email change.
-
-Request body:
-
-- `email`: string
-- `password`: string
-- `captcha`?: string - the captcha token, required if captcha is enabled
-
-Responses:
-
-- 500: smtp not configured ([Error](#error))
-- 500: [Error](#error)
-- 400: invalid request, invalid captcha ([Error](#error))
 - 200
 
 #### POST /users/resetPassword
@@ -578,9 +524,6 @@ export type InstanceInfo = {
     allowSignup: boolean
     captcha?: {
         siteKey: string;
-    },
-    smtp?: {
-        fromAddress: string;
     },
     logto?: {
         endpoint: string;

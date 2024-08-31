@@ -69,23 +69,6 @@ Site key and secret key for hCaptcha.
 }
 ```
 
-### `smtp`
-
-SMTP server to use for sending emails. Requires `apiUrl` to be set.
-
-```json
-{
-  // ...
-  "smtp": {
-    "serverAddress": "mailserver:465",
-    "fromAddress": "noreply@jan0660.dev",
-    "fromName": "kittygifs",
-    "username": "noreply@jan0660.dev",
-    "password": ""
-  }
-}
-```
-
 ### `logto`
 
 Note that when using Logto, legacy signup (username and password) is disabled by default.
