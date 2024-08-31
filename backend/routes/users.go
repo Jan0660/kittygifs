@@ -138,10 +138,6 @@ func MountUsers(mounting *Mounting) {
 			c.JSON(401, ErrorStr("invalid username"))
 			return
 		}
-		if user.Verification != nil {
-			c.JSON(401, ErrorStr("account not verified"))
-			return
-		}
 		if !CheckPassword(c, request.Password, user.PasswordHash) {
 			return
 		}

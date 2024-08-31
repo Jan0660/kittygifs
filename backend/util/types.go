@@ -23,8 +23,6 @@ type User struct {
 	LogtoId      *string   `json:"logtoId,omitempty" bson:"logtoId,omitempty"`
 	PasswordHash string    `json:"passwordHash" bson:"passwordHash"`
 	Groups       *[]string `json:"groups,omitempty" bson:"groups,omitempty"`
-	Email        *string   `json:"email,omitempty" bson:"email,omitempty"`
-	Verification *string   `json:"verification,omitempty" bson:"verification,omitempty"`
 }
 
 // HasGroups Returns true if user has all the specified groups or is admin, otherwise returns false
@@ -102,17 +100,6 @@ type UserInfo struct {
 
 type UserStats struct {
 	Uploads int64 `json:"uploads"`
-}
-
-type MiscBase struct {
-	Type string `json:"type" bson:"type"`
-}
-
-type MiscEmailChange struct {
-	MiscBase `bson:",inline"`
-	Username string `json:"username" bson:"username"`
-	Email    string `json:"email" bson:"email"`
-	Token    string `json:"token" bson:"token"`
 }
 
 type Tag struct {

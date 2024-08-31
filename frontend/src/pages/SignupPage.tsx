@@ -10,7 +10,6 @@ const SignupPage: Component = () => {
     const [password, setPassword] = createSignal("");
     const [passwordConfirm, setPasswordConfirm] = createSignal("");
     const [consent, setConsent] = createSignal(false);
-    const [email, setEmail] = createSignal(null as string | null);
     instanceInfo.getSave(true);
     const [captcha, setCaptcha] = createSignal(null as string | null);
     return (
@@ -30,17 +29,6 @@ const SignupPage: Component = () => {
                 </Show>
                 <Show when={instanceInfo.getStore() !== null && instanceInfo.getStore()?.allowSignup}>
                 <div class="error">{error() == "" ? <></> : <p>{error()}</p>}</div>
-                <Show when={instanceInfo.getStore()?.smtp != null}>
-                    <h2>Email</h2>
-                    <input
-                        type="email"
-                        value={email()}
-                        onInput={e => {
-                            setEmail(e.currentTarget.value);
-                        }}
-                        class="input"
-                    />
-                </Show>
                 <h2>Username</h2>
                 <input
                     type="text"
@@ -109,13 +97,11 @@ const SignupPage: Component = () => {
                                 setError("Passwords do not match!");
                                 return;
                             }
-                            const result = await client.users.post(username(), password(), captcha(), email());
+                            const result = await client.users.post(username(), password(), captcha());
                             if (result.type == "created") {
                                 config.token = result.session.token;
                                 await saveConfig();
                                 window.location.href = "/";
-                            } else if (result.type == "verificationSent") {
-                                setError("Verification email sent! Check your inbox, and your spam folder.");
                             }
                         } catch (e) {
                             setError(getErrorString(e));
@@ -125,26 +111,6 @@ const SignupPage: Component = () => {
                 >
                     Sign up
                 </button>
-                <Show when={instanceInfo.getStore()?.smtp != null}>
-                    <p>
-                        If you didn't receive a verification email, fill out the email field, finish the captcha and{" "}
-                        use the button below to resend the verification email.
-                    </p>
-                    <button
-                        class="button confirm"
-                        onClick={async () => {
-                            try {
-                                await client.users.resendVerificationEmail(email(), captcha());
-                                setError("Verification email sent! Check your inbox, and your spam folder.");
-                            } catch (e) {
-                                setError(getErrorString(e));
-                            }
-                        }}
-                        disabled={!(consent() && (captcha() != null || instanceInfo.getStore()?.captcha == null))}
-                    >
-                        Resend verification email
-                    </button>
-                </Show>
                 </Show>
             </div>
         </>

@@ -53,17 +53,14 @@ class KittyGifsClientUsers {
         username: string,
         password: string,
         captcha?: string,
-        email?: string,
         signal?: AbortSignal,
     ): Promise<{
         type: "created",
         session: UserSession,
-    } | {
-        type: "verificationSent",
     }> {
         const res = await this.client._axios.post(
             "/users",
-            { username: username, password: password, captcha: captcha, email: email },
+            { username: username, password: password, captcha: captcha },
             { signal },
         );
         return res.data;
@@ -112,14 +109,6 @@ class KittyGifsClientUsers {
             note: string,
         }): Promise<void> {
         await this.client._axios.post("/users/gdprRequest", props);
-    }
-
-    public async changeEmail(props: { email: string, password: string, captcha?: string }) {
-        await this.client._axios.post("/users/changeEmail", props);
-    }
-
-    public async resendVerificationEmail(email: string, captcha?: string) {
-        await this.client._axios.post("/users/resendVerificationEmail", { email, captcha });
     }
 }
 
@@ -436,9 +425,6 @@ export type InstanceInfo = {
     allowSignup: boolean
     captcha?: {
         siteKey: string;
-    },
-    smtp?: {
-        fromAddress: string;
     },
     logto?: {
         endpoint: string;

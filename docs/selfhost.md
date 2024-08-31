@@ -36,7 +36,7 @@ Required. Address to listen on.
 
 ### `apiUrl`
 
-Required by `smtp`. URL of the API, used in the verification email. Must not have a trailing slash.
+Required by `logto`. URL of the API, used in redirects from Logto.
 
 ### `allowSignup`
 
