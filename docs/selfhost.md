@@ -1,6 +1,6 @@
 # Selfhosting
 
-1. Install Go 1.20 or higher
+1. Install Go 1.21 or higher
 2. Clone this repo
 3. `cd backend/`
 4. `go build -ldflags "-s -w"` (the flags remove debug info and reduce binary size)
