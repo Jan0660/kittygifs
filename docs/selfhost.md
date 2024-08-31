@@ -85,3 +85,19 @@ SMTP server to use for sending emails. Requires `apiUrl` to be set.
   }
 }
 ```
+
+### `logto`
+
+Note that when using Logto, legacy signup (username and password) is disabled by default.
+
+```json
+{
+  // ...
+ "logto": {
+    "endpoint":           "https://logto.jan0660.dev/",
+    "appId":              "",
+    "appSecret":          "",
+    "allowLegacySignup":  false
+  }
+}
+```

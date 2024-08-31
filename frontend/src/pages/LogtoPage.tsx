@@ -1,6 +1,6 @@
 import { Component, createMemo, createSignal, Show } from "solid-js";
 import { client, config, userInfo, getErrorString, notificationStore, saveConfig, loginWithToken, instanceInfo } from "..";
-import { useNavigate, useSearchParams } from "@solidjs/router";
+import { A, useNavigate, useSearchParams } from "@solidjs/router";
 import localforage from "localforage";
 
 const LogtoPage: Component = () => {
@@ -36,6 +36,10 @@ const LogtoPage: Component = () => {
                     >
                         {config.token ? "Link this account with Logto" : loginOrSignup()}
                     </button>
+                    <p><A href="/login" class="link">Log in with password instead.</A></p>
+                    <Show when={instanceInfo.getStore().allowSignup && instanceInfo.getStore().logto?.allowLegacySignup}>
+                        <p><A href="/signup" class="link">Sign up with username and password instead.</A></p>
+                    </Show>
                 </Show>
                 <Show when={!searchParams["token"] && !searchParams["logtoFirstId"] && searchParams["signupDisabled"]}>
                     <p>Signing up is disabled by the kittygifs instance admin.</p>

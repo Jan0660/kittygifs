@@ -97,9 +97,10 @@ type SmtpConfiguration struct {
 }
 
 type LogtoConfiguration struct {
-	Endpoint  string `json:"endpoint"`
-	AppId     string `json:"appId"`
-	AppSecret string `json:"appSecret"`
+	Endpoint          string `json:"endpoint"`
+	AppId             string `json:"appId"`
+	AppSecret         string `json:"appSecret"`
+	AllowLegacySignup bool   `json:"AllowLegacySignup"`
 }
 
 type UserInfo struct {
