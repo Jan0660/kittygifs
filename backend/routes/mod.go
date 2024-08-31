@@ -124,11 +124,6 @@ func RunGin(config *Configuration) error {
 		HCaptchaClient = hcaptcha.New(config.Captcha.SecretKey, config.Captcha.SiteKey)
 		info["captcha"] = gin.H{"siteKey": config.Captcha.SiteKey}
 	}
-	if config.Smtp != nil {
-		info["smtp"] = gin.H{
-			"fromAddress": config.Smtp.FromAddress,
-		}
-	}
 	if config.Logto != nil {
 		info["logto"] = gin.H{
 			"endpoint":          config.Logto.Endpoint,

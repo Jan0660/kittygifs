@@ -1,5 +1,0 @@
-Hello {{.User.Username}},
-
-your kittygifs verification link is: {{.ApiUrl}}/users/verify/{{.User.Verification}}
-
-If you did not request this, please ignore this email.
