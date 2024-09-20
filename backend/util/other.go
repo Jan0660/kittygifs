@@ -30,6 +30,7 @@ var AllowedDomains = []string{
 	"i.imgur.com",
 	"f.jan0660.dev",
 	"autumn.revolt.chat",
+	"cdn.skybord.xyz"
 }
 
 // ValidateGif Returns nil if gif is valid, otherwise returns an error
