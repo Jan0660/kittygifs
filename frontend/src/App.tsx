@@ -1,8 +1,19 @@
-import { lazy, type Component, createResource, ErrorBoundary, Show, For } from "solid-js";
+import {
+    lazy,
+    type Component,
+    createResource,
+    ErrorBoundary,
+    Show,
+    For,
+    createSignal,
+    onMount,
+    onCleanup,
+} from "solid-js";
 import { Route, Routes } from "@solidjs/router";
-import { client, getErrorString, config, notificationStore, instanceInfo } from ".";
+import { client, getErrorString } from ".";
 import { A } from "@solidjs/router";
 import { Toaster } from "solid-toast";
+import NavbarLinks from "./components/NavbarLinks";
 
 export function GifViewData({ params }) {
     const fetchGif = async () => {
@@ -13,6 +24,32 @@ export function GifViewData({ params }) {
 }
 
 const App: Component = () => {
+    const [collapsed, setCollapsed] = createSignal(false);
+
+    const onNavbarToggle = () => {
+        setCollapsed(!collapsed());
+    };
+
+    onMount(() => {
+        const collapse = (evt: Event) => {
+            if (window.innerWidth > 1300) return;
+            if (
+                (evt.target as Element)?.closest(".side-contents") ||
+                (evt.target as Element)?.closest(".navbar-content") ||
+                (evt.target as Element)?.closest("svg")
+            )
+                return;
+
+            setCollapsed(true);
+        };
+
+        window.addEventListener("click", collapse);
+
+        onCleanup(() => {
+            window.removeEventListener("click", collapse);
+        });
+    });
+
     return (
         <>
             <Toaster
@@ -24,67 +61,21 @@ const App: Component = () => {
             />
             <div class="navbar">
                 <div class="navbar-content">
+                    <button class="button navbar-toggle" onClick={onNavbarToggle}>
+                        <Show when={collapsed()}>☰</Show>
+                        <Show when={!collapsed()}>←</Show>
+                    </button>
                     <span class="site-name">
                         <A href="/" class="link">
                             kitties!!
                         </A>
                     </span>
-                    <ul class="navbar-links">
-                        <li>
-                            <Show when={config.token == null}>
-                                <Show
-                                    when={instanceInfo.getStore().logto}
-                                    fallback={
-                                        <>
-                                            <A href="/login" class="button">
-                                                Login
-                                            </A>{" "}
-                                            <Show when={instanceInfo.getStore().allowSignup}>
-                                                or{" "}
-                                                <A href="/signup" class="button">
-                                                    Signup
-                                                </A>
-                                            </Show>
-                                        </>
-                                    }
-                                >
-                                    <A href="/logto" class="button">
-                                        {instanceInfo.getStore().allowSignup
-                                            ? "Login/Signup"
-                                            : "Login"}
-                                    </A>
-                                </Show>
-                            </Show>
-                            <Show when={config.token != null}>
-                                <Show when={notificationStore.getStore()}>
-                                    <A href="/notifications" class="button">
-                                        Notifications ({notificationStore.getStore()})
-                                    </A>
-                                </Show>
-                                <A href="/gifs/post" class="button">
-                                    Post
-                                </A>
-                                <A href="/resetPassword" class="button">
-                                    Reset Password
-                                </A>
-                                <A href="/logout" class="button">
-                                    Log out
-                                </A>
-                            </Show>
-                            <A href="/settings" class="button">
-                                Settings
-                            </A>
-                            <A href="/tags" class="button">
-                                Tags
-                            </A>
-                            <Show when={config.token != null}>
-                                <br />
-                            </Show>
-                        </li>
-                    </ul>
+                    <NavbarLinks />
                 </div>
             </div>
-            <div class="side-contents collapsed">AAAA</div>
+            <div class={`side-contents ${collapsed() ? "collapsed" : ""}`}>
+                <NavbarLinks />
+            </div>
             <ErrorBoundary
                 fallback={e => {
                     console.error(e);

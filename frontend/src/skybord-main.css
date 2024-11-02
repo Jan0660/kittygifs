@@ -83,7 +83,7 @@ body {
     font-size: larger;
 }
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 750px) {
     .navbar-links {
         display: none;
     }
@@ -140,10 +140,6 @@ h3 {
 
     .content-header h1 {
         font-size: xx-large;
-    }
-
-    .side-contents+.content .content-header {
-        padding-top: 10px;
     }
 }
 
@@ -428,4 +424,32 @@ h3 {
     width: 100%;
     border: 1px solid var(--foreground-secondary);
     border-radius: 8px;
+}
+
+/* Stuff so that navbar works on mobile and sidebar only show on mobile */
+
+.side-contents .navbar-links {
+    float: none;
+}
+
+.side-contents .navbar-links li {
+    width: 100%;
+}
+
+@media screen and (min-width: 750px) {
+    /* Hide mobile navbar on pc */
+    .side-contents {
+        display: none;
+    }
+
+    .navbar-toggle {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    /* Force show navbar links on mobile */
+    .side-contents .navbar-links {
+        display: inherit;
+    }
 }

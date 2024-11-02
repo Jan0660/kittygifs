@@ -7,7 +7,7 @@ import { AxiosError } from "axios";
 import "./skybord-components.css";
 import "./skybord-main.css";
 import { Accessor, createSignal } from "solid-js";
-import { emit, listen } from '@tauri-apps/api/event'
+import { emit, listen } from "@tauri-apps/api/event";
 import toast from "solid-toast";
 
 interface Config {
@@ -98,17 +98,17 @@ export const saveSettings = async (doNotSync?: boolean) => {
             }
         }, 1000);
     }
-}
+};
 
 globalThis.settings = settings;
 globalThis.saveSettings = saveSettings;
 
 if (window.__TAURI_IPC__ != null) {
-    listen("configChanged", (event) => {
+    listen("configChanged", event => {
         // @ts-ignore
         config = event.payload;
     });
-    listen("settingsChanged", (event) => {
+    listen("settingsChanged", event => {
         // @ts-ignore
         settings = event.payload;
     });
@@ -121,7 +121,11 @@ export const initClient = () => {
 };
 
 // if sync enabled, and token present, and settings not checked in the last 10m, check for new settings
-if (config.enableSync && config.token != null && (settings.checkedTimestamp ?? 0) < Date.now() - 10 * 60 * 1000) {
+if (
+    config.enableSync &&
+    config.token != null &&
+    (settings.checkedTimestamp ?? 0) < Date.now() - 10 * 60 * 1000
+) {
     client.sync.getSettings().then(async settingsSynced => {
         if (settingsSynced.data.timestamp > settings.data.timestamp) {
             settings = settingsSynced;
@@ -181,7 +185,7 @@ class Store<T> extends StoredStore<T> {
         this.lastFetch = Date.now();
     }
     async save() {
-        await localforage.setItem(this.storeKey, {store: this.store, lastFetch: this.lastFetch});
+        await localforage.setItem(this.storeKey, { store: this.store, lastFetch: this.lastFetch });
     }
     async setSave(store: T) {
         this.set(store);
@@ -195,12 +199,16 @@ class Store<T> extends StoredStore<T> {
     }
 }
 
-export const notificationStore = new Store<number>("kittygifs.notificationsCount", 5 * 60 * 1000, async () => {
-    if (config.token == null) {
-        return 0;
-    }
-    return await client.notifications.getCount();
-});
+export const notificationStore = new Store<number>(
+    "kittygifs.notificationsCount",
+    5 * 60 * 1000,
+    async () => {
+        if (config.token == null) {
+            return 0;
+        }
+        return await client.notifications.getCount();
+    },
+);
 await notificationStore.load();
 
 export const userInfo = new Store<UserInfo>("kittygifs.userInfo", 20 * 60 * 1000, async () => {
@@ -216,15 +224,23 @@ export const tagsStore = new Store<Tag[]>("kittygifs.tags", 20 * 60 * 1000, asyn
 });
 await tagsStore.load();
 
-export const tagCategories = new Store<TagCategory[]>("kittygifs.tagCategories", 20 * 60 * 1000, async () => {
-    return await client.tags.categories.getAll();
-});
+export const tagCategories = new Store<TagCategory[]>(
+    "kittygifs.tagCategories",
+    20 * 60 * 1000,
+    async () => {
+        return await client.tags.categories.getAll();
+    },
+);
 await tagCategories.load();
 
-export const instanceInfo = new Store<InstanceInfo>("kittygifs.instanceInfo", 30 * 60 * 1000, async () => {
-    return await client.getInstanceInfo();
-});
-instanceInfo.set({allowSignup: false});
+export const instanceInfo = new Store<InstanceInfo>(
+    "kittygifs.instanceInfo",
+    30 * 60 * 1000,
+    async () => {
+        return await client.getInstanceInfo();
+    },
+);
+instanceInfo.set({ allowSignup: false });
 await instanceInfo.load();
 
 export function getErrorString(e: Error): string {
@@ -244,7 +260,7 @@ export function toastSave(promise: Promise<any>) {
         loading: "Saving...",
         success: "Saved!",
         error: (e: Error) => "Failed to save: " + getErrorString(e),
-    })
+    });
 }
 
 export function applyTagImplications(tags: string[]): string[] {
@@ -260,13 +276,13 @@ export function applyTagImplications(tags: string[]): string[] {
         }
     }
     return newTags;
-};
+}
 
 export async function loginWithToken(token: string) {
     config.token = token;
     await saveConfig();
     initClient();
-    try{
+    try {
         const syncSettings = await client.sync.getSettings();
         if (syncSettings.data.enableSyncByDefault) {
             config.enableSync = true;
