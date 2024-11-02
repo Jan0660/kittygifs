@@ -342,71 +342,77 @@ h3 {
 
 /* The sidebar menu */
 .side-contents {
-    height: 100%;
-    width: 160px;
+    height: 78%;
+    width: 300px;
     position: fixed;
     z-index: 1;
     top: 0;
-    left: calc((100% - 1200px)/2);
-    margin-right: 0;
-    background-color: var(--background-secondary);
+    left: 5px;
+    background: rgba(26, 26, 26, 0.8);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
     overflow-x: hidden;
     padding: 20px;
-    padding-top: 80px;
-    border-right: 1px solid var(--foreground-border);
-}
-
-.side-contents * {
-    padding: 6px;
-}
-
-.side-contents a {
+    margin: 100px 10px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--foreground-border);
+  }
+  
+  .side-contents > *{
+    margin-bottom: 10px;
+  }
+  
+  .side-contents a {
     color: var(--foreground-primary);
     display: block;
     padding: 6px;
-    margin: none;
+    margin: 0;
     text-decoration: none;
     transition: filter .4s;
-}
-
-.side-contents a:hover {
+  }
+  
+  .side-contents a:hover {
     filter: brightness(130%);
-}
-
-/* The content will move only if there is a side contents.*/
-.side-contents+.content {
-    margin-left: calc((100% - 800px)/2);
-}
-
-@media only screen and (max-width: 1300px) {
-    .side-contents {
-        height: max-content;
-        min-width: 100%;
-        max-width: 100%;
-        position: relative;
-        z-index: 1;
-        margin: auto;
-        padding: none;
-        background-color: var(--background-primary);
-        overflow-x: hidden;
-        padding-top: 80px;
-        left: 0;
-    }
-
+  }
+  
+  .side-contents a.active {
+    font-weight: bold;
+    color: var(--background-primary);
+    background-color: var(--foreground-primary);
+  }
+  
+  .content {
+    transition: margin 0.2s;
+  }
+  
+  .side-contents.collapsed+.content {
+    margin: auto;
+  }
+  
+  @media only screen and (max-width: 1300px) {
+  
     .side-contents a {
-        color: var(--foreground-primary);
-        display: block;
-        font-size: larger;
-        text-decoration: none;
-        transition: filter .4s;
-    }
-
-
-    .side-contents+.content {
-        margin: auto;
-        /* small screen support soon */
+      color: var(--foreground-primary);
+      display: block;
+      font-size: larger;
+      text-decoration: none;
+      transition: filter .4s;
     }
 }
+  
+  .side-contents {
+    transition: transform 0.2s;
+  }
+  
+  .side-contents.collapsed {
+  /*  Move element out of screen*/
+    transform: translateX(-120%);
+  }
+  
+  .side-contents.collapsed .button {
+  display: none;
+  }
+  
 
 .tag {
     background-color: var(--background-tertiary);

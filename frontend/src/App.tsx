@@ -15,9 +15,13 @@ export function GifViewData({ params }) {
 const App: Component = () => {
     return (
         <>
-            <Toaster position="top-center" containerStyle={{ "top": "75px" }} toastOptions={{
-                duration: 12000,
-            }} />
+            <Toaster
+                position="top-center"
+                containerStyle={{ top: "75px" }}
+                toastOptions={{
+                    duration: 12000,
+                }}
+            />
             <div class="navbar">
                 <div class="navbar-content">
                     <span class="site-name">
@@ -28,20 +32,26 @@ const App: Component = () => {
                     <ul class="navbar-links">
                         <li>
                             <Show when={config.token == null}>
-                                <Show when={instanceInfo.getStore().logto} fallback={
-                                    <>
-                                        <A href="/login" class="button">
-                                            Login
-                                        </A>{" "}
-                                        <Show when={instanceInfo.getStore().allowSignup}>
-                                            or{" "}
-                                            <A href="/signup" class="button">
-                                                Signup
-                                            </A>
-                                        </Show>
-                                    </>}>
+                                <Show
+                                    when={instanceInfo.getStore().logto}
+                                    fallback={
+                                        <>
+                                            <A href="/login" class="button">
+                                                Login
+                                            </A>{" "}
+                                            <Show when={instanceInfo.getStore().allowSignup}>
+                                                or{" "}
+                                                <A href="/signup" class="button">
+                                                    Signup
+                                                </A>
+                                            </Show>
+                                        </>
+                                    }
+                                >
                                     <A href="/logto" class="button">
-                                        {instanceInfo.getStore().allowSignup ? "Login/Signup" : "Login"}
+                                        {instanceInfo.getStore().allowSignup
+                                            ? "Login/Signup"
+                                            : "Login"}
                                     </A>
                                 </Show>
                             </Show>
@@ -74,6 +84,7 @@ const App: Component = () => {
                     </ul>
                 </div>
             </div>
+            <div class="side-contents collapsed">AAAA</div>
             <ErrorBoundary
                 fallback={e => {
                     console.error(e);
@@ -138,10 +149,7 @@ const App: Component = () => {
                             path="/resetPassword"
                             component={lazy(() => import("./pages/ResetPasswordPage"))}
                         />
-                        <Route
-                            path="/logto"
-                            component={lazy(() => import("./pages/LogtoPage"))}
-                        />
+                        <Route path="/logto" component={lazy(() => import("./pages/LogtoPage"))} />
                         <Route
                             path="/settings"
                             component={lazy(() => import("./pages/SettingsPage"))}
@@ -160,13 +168,28 @@ const App: Component = () => {
                                 component={lazy(() => import("./pages/legal/TermsPage"))}
                             />
                         </Route>
-                        <Route path="/notifications" component={lazy(() => import("./pages/NotificationsPage"))} />
+                        <Route
+                            path="/notifications"
+                            component={lazy(() => import("./pages/NotificationsPage"))}
+                        />
                         <Route path="/tags">
-                            <Route path="/" component={lazy(() => import("./pages/tags/TagsPage"))} />
-                            <Route path="/tag/:tag" component={lazy(() => import("./pages/tags/TagPage"))} />
+                            <Route
+                                path="/"
+                                component={lazy(() => import("./pages/tags/TagsPage"))}
+                            />
+                            <Route
+                                path="/tag/:tag"
+                                component={lazy(() => import("./pages/tags/TagPage"))}
+                            />
                             <Route path="/categories">
-                                <Route path="/" component={lazy(() => import("./pages/tags/TagCategoriesPage"))} />
-                                <Route path="/category/:category" component={lazy(() => import("./pages/tags/TagCategoryPage"))} />
+                                <Route
+                                    path="/"
+                                    component={lazy(() => import("./pages/tags/TagCategoriesPage"))}
+                                />
+                                <Route
+                                    path="/category/:category"
+                                    component={lazy(() => import("./pages/tags/TagCategoryPage"))}
+                                />
                             </Route>
                         </Route>
                     </Routes>
@@ -194,7 +217,8 @@ const App: Component = () => {
                         <span>
                             <a href="/legal/privacy" class="link">
                                 Privacy Policy
-                            </a>{" | "}
+                            </a>
+                            {" | "}
                             <a href="/legal/terms" class="link">
                                 Terms of Service
                             </a>
