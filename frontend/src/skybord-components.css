@@ -7,11 +7,37 @@
     padding: 10px;
     height: auto;
     border-radius: 4px;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Adding a background to the card with the tertiary background color. */
+.card.has-img-bg {
+    padding-top: 60px;
+}
+
 .card.background {
     background: var(--background-tertiary);
+}
+
+.card.background-blur {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.card:hover .card-img-bg-proj-full,
+.card:hover .card-img-bg {
+    /* zoom in ze image */
+    transform: scale(1.05);
+}
+
+.card-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.card > *:not(.card-img-bg-proj-full):not(.card-img-bg) {
+    position: relative;
+    z-index: 1;
 }
 
 /* Lists are moved left in cards to make it appear more compact. */
@@ -50,17 +76,16 @@
     margin-top: 0.5em;
     color: var(--foreground-secondary);
 }
-
 /* BUTTONS */
 
 /* Your everyday button */
 .button {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--font-family);
     background-color: var(--background-tertiary);
     color: var(--foreground-primary);
     font-size: medium;
     box-shadow: none;
-    padding: 7px 9px;
+    padding: 5px 13px;
     border-radius: 4px;
     margin: 2px;
     border: 1px solid var(--foreground-border);
@@ -70,6 +95,10 @@
     text-decoration: none;
 }
 
+.button:hover {
+    filter: brightness(130%);
+    cursor: pointer;
+}
 
 /* This will invert the button colours to highlight it. */
 .button.selected {
@@ -85,19 +114,19 @@
 }
 
 .button.primary {
-    background-color: var(--blue);
+    background-color: var(--blue-dark);
 }
 
 .button.danger {
-    background-color: var(--red);
+    background-color: var(--red-dark);
 }
 
 .button.warn {
-    background-color: var(--yellow);
+    background-color: var(--yellow-dark);
 }
 
 .button.confirm {
-    background-color: var(--green);
+    background-color: var(--green-dark);
 }
 
 .button.hollow {
@@ -109,25 +138,19 @@
     border: none;
 }
 
-
-.button:hover {
-    border: 1px solid var(--foreground-primary);
-    filter: brightness(130%);
-    cursor: pointer;
-}
-
 .button.hollow:hover {
     border: 1px solid var(--foreground-primary);
 }
 
 .button.borderless:hover {
-    border: none
-}
-
-.button[disabled],
-.button[disabled]:hover {
-    filter: brightness(70%);
     border: none;
+}
+.button[disabled],
+.button[aria-disabled],
+.button[disabled]:hover,
+.button[aria-disabled]:hover {
+    filter: brightness(70%);
+    border: var(--foreground-border) 1px solid;
     cursor: default;
 }
 
@@ -159,17 +182,17 @@
 .input:focus {
     border: 1px solid var(--foreground-primary);
 }
-
 .input:hover {
     filter: brightness(130%);
 }
 
 .input[disabled],
-.input[disabled]:hover {
+.input[aria-disabled],
+.input[disabled]:hover,
+.input[aria-disabled]:hover {
     filter: brightness(70%);
     border: none;
 }
-
 
 /* LINK */
 /* The link is set brighter to better suit dark mode.*/
@@ -184,6 +207,19 @@
 
 .link:hover {
     text-decoration: underline;
+}
+
+.link.nocolor {
+    color: var(--foreground-primary);
+    text-decoration: none;
+}
+
+.link.nocolor:visited {
+    color: var(--foreground-primary);
+}
+
+.link.nocolor:hover {
+    text-decoration: none;
 }
 
 /* SMALL CODE */
@@ -201,6 +237,157 @@ pre {
     color: var(--foreground-primary);
 }
 
+pre code {
+    background-color: var(--background-primary);
+    padding: 0;
+    border-radius: 0;
+}
+
+/* Code block styles with highlight.js support */
+pre.hljs {
+    background: var(--background-primary) !important;
+    border: 1px solid var(--foreground-border);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    overflow-x: auto;
+    position: relative;
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", "Monaco", monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+pre.hljs[data-lang]::before {
+    content: attr(data-lang);
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: var(--background-tertiary);
+    color: var(--foreground-secondary);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+pre.hljs code {
+    background: transparent !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    font-family: inherit;
+    color: var(--foreground-primary);
+}
+
+/* Inline code */
+code:not(pre code) {
+    background-color: var(--background-secondary);
+    color: var(--foreground-primary);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", "Monaco", monospace;
+    font-size: 0.9em;
+    border: 1px solid var(--foreground-border);
+}
+
+/* Dark theme highlight.js overrides */
+.hljs {
+    color: var(--foreground-primary) !important;
+    background: var(--background-primary) !important;
+}
+
+.hljs-comment,
+.hljs-quote {
+    color: var(--foreground-secondary) !important;
+    font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name,
+.hljs-tag {
+    color: var(--purple) !important;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-section,
+.hljs-attribute,
+.hljs-literal,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-addition {
+    color: var(--green) !important;
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-variable,
+.hljs-params {
+    color: var(--blue) !important;
+}
+
+.hljs-function,
+.hljs-class,
+.hljs-title.class_,
+.hljs-title.function_ {
+    color: var(--yellow) !important;
+}
+
+.hljs-attr,
+.hljs-property {
+    color: var(--cyan) !important;
+}
+
+.hljs-deletion {
+    color: var(--red) !important;
+}
+
+.hljs-emphasis {
+    font-style: italic;
+}
+
+.hljs-strong {
+    font-weight: bold;
+}
+
+/* Copy button for code blocks */
+pre.hljs {
+    position: relative;
+}
+
+pre.hljs:hover .copy-button {
+    opacity: 1;
+}
+
+.copy-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--background-secondary);
+    border: 1px solid var(--foreground-border);
+    color: var(--foreground-primary);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, background-color 0.2s;
+    z-index: 1;
+}
+
+.copy-button:hover {
+    background: var(--background-tertiary);
+}
+
+.copy-button.copied {
+    background: var(--green-dark);
+    color: white;
+}
 
 /* QUOTE AND INFORMATION */
 .quote,
@@ -208,12 +395,17 @@ pre {
 .info p,
 .warn p,
 .success p,
-.error p {
-    background: var(--background-primary);
+.error p,
+.note p,
+.tip p,
+.important p,
+.question p,
+.danger p,
+.warning p {
     padding: 0.5em 10px;
-    border: 1px solid;
-    border-left: 5px solid;
     border-radius: 4px;
+    border: 1px solid;
+    transition: background-color 0.2s;
 }
 
 .quote {
@@ -222,25 +414,94 @@ pre {
 }
 
 .info p {
-    background-color: var(--blue);
-    border-color: #0077ff;
+    background-color: rgba(var(--blue-dark-rgb), 0.5);
+    border-color: var(--blue);
+}
+
+.info p:hover {
+    background-color: rgba(var(--blue-dark-rgb), 0.7);
 }
 
 .warn p {
-    background-color: var(--yellow);
-    border-color: #efbf00;
+    background-color: rgba(var(--orange-dark-rgb), 0.5);
+    border-color: var(--orange);
+}
+
+.warn p:hover {
+    background-color: rgba(var(--orange-dark-rgb), 0.7);
 }
 
 .error p {
-    background-color: var(--red);
-    border-color: #bc0000;
+    background-color: rgba(var(--red-dark-rgb), 0.5);
+    border-color: var(--red);
+}
+
+.error p:hover {
+    background-color: rgba(var(--red-dark-rgb), 0.7);
 }
 
 .success p {
-    background-color: var(--green);
-    border-color: #00e600;
+    background-color: rgba(var(--green-dark-rgb), 0.5);
+    border-color: var(--green);
 }
 
+.success p:hover {
+    background-color: rgba(var(--green-dark-rgb), 0.7);
+}
+
+.note p {
+    background-color: rgba(var(--cyan-dark-rgb), 0.5);
+    border-color: var(--cyan);
+}
+
+.note p:hover {
+    background-color: rgba(var(--cyan-dark-rgb), 0.7);
+}
+
+.tip p {
+    background-color: rgba(var(--green-dark-rgb), 0.5);
+    border-color: var(--green);
+}
+
+.tip p:hover {
+    background-color: rgba(var(--green-dark-rgb), 0.7);
+}
+
+.important p {
+    background-color: rgba(var(--pink-dark-rgb), 0.5);
+    border-color: var(--pink);
+}
+
+.important p:hover {
+    background-color: rgba(var(--pink-dark-rgb), 0.7);
+}
+
+.question p {
+    background-color: rgba(var(--purple-dark-rgb), 0.5);
+    border-color: var(--purple);
+}
+
+.question p:hover {
+    background-color: rgba(var(--purple-dark-rgb), 0.7);
+}
+
+.danger p {
+    background-color: rgba(var(--red-dark-rgb), 0.5);
+    border-color: var(--red);
+}
+
+.danger p:hover {
+    background-color: rgba(var(--red-dark-rgb), 0.7);
+}
+
+.warning p {
+    background-color: rgba(var(--orange-dark-rgb), 0.5);
+    border-color: var(--orange);
+}
+
+.warning p:hover {
+    background-color: rgba(var(--orange-dark-rgb), 0.7);
+}
 /* TABLE */
 .table {
     background-color: var(--background-tertiary);
@@ -254,21 +515,203 @@ td {
     padding: 5px;
 }
 
-.select, .select option {
-    color: #ddd;
-    color: var(--foreground-primary);
-    padding: 7px;
-}
 .select {
-    background-color: #222;
-    background-color: var(--background-tertiary);
-    border: 1px solid #383838;
-    border: 1px solid var(--foreground-border);
-    border-radius: 4px;
     margin: 5px;
-}
-.select option {
-    background-color: #1a1a1a;
-    background-color: var(--background-secondary);
+    padding: 7px;
+    background-color: var(--background-tertiary);
+    color: var(--foreground-primary);
     border-radius: 4px;
+    border: 1px solid var(--foreground-border);
+}
+
+.select option {
+    padding: 7px;
+    background-color: var(--background-secondary);
+    color: var(--foreground-primary);
+    border-radius: 4px;
+}
+/* Hide the default checkbox */
+input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Create a custom checkbox */
+.checkbox {
+    display: inline-block;
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background-color: var(--background-tertiary);
+    border: 2px solid var(--foreground-border);
+    border-radius: 4px;
+}
+
+/* Create the checkmark/indicator (hidden by default) */
+.checkbox::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    width: 8px;
+    height: 14px;
+    border: solid var(--background-primary);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+}
+
+/* Show the checkmark when the checkbox is checked */
+input[type="checkbox"]:checked ~ .checkbox {
+    background-color: var(--foreground-primary);
+    border-color: var(--foreground-border);
+}
+
+input[type="checkbox"]:checked ~ .checkbox::after {
+    opacity: 1;
+}
+
+/* Optional: Add some text beside the checkbox */
+label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+}
+
+label span {
+    margin-left: 8px;
+}
+
+.update-info-box {
+    position: relative;
+    background: var(--foreground-border);
+    color: var(--foreground-primary);
+    border-radius: 6px;
+    padding: 8px 14px 8px 14px;
+    min-width: 120px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    z-index: 2;
+    font-size: medium;
+    margin-top: 11px;
+    margin-left: 0;
+    display: inline-block;
+}
+
+.update-info-arrow-left {
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 20px solid var(--foreground-border);
+    z-index: 3;
+}
+
+/* DynamicSearch styles */
+.search-container {
+    position: absolute;
+    width: 200px;
+    height: 100%;
+    transition: width 0.1s ease;
+    margin-right: 20px;
+}
+/* When the input is focused, style the container */
+.search-container:has(.search-input:focus) {
+    width: 450px;
+}
+
+.search-container .search-input {
+    width: 100%;
+    transition: width 0.3s ease;
+}
+
+.search-container .search-input:focus {
+}
+.search-results,
+.search-loading,
+.search-error,
+.search-no-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--background-primary);
+    border: 1px solid var(--border);
+    border-top: none;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    max-height: 400px;
+    overflow-y: auto;
+}
+.search-results a {
+    display: block;
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s;
+}
+.search-results a:hover {
+    background: var(--background-secondary);
+}
+.search-loading,
+.search-error,
+.search-no-results {
+    padding: 10px;
+    color: var(--foreground-secondary);
+}
+.search-error {
+    color: var(--error);
+}
+
+/* Sidebar styles */
+.sidebar-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.sidebar-parent {
+    margin: 0;
+    padding: 0;
+}
+.sidebar-leaf {
+    margin: 0;
+    padding: 0;
+}
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 4px;
+    color: var(--foreground);
+    text-decoration: none;
+    font-size: 0.98em;
+    transition: background 0.15s, color 0.15s;
+    cursor: pointer;
+}
+.sidebar-link:hover,
+.sidebar-link:focus {
+    background: var(--background-secondary);
+    color: var(--accent);
+}
+.sidebar-parent-link {
+    font-weight: 600;
+}
+.sidebar-leaf-link {
+    font-weight: 400;
+}
+.sidebar-chevron {
+    margin-left: auto;
+    font-size: 0.9em;
+    color: var(--foreground-secondary);
+}
+.sidebar-children {
+    list-style: none;
+    margin: 0 0 0 12px;
+    padding: 0;
+    border-left: 2px solid var(--border);
 }
