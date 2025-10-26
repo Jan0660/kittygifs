@@ -24,7 +24,7 @@ export function GifViewData({ params }) {
 }
 
 const App: Component = () => {
-    const [collapsed, setCollapsed] = createSignal(false);
+    const [collapsed, setCollapsed] = createSignal(true);
 
     const onNavbarToggle = () => {
         setCollapsed(!collapsed());
